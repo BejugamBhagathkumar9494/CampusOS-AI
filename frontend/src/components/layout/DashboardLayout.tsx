@@ -35,24 +35,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const location = useLocation()
 
   const sidebarItems: SidebarItem[] = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'AI Assistant', path: '/ai-assistant', icon: MessageSquare },
-    { name: 'Academics', path: '/academics', icon: BookOpen },
-    { name: 'Attendance', path: '/attendance', icon: CalendarCheck },
-    { name: 'Exams', path: '/exams', icon: FileText },
-    { name: 'Assignments', path: '/assignments', icon: FileEdit },
-    { name: 'Library', path: '/library', icon: Library },
-    { name: 'Hostel', path: '/hostel', icon: Home },
-    { name: 'Transport', path: '/transport', icon: Bus },
-    { name: 'Placements', path: '/placements', icon: Briefcase },
-    { name: 'Finance', path: '/finance', icon: DollarSign },
-    { name: 'Events', path: '/events', icon: Calendar },
-    { name: 'Clubs', path: '/clubs', icon: Users },
-    { name: 'Notices', path: '/notices', icon: Bell },
-    { name: 'Research', path: '/research', icon: SearchCode },
-    { name: 'AI Insights', path: '/ai-insights', icon: Sparkles },
-    { name: 'Settings', path: '/settings', icon: Settings },
-    { name: 'Profile', path: '/profile', icon: User },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'AI Assistant', path: '/dashboard/ai-assistant', icon: MessageSquare },
+    { name: 'Academics', path: '/dashboard/academics', icon: BookOpen },
+    { name: 'Attendance', path: '/dashboard/attendance', icon: CalendarCheck },
+    { name: 'Exams', path: '/dashboard/exams', icon: FileText },
+    { name: 'Assignments', path: '/dashboard/assignments', icon: FileEdit },
+    { name: 'Library', path: '/dashboard/library', icon: Library },
+    { name: 'Hostel', path: '/dashboard/hostel', icon: Home },
+    { name: 'Transport', path: '/dashboard/transport', icon: Bus },
+    { name: 'Placements', path: '/dashboard/placements', icon: Briefcase },
+    { name: 'Finance', path: '/dashboard/finance', icon: DollarSign },
+    { name: 'Events', path: '/dashboard/events', icon: Calendar },
+    { name: 'Clubs', path: '/dashboard/clubs', icon: Users },
+    { name: 'Notices', path: '/dashboard/notices', icon: Bell },
+    { name: 'Research', path: '/dashboard/research', icon: SearchCode },
+    { name: 'AI Insights', path: '/dashboard/ai-insights', icon: Sparkles },
+    { name: 'Settings', path: '/dashboard/settings', icon: Settings },
+    { name: 'Profile', path: '/dashboard/profile', icon: User },
   ]
 
   return (
@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-500/20">
               <Sparkles className="w-6 h-6" />
             </span>
