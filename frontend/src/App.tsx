@@ -1,5 +1,5 @@
-import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import DashboardLayout from './components/layout/DashboardLayout'
 import Dashboard from './features/dashboard/Dashboard'
 import AIAssistant from './features/ai-assistant/AIAssistant'

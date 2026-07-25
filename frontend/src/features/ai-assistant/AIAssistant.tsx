@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { Send, Sparkles, HelpCircle, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { Send, Sparkles, HelpCircle } from 'lucide-react'
+import { chatWithAgent } from '../../services/api'
 
 interface Message {
   sender: 'user' | 'assistant'
@@ -16,35 +17,41 @@ export default function AIAssistant() {
     },
   ])
   const [inputValue, setInputValue] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return
+  const handleSend = async () => {
+    const query = inputValue.trim()
+    if (!query || isLoading) return
+
     const userMsg: Message = {
       sender: 'user',
-      text: inputValue,
+      text: query,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
     setMessages((prev) => [...prev, userMsg])
     setInputValue('')
+    setIsLoading(true)
 
-    // Mock API response delay
-    setTimeout(() => {
-      let botResponse = "I've searched our knowledge base. "
-      if (inputValue.toLowerCase().includes("hostel")) {
-        botResponse += "According to Section 4 of the Hostel Rulebook, late entries are permitted up to 10:30 PM. Any entrance post curfew requires warden authorization."
-      } else if (inputValue.toLowerCase().includes("attendance")) {
-        botResponse += "As per university policies, a minimum of 75% attendance is required in each course to write end-semester exams."
-      } else {
-        botResponse += "I'm processing your query with LangGraph. Let me know if you would like me to draft a study schedule or compile relevant previous exam papers."
-      }
+    try {
+      const res = await chatWithAgent(query)
       const botMsg: Message = {
         sender: 'assistant',
-        text: botResponse,
+        text: res.response,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
       setMessages((prev) => [...prev, botMsg])
-    }, 1000)
+    } catch (err) {
+      const errorMsg: Message = {
+        sender: 'assistant',
+        text: 'I ran into an issue communicating with the CampusOS agents. Please ensure the backend server is running.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }
+      setMessages((prev) => [...prev, errorMsg])
+    } finally {
+      setIsLoading(false)
+    }
   }
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-fade-in space-y-4">
@@ -75,6 +82,16 @@ export default function AIAssistant() {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-slate-900 border border-slate-800 text-slate-400 p-4 rounded-xl rounded-bl-none text-sm flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* Suggested Queries */}

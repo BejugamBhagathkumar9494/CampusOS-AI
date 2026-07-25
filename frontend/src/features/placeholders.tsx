@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
-  BookOpen, Calendar, HelpCircle, Upload, Shield, Landmark, DollarSign,
-  Bus, Info, ArrowUpRight, Search, Activity, Cpu, CheckCircle, FileText
+  BookOpen, Upload, Landmark, Bus, Info, Cpu
 } from 'lucide-react'
+
 
 // Academics Component
 export const Academics = () => (

@@ -15,6 +15,12 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from pgvector.sqlalchemy import Vector
+from sqlalchemy.ext.compiler import compiles
+
+@compiles(Vector, "sqlite")
+def compile_vector_sqlite(type_, compiler, **kw):
+    return "TEXT"
+
 
 # Association table for User <-> Role (for many-to-many if needed, or simple direct mapping)
 # For simplicity, we can do direct relationships or association tables.

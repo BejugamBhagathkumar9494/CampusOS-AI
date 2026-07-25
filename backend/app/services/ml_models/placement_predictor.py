@@ -2,7 +2,8 @@
 
 Estimates placement readiness using skills, CGPA, coding progress, and certifications.
 """
-from typing import List, Dict
+from typing import List, Dict, Any
+
 
 
 def predict_placement_readiness(

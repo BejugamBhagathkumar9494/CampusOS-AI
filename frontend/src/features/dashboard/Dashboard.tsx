@@ -1,7 +1,25 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { Sparkles, Calendar, BookOpen, Clock, AlertTriangle, ArrowUpRight } from 'lucide-react'
+import { getStudentProfile, getStudentAttendance } from '../../services/api'
 
 export default function Dashboard() {
+  const [profile, setProfile] = useState<any>(null)
+  const [attendance, setAttendance] = useState<any>(null)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const prof = await getStudentProfile()
+        setProfile(prof)
+        const att = await getStudentAttendance(prof.id)
+        setAttendance(att)
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err)
+      }
+    }
+    loadData()
+  }, [])
+
   const recommendations = [
     "Your attendance in 'Automata Theory' is at 74%. Attend tomorrow's session to cross the 75% threshold.",
     "Academic risk model predicts upcoming mid-terms for 'Discrete Math' may be difficult. Generate a practice quiz.",
@@ -21,7 +39,7 @@ export default function Dashboard() {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
-              Welcome back, <span className="gradient-text">John Doe</span>
+              Welcome back, <span className="gradient-text">{profile ? profile.user.full_name : 'John Doe'}</span>
             </h1>
             <p className="text-slate-400 text-sm max-w-xl">
               CampusOS AI has analyzed your academics, hostel status, and placement goals. Here are your personalized recommendations.
@@ -29,10 +47,10 @@ export default function Dashboard() {
           </div>
           <div className="flex gap-3">
             <span className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              GPA: 8.42
+              GPA: {profile ? profile.cgpa : '8.42'}
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              Semester V
+              Semester {profile ? (profile.current_semester === 5 ? 'V' : profile.current_semester) : 'V'}
             </span>
           </div>
         </div>
@@ -46,7 +64,8 @@ export default function Dashboard() {
             <span className="text-slate-400 text-sm">Attendance</span>
             <Calendar className="w-5 h-5 text-indigo-500" />
           </div>
-          <p className="text-2xl font-bold text-white mb-1">87.5%</p>
+          <p className="text-2xl font-bold text-white mb-1">{attendance ? `${attendance.overall_rate}%` : '87.5%'}</p>
+
           <span className="text-xs text-emerald-400">Above minimum requirement</span>
         </div>
 
