@@ -223,10 +223,10 @@ export default function LandingPage() {
 
       {/* Sticky transparent navigation */}
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-500/20">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
               <Sparkles className="w-5 h-5" />
             </span>
             <span className="font-bold text-xl tracking-tight font-sans text-white">
@@ -235,7 +235,7 @@ export default function LandingPage() {
           </Link>
 
           {/* Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-7">
+          <nav className="hidden lg:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Features</a>
             <a href="#agents" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Agents</a>
             <a href="#intelligence" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Solutions</a>
@@ -246,17 +246,17 @@ export default function LandingPage() {
 
           {/* Right Header Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-56' : 'w-40'}`}>
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
+            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-56' : 'w-44'}`}>
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search solutions..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-8 pr-3 py-1.5 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
+                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
-            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3.5 py-2">
+            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-4 py-2">
               Login
             </Link>
             <Link
