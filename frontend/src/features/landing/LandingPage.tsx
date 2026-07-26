@@ -235,25 +235,25 @@ export default function LandingPage() {
           </Link>
 
           {/* Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Features</a>
-            <a href="#agents" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Agents</a>
-            <a href="#intelligence" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Solutions</a>
-            <a href="#copilot" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Copilot</a>
-            <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">FAQ</a>
+          <nav className="hidden lg:flex items-center gap-7">
+            <a href="#features" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Features</a>
+            <a href="#agents" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Agents</a>
+            <a href="#intelligence" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Solutions</a>
+            <a href="#copilot" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Copilot</a>
+            <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Pricing</a>
+            <a href="#faq" className="text-sm font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">FAQ</a>
           </nav>
 
           {/* Right Header Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-64' : 'w-48'}`}>
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
+            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-56' : 'w-40'}`}>
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search solutions..."
+                placeholder="Search..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
+                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-8 pr-3 py-1.5 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
             <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3.5 py-2">
@@ -388,20 +388,20 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-7 drop-shadow-md">
             The AI Operating System for{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-md">
               Modern Universities
             </span>
           </h1>
 
-          {/* Subtitle (Max 650px) */}
-          <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-[650px] font-normal leading-relaxed mb-10 drop-shadow-sm">
+          {/* Subtitle (Max 620px) */}
+          <p className="text-base sm:text-lg text-slate-200 max-w-[620px] font-normal leading-relaxed mb-12 drop-shadow-sm">
             Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
           </p>
 
           {/* Call to Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-10 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
             <Link
               to="/dashboard"
               className="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5"
@@ -505,7 +505,7 @@ export default function LandingPage() {
             {institutionsList.map((inst) => (
               <div
                 key={inst.title}
-                className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/40 hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 shadow-lg hover:shadow-blue-500/15 text-center flex flex-col items-center justify-center"
+                className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-400/60 hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1.5 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 text-center flex flex-col items-center justify-center"
               >
                 <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
                   {inst.icon}
@@ -717,11 +717,11 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Section: Bento Grid */}
-      <section id="features" className="bg-slate-50 border-b border-slate-200/80 py-24 md:py-32 px-6">
+      <section id="features" className="bg-slate-50 border-b border-slate-200/80 py-20 md:py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-20">
+          <div className="text-center max-w-3xl mx-auto mb-14">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-              Unified Intelligent Campus <span className="gradient-text-blue">Bento Suite</span>
+              Enterprise AI Modules
             </h2>
             <p className="text-base text-slate-500 font-normal leading-relaxed">
               One core campus operating system integrating all functional wings of university life with machine learning, RAG, and automated pipelines.
@@ -915,11 +915,11 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Chart 1: Attendance prediction */}
-          <div className="lg:col-span-8 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[380px]">
+          <div className="lg:col-span-8 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[380px] border border-slate-200/80 shadow-md hover:shadow-lg transition-shadow">
             <div>
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="font-bold text-lg text-slate-800">Student Attendance Prediction</h3>
+                  <h3 className="font-bold text-lg text-slate-800">AI Attendance Forecast</h3>
                   <p className="text-xs text-slate-400">Predicted versus actual attendance vectors showing upcoming midterm eligibility drops.</p>
                 </div>
                 <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">Live Forecast</span>
@@ -949,9 +949,9 @@ export default function LandingPage() {
           </div>
 
           {/* Chart 2: Resource Utilization Pie chart */}
-          <div className="lg:col-span-4 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[380px]">
+          <div className="lg:col-span-4 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[380px] border border-slate-200/80 shadow-md hover:shadow-lg transition-shadow">
             <div>
-              <h3 className="font-bold text-lg text-slate-800">Resource Utilization Index</h3>
+              <h3 className="font-bold text-lg text-slate-800">Campus Resource Intelligence</h3>
               <p className="text-xs text-slate-400">Current active campus utility weights.</p>
             </div>
             <div className="flex-1 flex justify-center items-center relative">
@@ -989,9 +989,9 @@ export default function LandingPage() {
           </div>
 
           {/* Chart 3: Food demand Bar Chart */}
-          <div className="lg:col-span-6 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[320px]">
+          <div className="lg:col-span-6 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[320px] border border-slate-200/80 shadow-md hover:shadow-lg transition-shadow">
             <div>
-              <h3 className="font-bold text-base text-slate-800">Hostel Mess D - Food Demand Curve</h3>
+              <h3 className="font-bold text-base text-slate-800">Mess Demand Forecast</h3>
               <p className="text-xs text-slate-400">Hourly food servings logs mapped to predict optimal buffer waste.</p>
             </div>
             <div className="flex-1 min-h-[180px] mt-4">
@@ -1007,9 +1007,9 @@ export default function LandingPage() {
           </div>
 
           {/* Chart 4: Placement Readiness timeline */}
-          <div className="lg:col-span-6 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[320px]">
+          <div className="lg:col-span-6 glass-card-light rounded-[20px] p-6 flex flex-col justify-between h-[320px] border border-slate-200/80 shadow-md hover:shadow-lg transition-shadow">
             <div>
-              <h3 className="font-bold text-base text-slate-800">Placement Success Forecast</h3>
+              <h3 className="font-bold text-base text-slate-800">Placement Intelligence</h3>
               <p className="text-xs text-slate-400">Timeline metric matching student portfolio readiness to hiring thresholds.</p>
             </div>
             <div className="flex-1 min-h-[180px] mt-4">
