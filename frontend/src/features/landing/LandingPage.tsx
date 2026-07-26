@@ -17,7 +17,8 @@ import {
   DollarSign,
   Layers,
   Menu,
-  X
+  X,
+  Play
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -344,108 +345,270 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-0 pt-20 pb-28 md:pt-28 md:pb-36 px-6 overflow-hidden min-h-[90vh] flex items-center justify-center">
-        {/* Hero Background Video */}
+      <section className="relative z-0 pt-16 pb-24 md:pt-24 md:pb-32 px-6 overflow-hidden min-h-[92vh] flex items-center justify-center">
+        {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover scale-105"
+            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000"
           >
             <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
             <source src="/hero-bg.mp4" type="video/mp4" />
           </video>
-          {/* Overlay gradients for enhanced text readability and modern aesthetic */}
-          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/80" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/25 via-transparent to-transparent" />
+          {/* Subtle blue overlay (25%) and dark vignette for 100% text readability */}
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-blue-950/30 to-slate-950/80" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-slate-950/60" />
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
-          {/* Eyebrow Badge: Built for Modern Higher Education */}
-          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-6 shadow-xl shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
-            <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
-            <span>Built for Modern Higher Education</span>
+        <div className="max-w-7xl mx-auto w-full relative z-10 grid lg:grid-cols-12 gap-10 items-center">
+          {/* Left Column: Text & CTAs */}
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+            {/* Minimal AI-inspired Official Icon Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 backdrop-blur-md mb-6 shadow-xl shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/50">
+              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+              <span>CampusOS AI Platform</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.08] mb-6 drop-shadow-md">
+              The AI Operating System for{' '}
+              <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                Modern Universities
+              </span>
+            </h1>
+
+            {/* Subtitle (Max 650px) */}
+            <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-[650px] font-normal leading-relaxed mb-8 drop-shadow-sm">
+              Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
+            </p>
+
+            {/* Call to Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full sm:w-auto">
+              <Link
+                to="/dashboard"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5"
+              >
+                Get Started
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <a
+                href="#copilot"
+                className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-lg transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group"
+              >
+                <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
+                Watch Demo
+              </a>
+            </div>
+
+            {/* Small Rounded Pill Badges */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-2.5 mb-8">
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+                <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
+              </span>
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+                <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
+              </span>
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+                <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
+              </span>
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+                <Check className="w-3.5 h-3.5 text-emerald-400" /> Predictive Analytics
+              </span>
+            </div>
+
+            {/* Target Users Chips */}
+            <div className="w-full flex flex-wrap justify-center lg:justify-start gap-2 pt-4 border-t border-white/10">
+              {institutionsList.map((inst, idx) => {
+                const isActive = idx === currentInstIndex
+                return (
+                  <button
+                    key={inst.title}
+                    onClick={() => setCurrentInstIndex(idx)}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-md ${
+                      isActive
+                        ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 scale-105'
+                        : 'bg-white/10 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md hover:border-blue-400/40'
+                    }`}
+                  >
+                    <span>{inst.icon}</span>
+                    <span>{inst.title}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
-          {/* Small Feature Badges */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-blue-300 border border-white/15 backdrop-blur-md shadow-lg shadow-blue-500/10">
-              <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-indigo-300 border border-white/15 backdrop-blur-md shadow-lg shadow-indigo-500/10">
-              <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-sky-300 border border-white/15 backdrop-blur-md shadow-lg shadow-sky-500/10">
-              <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-emerald-300 border border-white/15 backdrop-blur-md shadow-lg shadow-emerald-500/10">
-              <Check className="w-3.5 h-3.5 text-emerald-400" /> Smart Analytics
-            </span>
+          {/* Right Column: Floating AI Cards & Live Dashboard */}
+          <div className="lg:col-span-5 relative flex flex-col gap-4 items-center">
+            {/* Live Dashboard Container */}
+            <div className="w-full bg-slate-950/80 backdrop-blur-2xl border border-white/15 rounded-3xl p-6 shadow-2xl shadow-blue-500/10 animate-float-subtle relative overflow-hidden">
+              {/* Top Bar */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-blue-600/30 text-blue-400 border border-blue-500/30">
+                    <Sparkles className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="font-bold text-sm text-white">CampusOS AI Live</h3>
+                    <p className="text-[10px] text-slate-400">Autonomous University Operations</p>
+                  </div>
+                </div>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  8 Active
+                </span>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 hover:border-blue-500/30 transition-all">
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Attendance</span>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xl font-extrabold text-white">91%</span>
+                    <span className="text-[10px] text-emerald-400 font-semibold">+3% forecast</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 hover:border-blue-500/30 transition-all">
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Placement</span>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xl font-extrabold text-white">88%</span>
+                    <span className="text-[10px] text-blue-400 font-semibold">CS Ready</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 hover:border-blue-500/30 transition-all">
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Campus Health</span>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xl font-extrabold text-white">96%</span>
+                    <span className="text-[10px] text-emerald-400 font-semibold">Optimal</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 hover:border-blue-500/30 transition-all">
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mb-1">Hostel</span>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xl font-extrabold text-white">Healthy</span>
+                    <span className="text-[10px] text-sky-400 font-semibold">Grid Auto</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Row */}
+              <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3 mb-4 text-xs">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-indigo-400" />
+                  <span className="text-slate-300 font-medium">Knowledge Search:</span>
+                </div>
+                <span className="text-sky-400 font-semibold bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">Ready</span>
+              </div>
+
+              {/* Live Sparkline Chart */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-3">
+                <div className="flex justify-between items-center mb-1 px-1">
+                  <span className="text-[11px] font-semibold text-slate-300">Live Campus Optimization Index</span>
+                  <span className="text-[10px] text-blue-400 font-bold">Real-time</span>
+                </div>
+                <div className="h-20 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={placementData}>
+                      <defs>
+                        <linearGradient id="liveGlow" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <Area type="monotone" dataKey="placement" stroke="#60a5fa" strokeWidth={2} fillOpacity={1} fill="url(#liveGlow)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* 6 Floating Glassmorphism AI Cards Grid */}
+            <div className="w-full grid grid-cols-2 gap-2.5">
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  🤖 <span>AI Copilot</span>
+                </div>
+                <div className="text-xs font-bold text-emerald-400 mt-1 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" /> Active
+                </div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-delayed shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  📊 <span>Campus Health</span>
+                </div>
+                <div className="text-xs font-bold text-white mt-1">96%</div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-subtle shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  🎓 <span>Placement Readiness</span>
+                </div>
+                <div className="text-xs font-bold text-white mt-1">88%</div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-subtle-delayed shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  📈 <span>Attendance Prediction</span>
+                </div>
+                <div className="text-xs font-bold text-white mt-1">91%</div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  🏠 <span>Hostel Intelligence</span>
+                </div>
+                <div className="text-xs font-bold text-blue-400 mt-1">Running</div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-delayed shadow-xl hover:border-blue-400/50 transition-all">
+                <div className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                  📚 <span>Knowledge Search</span>
+                </div>
+                <div className="text-xs font-bold text-sky-400 mt-1">Ready</div>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Huge Headline showcasing dynamic Higher Ed target */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.1] mb-6 drop-shadow-md">
-            The AI Operating System for{' '}
-            <span className="inline-block bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent transition-all duration-500">
-              {institutionsList[currentInstIndex].icon} {institutionsList[currentInstIndex].title}
-            </span>
-          </h1>
-
-          {/* Higher Education Target Audience Glass Pills */}
-          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mb-8">
-            {institutionsList.map((inst, idx) => {
-              const isActive = idx === currentInstIndex
-              return (
-                <button
-                  key={inst.title}
-                  onClick={() => setCurrentInstIndex(idx)}
-                  className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 ${
-                    isActive
-                      ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/30 scale-105 ring-2 ring-blue-400/30'
-                      : 'bg-white/10 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md'
-                  }`}
-                >
-                  <span className="text-base">{inst.icon}</span>
-                  <span>{inst.title}</span>
-                </button>
-              )
-            })}
+      {/* Built for Modern Higher Education Section (No Fake University Names!) */}
+      <section className="py-20 bg-slate-900 border-y border-white/10 text-white relative">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4">
+            Institutions & Campuses
           </div>
-
-          {/* Subheading */}
-          <p className="text-lg md:text-xl text-slate-200 max-w-3xl font-normal leading-relaxed mb-10 drop-shadow-sm">
-            CampusOS AI transforms higher education institutions—from engineering colleges to global research centers—into intelligent campuses using autonomous AI Agents, Predictive Machine Learning, Smart Automation, and Enterprise-grade RAG pipelines.
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+            Built for Modern Higher Education
+          </h2>
+          <p className="text-slate-300 max-w-2xl mx-auto text-base sm:text-lg mb-12">
+            Designed to support institutions of every size through AI-powered learning, intelligent administration, and smart campus operations.
           </p>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            <Link
-              to="/dashboard"
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full shadow-xl shadow-blue-600/30 hover:shadow-blue-500/50 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30"
-            >
-              Get Started Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <a
-              href="#copilot"
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-lg transition-all text-base flex items-center justify-center gap-2"
-            >
-              Book Live Demo
-            </a>
-          </div>
-
-          {/* Social Proof */}
-          <div className="w-full max-w-4xl border-t border-white/15 pt-8">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-6">Trusted by leading universities & learning centers worldwide</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all text-slate-200">
-              <span className="font-sans font-bold text-xl tracking-tight text-slate-200">HARVARD ACADEMY</span>
-              <span className="font-sans font-extrabold text-xl tracking-tight text-slate-200">STANFORD COLLABORATIVE</span>
-              <span className="font-sans font-semibold text-lg tracking-tight text-slate-200">OXFORD AI LAB</span>
-              <span className="font-sans font-medium text-lg tracking-tight text-slate-200">MIT LOGISTICS</span>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {institutionsList.map((inst) => (
+              <div
+                key={inst.title}
+                className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/40 hover:bg-white/10 transition-all duration-300 group hover:-translate-y-1 shadow-lg hover:shadow-blue-500/15 text-center flex flex-col items-center justify-center"
+              >
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
+                  {inst.icon}
+                </div>
+                <h4 className="font-bold text-white text-base mb-1">
+                  {inst.title}
+                </h4>
+                <p className="text-slate-400 text-xs leading-relaxed">
+                  {inst.tag}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
