@@ -88,9 +88,11 @@ export default function LandingPage() {
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // Auto scroll chat to bottom
+  // Auto scroll chat to bottom (only when user interacts)
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (chatMessages.length > 1 || isTyping) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [chatMessages, isTyping])
 
   // Custom useEffect to force Light Mode on landing page
@@ -200,29 +202,29 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans relative overflow-hidden grid-bg-light">
       {/* Background gradients */}
-      <div className="absolute top-0 inset-x-0 h-[1000px] gradient-bg-hero pointer-events-none -z-10" />
+      <div className="absolute top-0 inset-x-0 h-[1000px] pointer-events-none -z-10" />
 
       {/* Sticky transparent navigation */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300">
+      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-500/20">
               <Sparkles className="w-5 h-5" />
             </span>
-            <span className="font-bold text-xl tracking-tight font-sans text-slate-900">
-              CampusOS <span className="text-blue-600 font-extrabold">AI</span>
+            <span className="font-bold text-xl tracking-tight font-sans text-white">
+              CampusOS <span className="text-blue-400 font-extrabold">AI</span>
             </span>
           </Link>
 
           {/* Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Features</a>
-            <a href="#agents" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">AI Agents</a>
-            <a href="#intelligence" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Solutions</a>
-            <a href="#copilot" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">AI Copilot</a>
-            <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">FAQ</a>
+            <a href="#features" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Features</a>
+            <a href="#agents" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Agents</a>
+            <a href="#intelligence" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Solutions</a>
+            <a href="#copilot" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Copilot</a>
+            <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Pricing</a>
+            <a href="#faq" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">FAQ</a>
           </nav>
 
           {/* Right Header Buttons */}
@@ -234,15 +236,15 @@ export default function LandingPage() {
                 placeholder="Search solutions..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="w-full bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-xs pl-9 pr-4 py-2 rounded-full border border-transparent focus:border-blue-500/30 outline-none transition-all"
+                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
-            <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-1.5">
+            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
               Login
             </Link>
             <Link
               to="/dashboard"
-              className="text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg shadow-blue-500/10 transition-all flex items-center gap-1.5 group"
+              className="text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg shadow-blue-500/20 transition-all flex items-center gap-1.5 group border border-blue-400/30"
             >
               Get Started
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -252,7 +254,7 @@ export default function LandingPage() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-600 hover:text-slate-900"
+            className="lg:hidden p-2 text-slate-300 hover:text-white"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -326,31 +328,49 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-24 md:pt-24 md:pb-32 px-6 overflow-hidden">
+      <section className="relative z-0 pt-20 pb-28 md:pt-28 md:pb-36 px-6 overflow-hidden min-h-[90vh] flex items-center justify-center">
+        {/* Hero Background Video */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover scale-105"
+          >
+            <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+          {/* Overlay gradients for enhanced text readability and modern aesthetic */}
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/80" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/25 via-transparent to-transparent" />
+        </div>
+
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
           {/* Small Feature Badges */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-600 border border-blue-100 shadow-sm shadow-blue-500/5">
-              <Check className="w-3 h-3 text-blue-600" /> AI Powered
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-blue-300 border border-white/15 backdrop-blur-md shadow-lg shadow-blue-500/10">
+              <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm shadow-indigo-500/5">
-              <Check className="w-3 h-3 text-indigo-600" /> Enterprise Ready
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-indigo-300 border border-white/15 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+              <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-sky-50 text-sky-600 border border-sky-100 shadow-sm shadow-sky-500/5">
-              <Check className="w-3 h-3 text-sky-600" /> Multi-Agent AI
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-sky-300 border border-white/15 backdrop-blur-md shadow-lg shadow-sky-500/10">
+              <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm shadow-emerald-500/5">
-              <Check className="w-3 h-3 text-emerald-600" /> Smart Analytics
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-emerald-300 border border-white/15 backdrop-blur-md shadow-lg shadow-emerald-500/10">
+              <Check className="w-3.5 h-3.5 text-emerald-400" /> Smart Analytics
             </span>
           </div>
 
           {/* Huge Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 max-w-5xl leading-[1.1] mb-6">
-            The AI Operating System for <span className="gradient-text-blue">Modern Universities</span>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.1] mb-6 drop-shadow-md">
+            The AI Operating System for <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">Modern Universities</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-xl text-slate-500 max-w-3xl font-normal leading-relaxed mb-10">
+          <p className="text-lg md:text-xl text-slate-200 max-w-3xl font-normal leading-relaxed mb-10 drop-shadow-sm">
             CampusOS AI transforms traditional universities into intelligent campuses using autonomous AI Agents, Predictive Machine Learning, Smart Automation, and Enterprise-grade RAG pipelines.
           </p>
 
@@ -358,27 +378,27 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
             <Link
               to="/dashboard"
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full shadow-xl shadow-blue-600/15 hover:shadow-blue-600/25 transition-all text-base flex items-center justify-center gap-2 group"
+              className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full shadow-xl shadow-blue-600/30 hover:shadow-blue-500/50 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="#copilot"
-              className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-800 font-medium rounded-full border border-slate-200/80 shadow-md shadow-slate-100 transition-all text-base flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-lg transition-all text-base flex items-center justify-center gap-2"
             >
               Book Live Demo
             </a>
           </div>
 
           {/* Social Proof */}
-          <div className="w-full max-w-4xl border-t border-slate-200/60 pt-8">
+          <div className="w-full max-w-4xl border-t border-white/15 pt-8">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-6">Trusted by leading universities & learning centers worldwide</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all">
-              <span className="font-sans font-bold text-xl tracking-tight text-slate-800">HARVARD ACADEMY</span>
-              <span className="font-sans font-extrabold text-xl tracking-tight text-slate-800">STANFORD COLLABORATIVE</span>
-              <span className="font-sans font-semibold text-lg tracking-tight text-slate-800">OXFORD AI LAB</span>
-              <span className="font-sans font-medium text-lg tracking-tight text-slate-800">MIT LOGISTICS</span>
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all text-slate-200">
+              <span className="font-sans font-bold text-xl tracking-tight text-slate-200">HARVARD ACADEMY</span>
+              <span className="font-sans font-extrabold text-xl tracking-tight text-slate-200">STANFORD COLLABORATIVE</span>
+              <span className="font-sans font-semibold text-lg tracking-tight text-slate-200">OXFORD AI LAB</span>
+              <span className="font-sans font-medium text-lg tracking-tight text-slate-200">MIT LOGISTICS</span>
             </div>
           </div>
         </div>
