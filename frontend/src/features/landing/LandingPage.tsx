@@ -223,7 +223,7 @@ export default function LandingPage() {
 
       {/* Sticky transparent navigation */}
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-18 py-3 flex items-center justify-between">
+        <div className="max-w-7xl xl:max-w-[1440px] mx-auto px-6 sm:px-8 xl:px-12 h-18 py-3 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5">
             <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-500/20">
@@ -345,7 +345,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-0 pt-12 pb-12 md:pt-16 md:pb-16 px-6 overflow-hidden flex flex-col items-center justify-center">
+      <section className="relative z-0 pt-14 pb-14 lg:pt-20 lg:pb-20 px-6 sm:px-8 xl:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-4.5rem)]">
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu">
           <video
@@ -365,31 +365,31 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-slate-950/60" />
         </div>
 
-        <div className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
           {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-4 shadow-lg shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-5 shadow-lg shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
+            <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
             <span>Built for Modern Higher Education</span>
           </div>
 
           {/* Small Feature Badges */}
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+          <div className="flex flex-wrap justify-center gap-2.5 mb-7">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-emerald-400" /> Predictive Analytics
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] mb-5 drop-shadow-md">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md">
             The AI Operating System for{' '}
             <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-md">
               Modern Universities
@@ -397,22 +397,22 @@ export default function LandingPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg text-slate-200 max-w-[600px] font-normal leading-relaxed mb-8 drop-shadow-sm">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-200 max-w-[640px] font-normal leading-relaxed mb-9 drop-shadow-sm">
             Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
           </p>
 
           {/* Call to Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3.5 mb-8 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4 mb-9 w-full sm:w-auto">
             <Link
               to="/dashboard"
-              className="px-7 py-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5 active:scale-95"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5 active:scale-95"
             >
               Get Started
-              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="#copilot"
-              className="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95"
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95"
             >
               <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
               Watch Demo
@@ -420,14 +420,14 @@ export default function LandingPage() {
           </div>
 
           {/* Target Users Chips */}
-          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl">
+          <div className="flex flex-wrap justify-center gap-3 max-w-5xl">
             {institutionsList.map((inst, idx) => {
               const isActive = idx === currentInstIndex
               return (
                 <button
                   key={inst.title}
                   onClick={() => setCurrentInstIndex(idx)}
-                  className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-sm active:scale-95 ${
+                  className={`flex items-center gap-2 px-4.5 py-2.5 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-sm active:scale-95 ${
                     isActive
                       ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 scale-105 ring-2 ring-blue-400/30'
                       : 'bg-slate-900/60 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md hover:border-blue-400/40'
@@ -443,8 +443,8 @@ export default function LandingPage() {
       </section>
 
       {/* Built for Modern Higher Education Section (No Fake University Names!) */}
-      <section className="py-20 bg-slate-900 border-y border-white/10 text-white relative">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+      <section className="py-20 lg:py-24 bg-slate-900 border-y border-white/10 text-white relative">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-6 sm:px-8 xl:px-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4">
             Institutions & Campuses
           </div>
@@ -633,8 +633,8 @@ export default function LandingPage() {
       </section>
 
       {/* Statistics Section */}
-      <section className="bg-white border-y border-slate-200/80 py-16 px-6 relative z-30">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-x divide-slate-100">
+      <section className="bg-white border-y border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-x divide-slate-100">
           <div className="flex flex-col items-center">
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
               {stats.universities}+
@@ -669,7 +669,7 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Section: Bento Grid */}
-      <section id="features" className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
+      <section id="features" className="py-20 lg:py-24 px-6 sm:px-8 xl:px-12 max-w-7xl xl:max-w-[1400px] mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
             Unified Intelligent Campus <span className="gradient-text-blue">Bento Suite</span>
@@ -790,8 +790,8 @@ export default function LandingPage() {
       </section>
 
       {/* AI Agents Section */}
-      <section id="agents" className="bg-slate-100/50 border-y border-slate-200/80 py-24 md:py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section id="agents" className="bg-slate-100/50 border-y border-slate-200/80 py-20 lg:py-24 px-6 sm:px-8 xl:px-12">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60 uppercase tracking-widest mb-4 inline-block">Autonomous Systems</span>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -802,7 +802,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Agent Cards */}
             {[
               { name: 'Student Success Agent', status: 'Running', health: '99.4%', confidence: '98%', tasks: '1,424/day', last: '2s ago', color: 'border-blue-200' },
@@ -851,7 +851,7 @@ export default function LandingPage() {
       </section>
 
       {/* Campus Intelligence Dashboard / Charts */}
-      <section id="intelligence" className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
+      <section id="intelligence" className="py-20 lg:py-24 px-6 sm:px-8 xl:px-12 max-w-7xl xl:max-w-[1400px] mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full border border-indigo-200/60 uppercase tracking-widest mb-4 inline-block">Predictive Engine</span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -1093,7 +1093,7 @@ export default function LandingPage() {
       </section>
 
       {/* Dashboard Previews Section */}
-      <section className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
+      <section className="py-20 lg:py-24 px-6 sm:px-8 xl:px-12 max-w-7xl xl:max-w-[1400px] mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold bg-sky-100 text-sky-700 px-3 py-1 rounded-full border border-sky-200/60 uppercase tracking-widest mb-4 inline-block">Portals Preview</span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -1326,8 +1326,8 @@ export default function LandingPage() {
       </section>
 
       {/* Workflow Section (Node workflow diagram) */}
-      <section className="bg-slate-100/50 border-y border-slate-200/80 py-24 md:py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section className="bg-slate-100/50 border-y border-slate-200/80 py-20 lg:py-24 px-6 sm:px-8 xl:px-12">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full border border-indigo-200/60 uppercase tracking-widest mb-4 inline-block">Workflow Automation</span>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -1368,7 +1368,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
+      <section className="py-20 lg:py-24 px-6 sm:px-8 xl:px-12 max-w-7xl xl:max-w-[1400px] mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
             Loved by University Administrators
@@ -1425,8 +1425,8 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="bg-slate-100/50 border-y border-slate-200/80 py-24 md:py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section id="pricing" className="bg-slate-100/50 border-y border-slate-200/80 py-20 lg:py-24 px-6 sm:px-8 xl:px-12">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60 uppercase tracking-widest mb-4 inline-block">Simple Pricing</span>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -1523,7 +1523,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-24 md:py-32 px-6 max-w-4xl mx-auto">
+      <section id="faq" className="py-20 lg:py-24 px-6 sm:px-8 xl:px-12 max-w-4xl xl:max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
             Frequently Asked Questions
@@ -1571,7 +1571,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
+      <section className="py-16 md:py-24 px-6 sm:px-8 xl:px-12 max-w-7xl xl:max-w-[1400px] mx-auto">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] p-8 md:p-16 text-white text-center flex flex-col items-center relative overflow-hidden shadow-2xl">
           {/* Subtle design elements */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -1605,8 +1605,8 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200/80 py-16 px-6 relative z-30">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+      <footer className="bg-white border-t border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand Info */}
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -1654,7 +1654,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-400 font-medium gap-4">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-400 font-medium gap-4">
           <span>&copy; {new Date().getFullYear()} CampusOS AI Platform. All rights reserved.</span>
           <div className="flex gap-6">
             <a href="#" className="hover:text-blue-600">Privacy Policy</a>
