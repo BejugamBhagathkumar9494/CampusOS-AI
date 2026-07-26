@@ -427,14 +427,14 @@ export default function LandingPage() {
                 <button
                   key={inst.title}
                   onClick={() => setCurrentInstIndex(idx)}
-                  className={`flex items-center gap-2 px-4.5 py-2.5 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-sm active:scale-95 ${
+                  className={`inline-flex items-center justify-center gap-2.5 px-6 py-2.5 text-xs sm:text-sm font-semibold tracking-wide whitespace-nowrap rounded-full border transition-all duration-300 shadow-sm shrink-0 active:scale-95 ${
                     isActive
-                      ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 scale-105 ring-2 ring-blue-400/30'
-                      : 'bg-slate-900/60 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md hover:border-blue-400/40'
+                      ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/40'
+                      : 'bg-slate-900/80 text-slate-200 border-white/15 hover:bg-slate-800 hover:text-white backdrop-blur-md hover:border-blue-400/40'
                   }`}
                 >
-                  <span className="text-base">{inst.icon}</span>
-                  <span>{inst.title}</span>
+                  <span className="text-base shrink-0">{inst.icon}</span>
+                  <span className="whitespace-nowrap">{inst.title}</span>
                 </button>
               )
             })}
