@@ -8,36 +8,36 @@ import {
 export const Academics = () => (
   <div className="space-y-6 animate-fade-in">
     <div>
-      <h1 className="text-2xl font-bold text-white">Academics</h1>
-      <p className="text-xs text-slate-400">Manage courses, syllabi, and study planners.</p>
+      <h1 className="text-3xl font-bold text-white mb-1">Academics</h1>
+      <p className="text-sm text-slate-300 font-medium">Manage courses, syllabi, and study planners.</p>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-indigo-400" /> Current Enrolled Subjects
+      <div className="glass-card rounded-2xl p-6 space-y-4">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2.5">
+          <BookOpen className="w-6 h-6 text-indigo-400" /> Current Enrolled Subjects
         </h2>
         <div className="space-y-3">
           {['Automata Theory (CS301)', 'Computer Networks (CS302)', 'Database Systems (CS303)'].map((subject) => (
-            <div key={subject} className="flex justify-between items-center p-3 rounded-lg bg-slate-900/50 border border-slate-800">
-              <span className="text-sm text-slate-200">{subject}</span>
-              <span className="text-xs text-indigo-400 font-medium cursor-pointer hover:underline">Syllabus PDF</span>
+            <div key={subject} className="flex justify-between items-center p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+              <span className="text-base text-slate-200 font-medium">{subject}</span>
+              <span className="text-sm text-indigo-400 font-semibold cursor-pointer hover:underline">Syllabus PDF</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <Cpu className="w-5 h-5 text-indigo-400" /> AI Elective Recommender
+      <div className="glass-card rounded-2xl p-6 space-y-4">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2.5">
+          <Cpu className="w-6 h-6 text-indigo-400" /> AI Elective Recommender
         </h2>
-        <p className="text-xs text-slate-400">Based on your interests in machine learning and database systems, our model suggests:</p>
-        <div className="space-y-2">
-          <div className="p-3 rounded-lg bg-indigo-950/20 border border-indigo-500/20">
-            <h3 className="text-xs font-semibold text-white">Natural Language Processing</h3>
-            <p className="text-[10px] text-slate-400 mt-1">94% recommendation match. Offered by Dr. Jenkins.</p>
+        <p className="text-sm text-slate-300">Based on your interests in machine learning and database systems, our model suggests:</p>
+        <div className="space-y-3">
+          <div className="p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
+            <h3 className="text-base font-bold text-white">Natural Language Processing</h3>
+            <p className="text-xs text-slate-400 mt-1">94% recommendation match • Offered by Dr. Jenkins.</p>
           </div>
-          <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
-            <h3 className="text-xs font-semibold text-white">Cloud Computing Architectures</h3>
-            <p className="text-[10px] text-slate-400 mt-1">82% recommendation match. Offered by Prof. Vance.</p>
+          <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800">
+            <h3 className="text-base font-bold text-white">Cloud Computing Architectures</h3>
+            <p className="text-xs text-slate-400 mt-1">82% recommendation match • Offered by Prof. Vance.</p>
           </div>
         </div>
       </div>
@@ -49,18 +49,18 @@ export const Academics = () => (
 export const Attendance = () => (
   <div className="space-y-6 animate-fade-in">
     <div>
-      <h1 className="text-2xl font-bold text-white">Attendance Monitor</h1>
-      <p className="text-xs text-slate-400">Track subject attendance and predict future shortages.</p>
+      <h1 className="text-3xl font-bold text-white mb-1">Attendance Monitor</h1>
+      <p className="text-sm text-slate-300 font-medium">Track subject attendance and predict future shortages.</p>
     </div>
-    <div className="glass-panel rounded-xl overflow-hidden">
-      <table className="w-full text-left border-collapse text-sm">
+    <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800">
+      <table className="w-full text-left border-collapse text-base">
         <thead>
-          <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold">
-            <th className="p-4">Subject</th>
-            <th className="p-4">Total Classes</th>
-            <th className="p-4">Attended</th>
-            <th className="p-4">Percentage</th>
-            <th className="p-4">Status</th>
+          <tr className="bg-slate-900 border-b border-slate-800 text-slate-300 font-bold">
+            <th className="p-4.5">Subject</th>
+            <th className="p-4.5">Total Classes</th>
+            <th className="p-4.5">Attended</th>
+            <th className="p-4.5">Percentage</th>
+            <th className="p-4.5">Status</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-800/50">
@@ -69,14 +69,14 @@ export const Attendance = () => (
             { name: 'Computer Networks', total: 34, attended: 31, percent: 91.1, status: 'Safe' },
             { name: 'Database Management Systems', total: 30, attended: 27, percent: 90.0, status: 'Safe' },
           ].map((sub) => (
-            <tr key={sub.name} className="hover:bg-slate-900/20">
-              <td className="p-4 font-medium text-white">{sub.name}</td>
-              <td className="p-4 text-slate-300">{sub.total}</td>
-              <td className="p-4 text-slate-300">{sub.attended}</td>
-              <td className="p-4 text-slate-300">{sub.percent}%</td>
-              <td className="p-4">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                  sub.status === 'Safe' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+            <tr key={sub.name} className="hover:bg-slate-900/30">
+              <td className="p-4.5 font-semibold text-white">{sub.name}</td>
+              <td className="p-4.5 text-slate-300">{sub.total}</td>
+              <td className="p-4.5 text-slate-300">{sub.attended}</td>
+              <td className="p-4.5 text-slate-300 font-mono">{sub.percent}%</td>
+              <td className="p-4.5">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  sub.status === 'Safe' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
                 }`}>
                   {sub.status}
                 </span>
@@ -93,22 +93,22 @@ export const Attendance = () => (
 export const Exams = () => (
   <div className="space-y-6 animate-fade-in">
     <div>
-      <h1 className="text-2xl font-bold text-white">Exams</h1>
-      <p className="text-xs text-slate-400">View schedules, results, and exam predictions.</p>
+      <h1 className="text-3xl font-bold text-white mb-1">Exams</h1>
+      <p className="text-sm text-slate-300 font-medium">View schedules, results, and exam predictions.</p>
     </div>
-    <div className="glass-card rounded-xl p-6">
-      <h2 className="text-lg font-bold text-white mb-4">Upcoming End Semester Timetable</h2>
+    <div className="glass-card rounded-2xl p-6">
+      <h2 className="text-xl font-bold text-white mb-4">Upcoming End Semester Timetable</h2>
       <div className="space-y-4">
         {[
           { date: 'Nov 12, 2026', code: 'CS301', name: 'Automata Theory', time: '10:00 AM - 01:00 PM' },
           { date: 'Nov 14, 2026', code: 'CS302', name: 'Computer Networks', time: '10:00 AM - 01:00 PM' },
         ].map((ex) => (
-          <div key={ex.code} className="flex justify-between items-center p-4 rounded-lg bg-slate-900/60 border border-slate-800">
+          <div key={ex.code} className="flex justify-between items-center p-4 rounded-xl bg-slate-900/60 border border-slate-800">
             <div>
-              <span className="text-xs text-indigo-400">{ex.date}</span>
-              <h3 className="text-sm font-semibold text-white mt-0.5">{ex.name} ({ex.code})</h3>
+              <span className="text-xs font-semibold text-indigo-400">{ex.date}</span>
+              <h3 className="text-base font-bold text-white mt-0.5">{ex.name} ({ex.code})</h3>
             </div>
-            <span className="text-xs text-slate-400">{ex.time}</span>
+            <span className="text-sm text-slate-300 font-mono">{ex.time}</span>
           </div>
         ))}
       </div>
@@ -120,19 +120,19 @@ export const Exams = () => (
 export const Assignments = () => (
   <div className="space-y-6 animate-fade-in">
     <div>
-      <h1 className="text-2xl font-bold text-white">Assignments</h1>
-      <p className="text-xs text-slate-400">Upload reports and view grades.</p>
+      <h1 className="text-3xl font-bold text-white mb-1">Assignments</h1>
+      <p className="text-sm text-slate-300 font-medium">Upload reports and view grades.</p>
     </div>
-    <div className="glass-card rounded-xl p-6 space-y-4">
-      <h2 className="text-lg font-bold text-white">Pending Assignments</h2>
+    <div className="glass-card rounded-2xl p-6 space-y-4">
+      <h2 className="text-xl font-bold text-white">Pending Assignments</h2>
       <div className="space-y-3">
-        <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
+        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
           <div>
-            <h3 className="text-sm font-semibold text-white">OS Lab: Thread Scheduling</h3>
-            <p className="text-xs text-red-400 mt-1">Due in 2 days</p>
+            <h3 className="text-base font-bold text-white">OS Lab: Thread Scheduling</h3>
+            <p className="text-sm text-red-400 font-semibold mt-1">Due in 2 days</p>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">
-            <Upload className="w-3.5 h-3.5" /> Submit File
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all">
+            <Upload className="w-4 h-4" /> Submit File
           </button>
         </div>
       </div>
@@ -157,34 +157,34 @@ export const Library = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white">Semantic Library Search</h1>
-        <p className="text-xs text-slate-400">Find reference books and digital materials using vector search.</p>
+        <h1 className="text-3xl font-bold text-white mb-1">Semantic Library Search</h1>
+        <p className="text-sm text-slate-300 font-medium">Find reference books and digital materials using vector search.</p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search topics (e.g. 'machine learning algorithms')"
-          className="flex-1 px-4 py-2 rounded-lg border border-slate-800 bg-slate-900 text-sm focus:outline-none focus:border-indigo-500"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-base text-white focus:outline-none focus:border-indigo-500"
         />
-        <button onClick={handleSearch} className="px-4 py-2 bg-indigo-600 rounded-lg text-sm text-white font-semibold">
+        <button onClick={handleSearch} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-base text-white font-semibold transition-all">
           Search
         </button>
       </div>
 
       {results.length > 0 && (
-        <div className="glass-card rounded-xl p-6 space-y-4">
-          <h2 className="text-md font-bold text-white">Results</h2>
+        <div className="glass-card rounded-2xl p-6 space-y-4">
+          <h2 className="text-xl font-bold text-white">Results</h2>
           <div className="space-y-3">
             {results.map((book) => (
-              <div key={book.title} className="p-4 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center">
+              <div key={book.title} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
                 <div>
-                  <h3 className="text-sm font-semibold text-white">{book.title}</h3>
-                  <p className="text-xs text-slate-400">{book.author} • Location: {book.location}</p>
+                  <h3 className="text-base font-bold text-white">{book.title}</h3>
+                  <p className="text-sm text-slate-300 mt-0.5">{book.author} • Location: {book.location}</p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
-                  book.copies > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                  book.copies > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
                 }`}>
                   {book.copies > 0 ? `${book.copies} Copies Available` : 'All Issued'}
                 </span>
