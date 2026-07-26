@@ -33,23 +33,23 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-7 animate-fade-in">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-900 p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-900 p-7 shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2.5">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
               Welcome back, <span className="gradient-text">{profile ? profile.user.full_name : 'John Doe'}</span>
             </h1>
-            <p className="text-slate-300 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
+            <p className="text-slate-300 text-sm sm:text-base max-w-xl font-normal leading-relaxed">
               CampusOS AI has analyzed your academics, hostel status, and placement goals. Here are your personalized recommendations.
             </p>
           </div>
-          <div className="flex gap-3">
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="flex gap-2.5">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               GPA: {profile ? profile.cgpa : '8.42'}
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               Semester {profile ? (profile.current_semester === 5 ? 'V' : profile.current_semester) : 'V'}
             </span>
           </div>
@@ -58,87 +58,87 @@ export default function Dashboard() {
       </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card rounded-2xl p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-slate-400 text-base font-medium">Attendance</span>
-            <Calendar className="w-5 h-5 text-indigo-400" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex justify-between items-start mb-3">
+            <span className="text-slate-400 text-sm font-medium">Attendance</span>
+            <Calendar className="w-4.5 h-4.5 text-indigo-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white mb-1.5">{attendance ? `${attendance.overall_rate}%` : '87.5%'}</p>
+          <p className="text-2xl font-bold text-white mb-1">{attendance ? `${attendance.overall_rate}%` : '87.5%'}</p>
 
-          <span className="text-sm font-semibold text-emerald-400">Above minimum requirement</span>
+          <span className="text-xs font-semibold text-emerald-400">Above minimum requirement</span>
         </div>
 
-        <div className="glass-card rounded-2xl p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-slate-400 text-base font-medium">Placement Readiness</span>
-            <Sparkles className="w-5 h-5 text-indigo-400" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex justify-between items-start mb-3">
+            <span className="text-slate-400 text-sm font-medium">Placement Readiness</span>
+            <Sparkles className="w-4.5 h-4.5 text-indigo-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white mb-1.5">78.5%</p>
-          <span className="text-sm font-semibold text-indigo-400">Top 15% of your class</span>
+          <p className="text-2xl font-bold text-white mb-1">78.5%</p>
+          <span className="text-xs font-semibold text-indigo-400">Top 15% of your class</span>
         </div>
 
-        <div className="glass-card rounded-2xl p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-slate-400 text-base font-medium">Library Dues</span>
-            <BookOpen className="w-5 h-5 text-indigo-400" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex justify-between items-start mb-3">
+            <span className="text-slate-400 text-sm font-medium">Library Dues</span>
+            <BookOpen className="w-4.5 h-4.5 text-indigo-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white mb-1.5">0 Books</p>
-          <span className="text-sm font-semibold text-slate-400">No active fines</span>
+          <p className="text-2xl font-bold text-white mb-1">0 Books</p>
+          <span className="text-xs font-semibold text-slate-400">No active fines</span>
         </div>
 
-        <div className="glass-card rounded-2xl p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-slate-400 text-base font-medium">Hostel Complaints</span>
-            <AlertTriangle className="w-5 h-5 text-indigo-400" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex justify-between items-start mb-3">
+            <span className="text-slate-400 text-sm font-medium">Hostel Complaints</span>
+            <AlertTriangle className="w-4.5 h-4.5 text-indigo-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white mb-1.5">1 Open</p>
-          <span className="text-sm font-semibold text-yellow-400">AI Priority: Medium</span>
+          <p className="text-2xl font-bold text-white mb-1">1 Open</p>
+          <span className="text-xs font-semibold text-yellow-400">AI Priority: Medium</span>
         </div>
       </div>
 
       {/* Main split */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
         {/* Weekly recommendations */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2.5">
-              <Sparkles className="w-6 h-6 text-indigo-400" /> AI Insights & Actions
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-400" /> AI Insights & Actions
             </h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {recommendations.map((rec, idx) => (
-              <div key={idx} className="glass-card rounded-2xl p-6 flex gap-4 items-start border-l-4 border-l-indigo-500">
-                <span className="flex-shrink-0 w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-base font-bold">
+              <div key={idx} className="glass-card rounded-2xl p-5 flex gap-3.5 items-start border-l-4 border-l-indigo-500">
+                <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-sm font-bold">
                   {idx + 1}
                 </span>
-                <p className="text-base sm:text-lg text-slate-200 leading-relaxed font-normal">{rec}</p>
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">{rec}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Schedule */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2.5">
-              <Clock className="w-6 h-6 text-indigo-400" /> Today's Schedule
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Clock className="w-5 h-5 text-indigo-400" /> Today's Schedule
             </h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {classes.map((cls, idx) => (
-              <div key={idx} className="glass-card rounded-2xl p-5 space-y-2.5">
+              <div key={idx} className="glass-card rounded-2xl p-4 space-y-2">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-base font-bold text-white">{cls.name}</h3>
-                  <span className="text-xs font-semibold bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md">
+                  <h3 className="text-sm sm:text-base font-bold text-white">{cls.name}</h3>
+                  <span className="text-[11px] font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
                     {cls.room}
                   </span>
                 </div>
-                <p className="text-sm text-slate-400 font-medium">{cls.professor}</p>
+                <p className="text-xs text-slate-400 font-medium">{cls.professor}</p>
                 <div className="flex justify-between items-center text-xs text-slate-400 pt-1.5 border-t border-slate-800/60">
                   <span className="font-mono">{cls.time}</span>
                   <span className="text-indigo-400 font-semibold flex items-center gap-1 cursor-pointer hover:underline">
-                    View Notes <ArrowUpRight className="w-4 h-4" />
+                    View Notes <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>

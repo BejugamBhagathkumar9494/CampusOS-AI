@@ -223,9 +223,9 @@ export default function LandingPage() {
 
       {/* Sticky transparent navigation */}
       <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-18 py-3 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2.5">
             <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-500/20">
               <Sparkles className="w-5 h-5" />
             </span>
@@ -234,19 +234,19 @@ export default function LandingPage() {
             </span>
           </Link>
 
-          {/* Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Features</a>
-            <a href="#agents" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Agents</a>
-            <a href="#intelligence" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Solutions</a>
-            <a href="#copilot" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">AI Copilot</a>
-            <a href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">FAQ</a>
+          {/* Navigation Links (15px Medium) */}
+          <nav className="hidden lg:flex items-center gap-7">
+            <a href="#features" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Features</a>
+            <a href="#agents" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Agents</a>
+            <a href="#intelligence" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Solutions</a>
+            <a href="#copilot" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Copilot</a>
+            <a href="#pricing" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Pricing</a>
+            <a href="#faq" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">FAQ</a>
           </nav>
 
           {/* Right Header Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-64' : 'w-48'}`}>
+            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-60' : 'w-44'}`}>
               <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
               <input
                 type="text"
@@ -256,12 +256,12 @@ export default function LandingPage() {
                 className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
-            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
+            <Link to="/dashboard" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
               Login
             </Link>
             <Link
               to="/dashboard"
-              className="text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg shadow-blue-500/20 transition-all flex items-center gap-1.5 group border border-blue-400/30"
+              className="text-[15px] font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4.5 py-2 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 group border border-blue-400/30"
             >
               Get Started
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -419,7 +419,7 @@ export default function LandingPage() {
           </div>
 
           {/* Target Users Chips */}
-          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mb-12">
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl">
             {institutionsList.map((inst, idx) => {
               const isActive = idx === currentInstIndex
               return (
@@ -437,53 +437,6 @@ export default function LandingPage() {
                 </button>
               )
             })}
-          </div>
-
-          {/* 6 Floating Glassmorphism AI Cards Grid */}
-          <div className="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-6 border-t border-white/10">
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                🤖 <span>AI Copilot</span>
-              </div>
-              <div className="text-xs font-bold text-emerald-400 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" /> Active
-              </div>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-delayed shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                📊 <span>Campus Health</span>
-              </div>
-              <div className="text-xs font-bold text-white mt-1">96%</div>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-subtle shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                🎓 <span>Placement</span>
-              </div>
-              <div className="text-xs font-bold text-white mt-1">88%</div>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-subtle-delayed shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                📈 <span>Attendance</span>
-              </div>
-              <div className="text-xs font-bold text-white mt-1">91%</div>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                🏠 <span>Hostel AI</span>
-              </div>
-              <div className="text-xs font-bold text-blue-400 mt-1">Running</div>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 animate-float-delayed shadow-xl hover:border-blue-400/50 transition-all text-left">
-              <div className="text-[11px] text-slate-300 font-semibold flex items-center gap-1">
-                📚 <span>Knowledge</span>
-              </div>
-              <div className="text-xs font-bold text-sky-400 mt-1">Ready</div>
-            </div>
           </div>
         </div>
       </section>
