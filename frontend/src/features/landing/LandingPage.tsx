@@ -256,12 +256,12 @@ export default function LandingPage() {
                 className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
-            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
+            <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3.5 py-2">
               Login
             </Link>
             <Link
               to="/dashboard"
-              className="text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg shadow-blue-500/20 transition-all flex items-center gap-1.5 group border border-blue-400/30"
+              className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 group border border-blue-400/30"
             >
               Get Started
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -679,37 +679,37 @@ export default function LandingPage() {
       </section>
 
       {/* Statistics Section */}
-      <section className="bg-white border-y border-slate-200/80 py-16 px-6 relative z-30">
+      <section className="bg-white border-y border-slate-200/80 py-20 px-6 relative z-30 shadow-sm">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-x divide-slate-100">
           <div className="flex flex-col items-center">
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
               {stats.universities}+
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Universities</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Institutions Supported</p>
           </div>
           <div className="flex flex-col items-center pt-4 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight mb-2">
               {stats.students}K+
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Students Managed</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Students Managed</p>
           </div>
           <div className="flex flex-col items-center pt-4 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-indigo-600 tracking-tight mb-2">
               {stats.modules}+
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">AI Modules</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">AI Microservices</p>
           </div>
           <div className="flex flex-col items-center pt-4 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
               {stats.automation}%
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Mess/Bus Automation</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Logistics Automation</p>
           </div>
           <div className="flex flex-col items-center pt-4 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-emerald-600 tracking-tight mb-2">
               {stats.accuracy}%
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Prediction Accuracy</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prediction Accuracy</p>
           </div>
         </div>
       </section>
@@ -836,11 +836,11 @@ export default function LandingPage() {
       </section>
 
       {/* AI Agents Section */}
-      <section id="agents" className="bg-slate-100/50 border-y border-slate-200/80 py-24 md:py-32 px-6">
+      <section id="agents" className="bg-slate-100/60 border-y border-slate-200/80 py-24 md:py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full border border-blue-200/60 uppercase tracking-widest mb-4 inline-block">Autonomous Systems</span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+            <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3.5 py-1.5 rounded-full border border-blue-200/60 uppercase tracking-widest mb-4 inline-block shadow-sm">Autonomous Systems</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
               Autonomous AI Agent Fleet
             </h2>
             <p className="text-base text-slate-500 font-normal leading-relaxed">
@@ -860,7 +860,7 @@ export default function LandingPage() {
               { name: 'Finance Reconciliation Agent', status: 'Running', health: '99.9%', confidence: '99.8%', tasks: '562/day', last: '10s ago', color: 'border-purple-200' },
               { name: 'Knowledge Graph Agent', status: 'Running', health: '99.5%', confidence: '98.5%', tasks: '3,842/day', last: '3s ago', color: 'border-cyan-200' }
             ].map((agent, i) => (
-              <div key={i} className={`glass-card-light rounded-[20px] p-6 border ${agent.color} relative overflow-hidden flex flex-col justify-between h-64 group`}>
+              <div key={i} className={`glass-card-light rounded-2xl p-6 border ${agent.color} relative overflow-hidden flex flex-col justify-between h-64 group shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-bold text-base text-slate-800 max-w-[140px] leading-tight">{agent.name}</h3>
@@ -1416,8 +1416,8 @@ export default function LandingPage() {
       {/* Testimonials */}
       <section className="py-24 md:py-32 px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Loved by University Administrators
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+            Loved by Academic Leaders
           </h2>
           <p className="text-base text-slate-500 font-normal leading-relaxed">
             Leading Vice Chancellors, Bursars, and academic coordinators report immediate operational savings and grade optimization.
@@ -1429,26 +1429,26 @@ export default function LandingPage() {
             {
               quote: "Implementing CampusOS AI slashed mess wastage by 24% and allowed us to predict exam dropouts, saving 200+ students from failing this semester alone.",
               author: "Dr. Sarah Jenkins",
-              role: "Dean of Academic Affairs, Harvard Tech Institute",
+              role: "Dean of Academic Affairs, Faculty of Science",
               rating: 5,
               photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120"
             },
             {
               quote: "The automated placement readiness engine vectorizes profiles and mocks interviews. Our placement percentage rose from 84% to 94% in a single season.",
               author: "Prof. Alan Vance",
-              role: "Placement Director, Stanford Science Campus",
+              role: "Placement Director, Department of Engineering",
               rating: 5,
               photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120"
             },
             {
               quote: "Bursar operations are now hands-free. The AI Reconciliation Agent handles billing and coordinates tuition installment requests autonomously.",
               author: "Emily Stone",
-              role: "Chief Financial Officer, Oxford AI logistics",
+              role: "Chief Financial Officer, University Administration",
               rating: 5,
               photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=120"
             }
           ].map((test, i) => (
-            <div key={i} className="bg-white border border-slate-200/80 rounded-[24px] p-8 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative">
+            <div key={i} className="bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 relative hover:-translate-y-1">
               <div>
                 {/* Stars */}
                 <div className="flex gap-1 mb-6 text-amber-400">
@@ -1524,14 +1524,14 @@ export default function LandingPage() {
             ].map((tier, i) => (
               <div
                 key={i}
-                className={`bg-white border rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all ${
+                className={`bg-white border rounded-2xl p-7 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                   tier.popular
-                    ? 'border-2 border-blue-600 shadow-xl shadow-blue-500/5 -translate-y-2'
-                    : 'border-slate-200'
+                    ? 'border-2 border-blue-600 shadow-xl shadow-blue-500/10'
+                    : 'border-slate-200/80'
                 }`}
               >
                 {tier.popular && (
-                  <span className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl border-l border-b border-blue-700">
+                  <span className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl border-l border-b border-blue-700 shadow-sm">
                     Recommended
                   </span>
                 )}
@@ -1539,7 +1539,7 @@ export default function LandingPage() {
                   <h3 className="font-bold text-lg text-slate-800 mb-2">{tier.name}</h3>
                   <p className="text-slate-400 text-xs mb-6">{tier.desc}</p>
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-3xl font-black text-slate-800">{tier.price}</span>
+                    <span className="text-3xl font-extrabold text-slate-900">{tier.price}</span>
                     <span className="text-slate-400 text-xs font-semibold">{tier.period}</span>
                   </div>
                   <hr className="border-slate-100 mb-6" />
@@ -1554,9 +1554,9 @@ export default function LandingPage() {
                 </div>
                 <Link
                   to="/dashboard"
-                  className={`w-full text-center py-3 rounded-xl text-xs font-semibold transition-all ${
+                  className={`w-full text-center py-3 rounded-full text-xs font-semibold transition-all shadow-sm ${
                     tier.popular
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/10'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-500/20 hover:shadow-blue-500/40'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                   }`}
                 >
