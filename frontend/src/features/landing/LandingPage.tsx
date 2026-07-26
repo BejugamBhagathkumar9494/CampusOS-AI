@@ -345,7 +345,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-0 pt-16 pb-24 md:pt-24 md:pb-32 px-6 overflow-hidden min-h-[92vh] flex items-center justify-center">
+      <section className="relative z-0 pt-12 pb-12 md:pt-16 md:pb-16 px-6 overflow-hidden flex flex-col items-center justify-center">
         {/* Background Video */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
           <video
@@ -366,52 +366,52 @@ export default function LandingPage() {
 
         <div className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
           {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-6 shadow-xl shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
-            <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-4 shadow-lg shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
             <span>Built for Modern Higher Education</span>
           </div>
 
           {/* Small Feature Badges */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-md">
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-emerald-400" /> Predictive Analytics
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-7 drop-shadow-md">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] mb-5 drop-shadow-md">
             The AI Operating System for{' '}
             <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-md">
               Modern Universities
             </span>
           </h1>
 
-          {/* Subtitle (Max 620px) */}
-          <p className="text-base sm:text-lg text-slate-200 max-w-[620px] font-normal leading-relaxed mb-12 drop-shadow-sm">
+          {/* Subtitle */}
+          <p className="text-base sm:text-lg text-slate-200 max-w-[600px] font-normal leading-relaxed mb-8 drop-shadow-sm">
             Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
           </p>
 
           {/* Call to Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3.5 mb-8 w-full sm:w-auto">
             <Link
               to="/dashboard"
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5"
+              className="px-7 py-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5 active:scale-95"
             >
               Get Started
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="#copilot"
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-lg transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group"
+              className="px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95"
             >
               <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
               Watch Demo
@@ -426,10 +426,10 @@ export default function LandingPage() {
                 <button
                   key={inst.title}
                   onClick={() => setCurrentInstIndex(idx)}
-                  className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-md ${
+                  className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 hover:-translate-y-0.5 shadow-sm active:scale-95 ${
                     isActive
                       ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 scale-105 ring-2 ring-blue-400/30'
-                      : 'bg-white/10 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md hover:border-blue-400/40'
+                      : 'bg-slate-900/60 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md hover:border-blue-400/40'
                   }`}
                 >
                   <span className="text-base">{inst.icon}</span>
