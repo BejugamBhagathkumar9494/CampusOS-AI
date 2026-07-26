@@ -261,10 +261,10 @@ export default function LandingPage() {
             </Link>
             <Link
               to="/dashboard"
-              className="text-[15px] font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-4.5 py-2 rounded-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all flex items-center gap-1.5 group border border-blue-400/30"
+              className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
             >
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              <span>Get Started</span>
+              <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
 
@@ -347,13 +347,14 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative z-0 pt-12 pb-12 md:pt-16 md:pb-16 px-6 overflow-hidden flex flex-col items-center justify-center">
         {/* Background Video */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000"
+            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000 transform-gpu will-change-transform"
+            style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' }}
           >
             <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
             <source src="/hero-bg.mp4" type="video/mp4" />
