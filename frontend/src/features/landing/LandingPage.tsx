@@ -71,11 +71,27 @@ const utilizationData = [
   { name: 'Labs', value: 78, color: '#10b981' },
 ]
 
+const institutionsList = [
+  { icon: '🏛', title: 'Universities', tag: 'Multi-disciplinary Campuses' },
+  { icon: '🎓', title: 'Engineering Colleges', tag: 'Lab & Accreditation Tracking' },
+  { icon: '🏫', title: 'Technical Institutes', tag: 'Vocational Skill Automation' },
+  { icon: '🔬', title: 'Research Centers', tag: 'R&D Grants & Publication RAG' },
+  { icon: '🌍', title: 'Global Campuses', tag: 'Multi-Location AI Sync' },
+]
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const [activeDashboardTab, setActiveDashboardTab] = useState('student')
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
+  const [currentInstIndex, setCurrentInstIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentInstIndex((prev) => (prev + 1) % institutionsList.length)
+    }, 2800)
+    return () => clearInterval(timer)
+  }, [])
   
   // Copilot Interactive Chat State
   const [chatInput, setChatInput] = useState('')
@@ -348,6 +364,12 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+          {/* Eyebrow Badge: Built for Modern Higher Education */}
+          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-6 shadow-xl shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
+            <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+            <span>Built for Modern Higher Education</span>
+          </div>
+
           {/* Small Feature Badges */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-blue-300 border border-white/15 backdrop-blur-md shadow-lg shadow-blue-500/10">
@@ -364,14 +386,38 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Huge Headline */}
+          {/* Huge Headline showcasing dynamic Higher Ed target */}
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.1] mb-6 drop-shadow-md">
-            The AI Operating System for <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">Modern Universities</span>
+            The AI Operating System for{' '}
+            <span className="inline-block bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent transition-all duration-500">
+              {institutionsList[currentInstIndex].icon} {institutionsList[currentInstIndex].title}
+            </span>
           </h1>
+
+          {/* Higher Education Target Audience Glass Pills */}
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mb-8">
+            {institutionsList.map((inst, idx) => {
+              const isActive = idx === currentInstIndex
+              return (
+                <button
+                  key={inst.title}
+                  onClick={() => setCurrentInstIndex(idx)}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-semibold rounded-full border transition-all duration-300 ${
+                    isActive
+                      ? 'bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/30 scale-105 ring-2 ring-blue-400/30'
+                      : 'bg-white/10 text-slate-200 border-white/15 hover:bg-white/20 hover:text-white backdrop-blur-md'
+                  }`}
+                >
+                  <span className="text-base">{inst.icon}</span>
+                  <span>{inst.title}</span>
+                </button>
+              )
+            })}
+          </div>
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-slate-200 max-w-3xl font-normal leading-relaxed mb-10 drop-shadow-sm">
-            CampusOS AI transforms traditional universities into intelligent campuses using autonomous AI Agents, Predictive Machine Learning, Smart Automation, and Enterprise-grade RAG pipelines.
+            CampusOS AI transforms higher education institutions—from engineering colleges to global research centers—into intelligent campuses using autonomous AI Agents, Predictive Machine Learning, Smart Automation, and Enterprise-grade RAG pipelines.
           </p>
 
           {/* Buttons */}
