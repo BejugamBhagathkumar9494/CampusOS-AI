@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../auth/hooks/useAuth'
 import {
   Sparkles,
   ArrowRight,
@@ -81,7 +82,22 @@ const institutionsList = [
 ]
 
 export default function LandingPage() {
+  const { isAuthenticated, role } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const getDashboardLink = () => {
+    if (!isAuthenticated || !role) return '/login';
+    const routes = {
+      student: '/student/dashboard',
+      faculty: '/faculty/dashboard',
+      admin: '/admin/dashboard',
+      hostel_warden: '/hostel/dashboard',
+      placement_officer: '/placement/dashboard',
+    };
+    return routes[role] || '/login';
+  };
+
+  const dashboardLink = getDashboardLink();
   const [searchFocused, setSearchFocused] = useState(false)
   const [activeDashboardTab, setActiveDashboardTab] = useState('student')
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
@@ -253,14 +269,14 @@ export default function LandingPage() {
                 className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
               />
             </div>
-            <Link to="/dashboard" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
-              Login
+            <Link to={dashboardLink} className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
+              {isAuthenticated ? 'Dashboard' : 'Login'}
             </Link>
             <Link
-              to="/dashboard"
+              to={isAuthenticated ? dashboardLink : '/register'}
               className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
             >
-              <span>Get Started</span>
+              <span>{isAuthenticated ? 'Go to Dashboard' : 'Get Started'}</span>
               <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -322,18 +338,18 @@ export default function LandingPage() {
             <hr className="border-slate-100" />
             <div className="flex flex-col gap-4">
               <Link
-                to="/dashboard"
+                to={dashboardLink}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-center text-base font-semibold text-slate-800 hover:text-blue-600 py-2 border border-slate-200 rounded-xl"
               >
-                Login
+                {isAuthenticated ? 'Dashboard' : 'Login'}
               </Link>
               <Link
-                to="/dashboard"
+                to={isAuthenticated ? dashboardLink : '/register'}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/20 hover:bg-blue-700"
               >
-                Get Started Free
+                <span>{isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

@@ -1,36 +1,16 @@
+import { supabase } from './supabaseClient';
+
 const API_URL = 'http://localhost:8000/api/v1';
 
 /**
- * Automatically authenticates the default seeded student user and saves the JWT token.
+ * Retrieves the current authenticated user's access token from Supabase.
  */
 export async function getAuthToken(): Promise<string> {
-  const cachedToken = localStorage.getItem('campusos_token');
-  if (cachedToken) {
-    return cachedToken;
-  }
-
   try {
-    const params = new URLSearchParams();
-    params.append('username', 'john.doe@university.edu');
-    params.append('password', 'student_password_2026');
-
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params,
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to login default user');
-    }
-
-    const data = await response.json();
-    localStorage.setItem('campusos_token', data.access_token);
-    return data.access_token;
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || '';
   } catch (error) {
-    console.error('Auth Login Error:', error);
+    console.error('Error fetching Supabase auth session token:', error);
     return '';
   }
 }
