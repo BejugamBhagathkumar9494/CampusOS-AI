@@ -6,6 +6,12 @@ Unlike traditional college ERP systems, CampusOS AI focuses on decision support,
 
 ---
 
+## 🚀 Supabase Integration & Setup
+
+The backend is fully configured for production deployment using Supabase. For complete details on deploying the SQL database migrations, configuring Row Level Security (RLS) policies, and setting up environment variables, please refer to the **[Supabase Integration & Configuration Guide](supabase_integration_guide.md)**.
+
+---
+
 ## Tech Stack
 
 ### Frontend
