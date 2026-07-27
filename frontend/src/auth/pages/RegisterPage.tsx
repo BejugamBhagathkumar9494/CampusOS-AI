@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Sparkles, Eye, EyeOff, User, Mail, Lock, ShieldCheck, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../types';
+import { getFriendlyErrorMessage } from '../utils/errorHelper';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -87,13 +88,7 @@ export const RegisterPage: React.FC = () => {
       }, 1500);
     } catch (err: any) {
       console.error('Registration error:', err);
-      if (err.message?.includes('User already registered')) {
-        setErrorMsg('This email address is already in use.');
-      } else if (err.message?.includes('weak_password')) {
-        setErrorMsg('Password is too weak. Make it stronger.');
-      } else {
-        setErrorMsg(err.message || 'An error occurred during registration.');
-      }
+      setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during registration.'));
       setIsSubmitting(false);
     }
   };

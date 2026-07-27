@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { getFriendlyErrorMessage } from '../utils/errorHelper';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -57,16 +58,7 @@ export const LoginPage: React.FC = () => {
       // Context state will trigger redirect via useEffect above
     } catch (err: any) {
       console.error('Sign In Error:', err);
-      // Map common Supabase Auth errors to friendly messages
-      if (err.message?.includes('Invalid login credentials')) {
-        setErrorMsg('Incorrect email or password. Please try again.');
-      } else if (err.message?.includes('Email not confirmed')) {
-        setErrorMsg('Please verify your email address before logging in.');
-      } else if (err.message?.includes('Network request failed')) {
-        setErrorMsg('Network failure. Please check your internet connection.');
-      } else {
-        setErrorMsg(err.message || 'An error occurred during sign in.');
-      }
+      setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during sign in.'));
       setIsSubmitting(false);
     }
   };
