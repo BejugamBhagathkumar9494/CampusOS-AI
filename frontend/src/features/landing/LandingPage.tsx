@@ -124,11 +124,10 @@ export default function LandingPage() {
 
   // Stats Counters state animation triggers
   const [stats, setStats] = useState({
-    universities: 0,
-    students: 0,
     modules: 0,
-    automation: 0,
-    accuracy: 0
+    features: 0,
+    portals: 0,
+    workflows: 0
   })
 
   useEffect(() => {
@@ -140,21 +139,19 @@ export default function LandingPage() {
     const timer = setInterval(() => {
       currentStep++
       setStats({
-        universities: Math.floor((100 / steps) * currentStep),
-        students: Math.floor((500 / steps) * currentStep),
-        modules: Math.floor((40 / steps) * currentStep),
-        automation: Math.floor((95 / steps) * currentStep),
-        accuracy: Math.floor((99 / steps) * currentStep)
+        modules: Math.floor((7 / steps) * currentStep),
+        features: Math.floor((20 / steps) * currentStep),
+        portals: Math.floor((5 / steps) * currentStep),
+        workflows: Math.floor((50 / steps) * currentStep)
       })
 
       if (currentStep >= steps) {
         clearInterval(timer)
         setStats({
-          universities: 100,
-          students: 500,
-          modules: 40,
-          automation: 95,
-          accuracy: 99
+          modules: 7,
+          features: 20,
+          portals: 5,
+          workflows: 50
         })
       }
     }, stepTime)
@@ -633,37 +630,47 @@ export default function LandingPage() {
       </section>
 
       {/* Statistics Section */}
-      <section className="bg-white border-y border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30">
-        <div className="max-w-7xl xl:max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-x divide-slate-100">
-          <div className="flex flex-col items-center">
+      <section className="bg-white border-y border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30 shadow-sm">
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          <div className="flex flex-col items-center justify-center px-4">
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
-              {stats.universities}+
-            </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Universities</p>
-          </div>
-          <div className="flex flex-col items-center pt-4 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight mb-2">
-              {stats.students}K+
-            </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Students Managed</p>
-          </div>
-          <div className="flex flex-col items-center pt-4 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-indigo-600 tracking-tight mb-2">
               {stats.modules}+
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">AI Modules</p>
+            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+              Smart Campus Modules
+            </p>
           </div>
-          <div className="flex flex-col items-center pt-4 md:pt-0">
+          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
+            <h3 className="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight mb-2">
+              {stats.features}+
+            </h3>
+            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+              AI-Powered Features
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
+            <h3 className="text-4xl md:text-5xl font-extrabold text-indigo-600 tracking-tight mb-2">
+              {stats.portals}
+            </h3>
+            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+              User Portals
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
-              {stats.automation}%
+              {stats.workflows}+
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Mess/Bus Automation</p>
+            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+              Automated Workflows
+            </p>
           </div>
-          <div className="flex flex-col items-center pt-4 md:pt-0">
+          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
             <h3 className="text-4xl md:text-5xl font-extrabold text-emerald-600 tracking-tight mb-2">
-              {stats.accuracy}%
+              24/7
             </h3>
-            <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Prediction Accuracy</p>
+            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+              AI Assistance
+            </p>
           </div>
         </div>
       </section>
