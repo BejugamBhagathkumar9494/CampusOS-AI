@@ -620,48 +620,48 @@ export default function LandingPage() {
           </div>
 
           {/* Floating Prediction Cards surrounding the laptop */}
-          {/* Card 1: Attendance prediction */}
-          <div className="absolute -left-12 top-10 md:top-20 glass-panel-light p-4 rounded-[20px] shadow-xl border border-slate-200 max-w-[200px] animate-float-subtle-delayed z-20 hover:scale-105 transition-all">
+          {/* Card 1: Attendance prediction (Purple Tinted Glass) */}
+          <div className="absolute -left-12 top-10 md:top-20 glass-premium-dark-purple p-4 rounded-[20px] max-w-[200px] animate-float-subtle-delayed z-20 hover:scale-105 transition-all">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Attendance Alert</span>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-purple-300">Attendance Alert</span>
             </div>
-            <p className="text-xs font-semibold text-slate-800 mb-1">Student ID #9204 attendance drops to <span className="text-red-500 font-bold">71.8%</span> next week.</p>
+            <p className="text-xs font-semibold text-white mb-1">Student ID #9204 attendance drops to <span className="text-red-400 font-bold">71.8%</span> next week.</p>
             <span className="text-[9px] text-slate-400">Academic Agent: Triggering waiver draft...</span>
           </div>
 
-          {/* Card 2: Placement recommendation */}
-          <div className="absolute -right-16 top-4 md:top-12 glass-panel-light p-4 rounded-[20px] shadow-xl border border-slate-200 max-w-[220px] animate-float-subtle z-20 hover:scale-105 transition-all">
+          {/* Card 2: Placement recommendation (Blue Tinted Glass) */}
+          <div className="absolute -right-16 top-4 md:top-12 glass-premium-dark-blue p-4 rounded-[20px] max-w-[220px] animate-float-subtle z-20 hover:scale-105 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <div className="p-1 rounded-md bg-blue-100 text-blue-600"><Sparkles className="w-3.5 h-3.5" /></div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-blue-600 font-bold">AI Recommendation</span>
+              <div className="p-1 rounded-md bg-blue-500/15 text-blue-300 border border-blue-500/20"><Sparkles className="w-3.5 h-3.5" /></div>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-blue-300 font-bold">AI Recommendation</span>
             </div>
-            <p className="text-xs font-semibold text-slate-800 mb-2">91% Placement match for TCS drives. Ready for resume push.</p>
+            <p className="text-xs font-semibold text-white mb-2">91% Placement match for TCS drives. Ready for resume push.</p>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100">Confidence: 94%</span>
+              <span className="text-[9px] font-bold bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/20">Confidence: 94%</span>
             </div>
           </div>
 
-          {/* Card 3: Campus health alert */}
-          <div className="absolute -bottom-8 left-4 md:-left-8 glass-panel-light p-4 rounded-[20px] shadow-xl border border-slate-200 max-w-[210px] animate-float z-20 hover:scale-105 transition-all">
+          {/* Card 3: Campus health alert (Blue Tinted Glass) */}
+          <div className="absolute -bottom-8 left-4 md:-left-8 glass-premium-dark-blue p-4 rounded-[20px] max-w-[210px] animate-float z-20 hover:scale-105 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <div className="p-1 rounded bg-indigo-50 text-indigo-600"><TrendingUp className="w-3.5 h-3.5" /></div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Campus Health</span>
+              <div className="p-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/20"><TrendingUp className="w-3.5 h-3.5" /></div>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-300">Campus Health</span>
             </div>
-            <p className="text-xs font-semibold text-slate-800 mb-1">Hostel Mess D: Food waste predicted to drop by <span className="text-green-600 font-bold">24%</span> using demand models.</p>
+            <p className="text-xs font-semibold text-white mb-1">Hostel Mess D: Food waste predicted to drop by <span className="text-green-400 font-bold">24%</span> using demand models.</p>
             <span className="text-[9px] text-slate-400">Automation: Optimized food prep logs</span>
           </div>
 
-          {/* Card 4: Agent Active log */}
-          <div className="absolute -bottom-10 right-4 md:-right-8 glass-panel-light p-4 rounded-[20px] shadow-xl border border-slate-200 max-w-[200px] animate-float-delayed z-20 hover:scale-105 transition-all">
+          {/* Card 4: Agent Active log (Purple Tinted Glass) */}
+          <div className="absolute -bottom-10 right-4 md:-right-8 glass-premium-dark-purple p-4 rounded-[20px] max-w-[200px] animate-float-delayed z-20 hover:scale-105 transition-all">
             <div className="flex items-center gap-2 mb-2">
-              <div className="p-1 rounded bg-emerald-50 text-emerald-600"><Activity className="w-3.5 h-3.5" /></div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Knowledge Search</span>
+              <div className="p-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20"><Activity className="w-3.5 h-3.5" /></div>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Knowledge Search</span>
             </div>
-            <p className="text-xs font-semibold text-slate-800 mb-1">Retrieval Augmented Policy matches found in Clause 12.A</p>
+            <p className="text-xs font-semibold text-white mb-1">Retrieval Augmented Policy matches found in Clause 12.A</p>
             <div className="flex items-center gap-1.5 mt-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block animate-pulse" />
-              <span className="text-[9px] font-bold text-emerald-600 uppercase">Agent Active</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 block animate-pulse" />
+              <span className="text-[9px] font-bold text-emerald-300 uppercase">Agent Active</span>
             </div>
           </div>
         </div>
