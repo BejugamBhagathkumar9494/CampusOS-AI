@@ -372,10 +372,10 @@ export default function LandingPage() {
             <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
             <source src="/hero-bg.mp4" type="video/mp4" />
           </video>
-          {/* Subtle blue overlay (25%) and dark vignette for 100% text readability */}
-          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-blue-950/30 to-slate-950/80" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-slate-950/60" />
+          {/* Subtle blue-to-purple gradient overlay & reduced dark opacity for campus visibility */}
+          <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[1.5px]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/55 via-slate-950/40 to-purple-950/50" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/15 via-transparent to-slate-950/75" />
 
           {/* Glowing Orbs */}
           <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[120px] mix-blend-screen animate-pulse-slow pointer-events-none" />
@@ -421,7 +421,7 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md text-shadow-premium">
             The AI Operating System for{' '}
             <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-md">
               Modern Universities
@@ -429,7 +429,7 @@ export default function LandingPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg lg:text-xl text-slate-200 max-w-[640px] font-normal leading-relaxed mb-9 drop-shadow-sm">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-200 max-w-[640px] font-normal leading-relaxed mb-9 drop-shadow-sm text-shadow-premium">
             Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
           </p>
 
