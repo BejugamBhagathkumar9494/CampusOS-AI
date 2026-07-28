@@ -395,6 +395,9 @@ export default function LandingPage() {
             <div className="absolute w-2 h-2 bg-cyan-400/25 rounded-full top-[90%] left-[45%] animate-particle-3" />
             <div className="absolute w-1.5 h-1.5 bg-indigo-400/35 rounded-full top-[75%] left-[80%] animate-particle-4" />
           </div>
+
+          {/* Bottom blending gradient to transition smoothly into the next section */}
+          <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none" />
         </div>
 
         <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
