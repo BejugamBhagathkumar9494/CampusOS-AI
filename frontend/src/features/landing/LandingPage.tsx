@@ -398,24 +398,27 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+          {/* Subtle gradient lighting backdrop behind the heading */}
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 -translate-y-12 w-[350px] sm:w-[600px] h-[150px] sm:h-[250px] bg-gradient-to-r from-blue-600/15 via-purple-600/10 to-cyan-500/15 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none -z-10" />
+
           {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-blue-500/20 border border-blue-400/35 text-blue-300 backdrop-blur-md mb-5 shadow-lg shadow-blue-500/10 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-400/60">
+          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-slate-900/60 border border-blue-500/30 text-blue-200 backdrop-blur-md mb-5 shadow-lg shadow-blue-950/20 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-500/50 hover:bg-slate-900/80">
             <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
             <span>Built for Modern Higher Education</span>
           </div>
 
           {/* Small Feature Badges */}
           <div className="flex flex-wrap justify-center gap-2.5 mb-7">
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
             </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-white/10 text-slate-200 border border-white/15 backdrop-blur-md shadow-sm">
+            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
               <Check className="w-3.5 h-3.5 text-emerald-400" /> Predictive Analytics
             </span>
           </div>
@@ -423,7 +426,7 @@ export default function LandingPage() {
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md text-shadow-premium">
             The AI Operating System for{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-blue-500 bg-clip-text text-transparent drop-shadow-md">
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-md">
               Modern Universities
             </span>
           </h1>
