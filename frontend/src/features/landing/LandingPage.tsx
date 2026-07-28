@@ -359,7 +359,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-0 pt-14 pb-14 lg:pt-20 lg:pb-20 px-6 sm:px-8 xl:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-4.5rem)]">
-        {/* Background Video */}
+        {/* Background Video & Ambient Overlay */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu">
           <video
             autoPlay
@@ -376,6 +376,25 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]" />
           <div className="absolute inset-0 bg-gradient-to-tr from-slate-950 via-blue-950/30 to-slate-950/80" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-slate-950/60" />
+
+          {/* Glowing Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[120px] mix-blend-screen animate-pulse-slow pointer-events-none" />
+          <div className="absolute bottom-1/3 right-1/4 w-[450px] h-[450px] rounded-full bg-purple-500/10 blur-[130px] mix-blend-screen animate-pulse-slow-delay pointer-events-none" />
+          <div className="absolute top-1/2 right-10 w-[300px] h-[300px] rounded-full bg-cyan-500/8 blur-[100px] mix-blend-screen animate-pulse-slow pointer-events-none" />
+
+          {/* Smooth Light Beams */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[150%] bg-gradient-to-b from-blue-500/5 via-indigo-500/3 to-transparent blur-[80px] transform rotate-[25deg] origin-top animate-light-beam" />
+            <div className="absolute top-[-30%] right-[-10%] w-[35%] h-[160%] bg-gradient-to-b from-purple-500/5 via-cyan-500/3 to-transparent blur-[90px] transform rotate-[-25deg] origin-top animate-light-beam" style={{ animationDelay: '-12s' }} />
+          </div>
+
+          {/* Light Floating Particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute w-1.5 h-1.5 bg-blue-400/40 rounded-full top-[80%] left-[20%] animate-particle-1" />
+            <div className="absolute w-1 h-1 bg-purple-400/30 rounded-full top-[70%] left-[60%] animate-particle-2" />
+            <div className="absolute w-2 h-2 bg-cyan-400/25 rounded-full top-[90%] left-[45%] animate-particle-3" />
+            <div className="absolute w-1.5 h-1.5 bg-indigo-400/35 rounded-full top-[75%] left-[80%] animate-particle-4" />
+          </div>
         </div>
 
         <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
