@@ -11,6 +11,7 @@ from app.schemas import (
     RAGSearchResponse, 
     RAGSearchResultItem
 )
+from app.services.ml_models.placement_predictor import predict_placement_readiness
 from app.services.ai_agents import (
     academic, 
     hostel as hostel_agent, 
@@ -69,17 +70,15 @@ def chat_with_agent(
             response_text = f"Here is your study roadmap:\n" + "\n".join(roadmap)
             
     elif any(k in query for k in ["placement", "job", "tcs", "resume", "readiness"]):
-        # Placement Agent
-        readiness_score = 78.5
-        if student:
-            readiness_score = float(student.cgpa * 9.3)
+        # Use the model trained from the supplied placement data, rather than a fixed score.
+        prediction = predict_placement_readiness(cgpa=float(student.cgpa) if student else 7.0)
         response_text = (
-            f"Your Placement Readiness prediction is {readiness_score:.1f}%. "
-            "You are in the top tier of candidates. Recommended focus areas: System Design, Mock coding rounds. "
-            "The TCS placement drive is open; let me know if you want me to review your resume."
+            f"Your Placement Readiness prediction is {prediction['readiness_score']:.1f}% "
+            f"({prediction['readiness_rating']}). This estimate is based on "
+            f"{prediction['training_rows']:,} 2026 placement records. "
+            "Recommended focus areas: System Design and mock coding rounds."
         )
-        
-    elif any(k in query for k in ["bus", "route", "eta", "transport"]):
+            elif any(k in query for k in ["bus", "route", "eta", "transport"]):
         # Transport Agent
         response_text = (
             "Checking live tracking... Bus TS-09-UA-1234 on Route 10A is currently 8 minutes away from the Main Gate. "
