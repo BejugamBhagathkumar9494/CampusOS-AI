@@ -37,7 +37,7 @@ function StudentDashboard({ name }: DashboardProps) {
   const recommendations = [
     "Your attendance in 'Automata Theory' is at 74%. Attend tomorrow's session to cross the 75% threshold.",
     "Academic risk model predicts upcoming mid-terms for 'Discrete Math' may be difficult. Generate a practice quiz.",
-    "TCS Placement drive has opened. Your placement readiness is 78.5%. Apply soon.",
+    "TCS Placement drive has opened. Run your dataset-backed readiness prediction before applying.",
   ];
 
   const classes = [
@@ -87,8 +87,8 @@ function StudentDashboard({ name }: DashboardProps) {
             <span className="text-slate-400 text-sm font-medium">Placement Readiness</span>
             <Sparkles className="w-4.5 h-4.5 text-indigo-400" />
           </div>
-          <p className="text-2xl font-bold text-white mb-1">78.5%</p>
-          <span className="text-xs font-semibold text-indigo-400">Top 15% of your class</span>
+          <p className="text-2xl font-bold text-white mb-1">—</p>
+          <span className="text-xs font-semibold text-indigo-400">Calculate in Placements</span>
         </div>
 
         <div className="glass-card rounded-2xl p-5">
