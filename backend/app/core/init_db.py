@@ -198,12 +198,20 @@ def init_db():
         db.add(route_2)
         db.commit()
 
-        # 10. Seed Company and Application
-        company = Company(name="TCS", industry="Information Technology", website="https://tcs.com")
-        db.add(company)
+        # 10. Seed Companies and Applications
+        companies_data = [
+            Company(name="Google", industry="Technology", website="https://careers.google.com"),
+            Company(name="Microsoft", industry="Technology", website="https://careers.microsoft.com"),
+            Company(name="Amazon", industry="Cloud & E-Commerce", website="https://amazon.jobs"),
+            Company(name="TCS Digital", industry="Information Technology", website="https://tcs.com"),
+            Company(name="Infosys", industry="IT Services", website="https://infosys.com"),
+            Company(name="Wipro", industry="IT Services", website="https://wipro.com"),
+        ]
+        for c in companies_data:
+            db.add(c)
         db.commit()
 
-        app = PlacementApplication(company_id=company.id, student_id=student_profile.id, status="Applied")
+        app = PlacementApplication(company_id=companies_data[0].id, student_id=student_profile.id, status="Applied")
         db.add(app)
         db.commit()
 
