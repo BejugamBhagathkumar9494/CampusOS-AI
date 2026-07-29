@@ -14,50 +14,93 @@ import {
   getStudentAttendance
 } from '../services/api'
 import {
-  BookOpen, Upload, Landmark, Bus, Info, Cpu, Award, Briefcase, TrendingUp, CheckCircle, Search, FileText
+  BookOpen, Upload, Landmark, Bus, Cpu, Award, Briefcase, TrendingUp, Search, FileText, Check, Users, Calendar, AlertTriangle, Sparkles, User, Lock, Bell
 } from 'lucide-react'
 
-// Academics Component
+// 1. ACADEMICS COMPONENT
 export const Academics = () => (
-  <div className="space-y-6 animate-fade-in">
-    <div>
-      <h1 className="text-3xl font-bold text-white mb-1">Academics</h1>
-      <p className="text-sm text-slate-300 font-medium">Manage courses, syllabi, and AI study planners.</p>
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <BookOpen className="w-5 h-5" />
+          </span>
+          Academics & Courses
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Manage enrolled courses, syllabi, study planners, and AI elective recommendations.</p>
+      </div>
+      <div className="px-4 py-2 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-2">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span className="text-xs font-bold text-slate-700">Semester V • 2026 Batch</span>
+      </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="glass-card rounded-2xl p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2.5">
-          <BookOpen className="w-6 h-6 text-indigo-400" /> Current Enrolled Subjects
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Current Enrolled Subjects */}
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-indigo-600" /> Current Enrolled Subjects
         </h2>
         <div className="space-y-3">
           {[
-            { code: 'CS301', name: 'Automata & Formal Languages', credits: 4 },
-            { code: 'CS302', name: 'Computer Networks & Protocols', credits: 4 },
-            { code: 'CS303', name: 'Database Management Systems', credits: 4 }
+            { code: 'CS301', name: 'Automata & Formal Languages', credits: 4, prof: 'Dr. Sarah Jenkins', progress: 78 },
+            { code: 'CS302', name: 'Computer Networks & Protocols', credits: 4, prof: 'Prof. Alan Vance', progress: 85 },
+            { code: 'CS303', name: 'Database Management Systems', credits: 4, prof: 'Dr. Emily Stone', progress: 92 }
           ].map((subject) => (
-            <div key={subject.code} className="flex justify-between items-center p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-              <div>
-                <span className="text-xs font-semibold text-indigo-400">{subject.code} • {subject.credits} Credits</span>
-                <h3 className="text-base text-slate-200 font-bold mt-0.5">{subject.name}</h3>
+            <div key={subject.code} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col justify-between gap-3 hover:bg-slate-50 transition-all">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100">{subject.code} • {subject.credits} Credits</span>
+                  <h3 className="text-base text-slate-900 font-bold mt-1.5">{subject.name}</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">Instructor: {subject.prof}</p>
+                </div>
+                <button className="text-xs font-bold text-indigo-600 bg-white border border-indigo-100 hover:bg-indigo-50 px-3 py-1.5 rounded-xl transition-all shadow-2xs">
+                  Syllabus PDF
+                </button>
               </div>
-              <span className="text-sm text-indigo-400 font-semibold cursor-pointer hover:underline">Syllabus PDF</span>
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500">
+                  <span>Syllabus Completed</span>
+                  <span className="text-indigo-600">{subject.progress}%</span>
+                </div>
+                <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                  <div className="bg-gradient-to-r from-indigo-600 to-violet-600 h-2 rounded-full transition-all duration-500" style={{ width: `${subject.progress}%` }}></div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="glass-card rounded-2xl p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2.5">
-          <Cpu className="w-6 h-6 text-indigo-400" /> AI Elective Recommender
+
+      {/* AI Elective Recommender */}
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <Cpu className="w-5 h-5 text-indigo-600" /> AI Elective Recommender
         </h2>
-        <p className="text-sm text-slate-300">Based on your academic performance and interest in AI & Systems:</p>
+        <p className="text-xs text-slate-500 font-medium leading-relaxed">Based on your academic performance, coding scores, and placement dataset requirements:</p>
+        
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30">
-            <h3 className="text-base font-bold text-white">Natural Language Processing & LLMs</h3>
-            <p className="text-xs text-slate-400 mt-1">96% recommendation match • High placement signal in 2026 data.</p>
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-purple-50/80 border border-indigo-100 space-y-2">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-bold text-slate-900">Natural Language Processing & LLMs</h3>
+              <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">96% Match</span>
+            </div>
+            <p className="text-xs text-slate-600 font-medium">High placement weightage in 2026 data • Offered by Dr. Sarah Jenkins</p>
+            <button className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+              Request Enrollment
+            </button>
           </div>
-          <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800">
-            <h3 className="text-base font-bold text-white">Distributed Systems & Cloud Architecture</h3>
-            <p className="text-xs text-slate-400 mt-1">88% recommendation match • Highly demanded by tech recruiters.</p>
+
+          <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-2">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-bold text-slate-900">Distributed Systems & Cloud Architecture</h3>
+              <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">88% Match</span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">Demanded by recruiters (TCS, Google, Amazon) • Offered by Prof. Vance</p>
+            <button className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all">
+              View Syllabus
+            </button>
           </div>
         </div>
       </div>
@@ -65,7 +108,7 @@ export const Academics = () => (
   </div>
 )
 
-// Attendance Component with Live Data
+// 2. ATTENDANCE COMPONENT
 export const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState<any>(null)
 
@@ -74,7 +117,7 @@ export const Attendance = () => {
       .then(data => setAttendanceData(data))
       .catch(() => {
         setAttendanceData({
-          overall_rate: 85.0,
+          overall_rate: 87.5,
           subjects: [
             { subject_name: 'Automata Theory', subject_code: 'CS301', total_classes: 32, attended_classes: 24, attendance_rate: 75.0, status: 'Safe' },
             { subject_name: 'Computer Networks', subject_code: 'CS302', total_classes: 34, attended_classes: 31, attendance_rate: 91.2, status: 'Safe' },
@@ -85,77 +128,112 @@ export const Attendance = () => {
   }, [])
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-end">
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Attendance Monitor</h1>
-          <p className="text-sm text-slate-300 font-medium">Track subject attendance rates and predictive shortage alerts.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <Calendar className="w-5 h-5" />
+            </span>
+            Attendance Monitor
+          </h1>
+          <p className="text-sm text-slate-500 font-medium mt-1">Track subject attendance rates and predictive shortage alerts.</p>
         </div>
         {attendanceData && (
-          <div className="px-4 py-2 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-right">
-            <span className="text-xs text-slate-400">Overall Attendance</span>
-            <div className="text-2xl font-extrabold text-indigo-400">{attendanceData.overall_rate}%</div>
+          <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-4">
+            <div>
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Overall Rate</span>
+              <span className="text-2xl font-extrabold text-emerald-600">{attendanceData.overall_rate}%</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold text-sm">
+              <Check className="w-5 h-5" />
+            </div>
           </div>
         )}
       </div>
 
-      <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800">
-        <table className="w-full text-left border-collapse text-base">
-          <thead>
-            <tr className="bg-slate-900 border-b border-slate-800 text-slate-300 font-bold">
-              <th className="p-4.5">Subject</th>
-              <th className="p-4.5">Total Classes</th>
-              <th className="p-4.5">Attended</th>
-              <th className="p-4.5">Percentage</th>
-              <th className="p-4.5">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800/50">
-            {(attendanceData?.subjects || []).map((sub: any) => (
-              <tr key={sub.subject_name} className="hover:bg-slate-900/30">
-                <td className="p-4.5 font-semibold text-white">
-                  {sub.subject_name} <span className="text-xs text-slate-500 font-mono">({sub.subject_code})</span>
-                </td>
-                <td className="p-4.5 text-slate-300">{sub.total_classes}</td>
-                <td className="p-4.5 text-slate-300">{sub.attended_classes}</td>
-                <td className="p-4.5 text-slate-300 font-mono">{sub.attendance_rate}%</td>
-                <td className="p-4.5">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    sub.status === 'Safe' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                  }`}>
-                    {sub.status}
-                  </span>
-                </td>
+      <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+          <h2 className="text-lg font-bold text-slate-900">Subject Breakdown</h2>
+          <span className="text-xs font-bold text-indigo-600">Threshold: 75.0%</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr className="bg-slate-50/70 border-b border-slate-100 text-slate-500 font-bold text-xs uppercase tracking-wider">
+                <th className="p-4.5 pl-6">Subject</th>
+                <th className="p-4.5">Total Classes</th>
+                <th className="p-4.5">Attended</th>
+                <th className="p-4.5">Attendance Rate</th>
+                <th className="p-4.5 pr-6">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-medium">
+              {(attendanceData?.subjects || []).map((sub: any) => (
+                <tr key={sub.subject_name} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="p-4.5 pl-6 font-bold text-slate-900">
+                    {sub.subject_name} <span className="text-xs text-slate-400 font-semibold font-mono">({sub.subject_code})</span>
+                  </td>
+                  <td className="p-4.5 text-slate-600">{sub.total_classes}</td>
+                  <td className="p-4.5 text-slate-600">{sub.attended_classes}</td>
+                  <td className="p-4.5">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono font-bold text-slate-800 w-12">{sub.attendance_rate}%</span>
+                      <div className="w-32 bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div className={`h-2 rounded-full ${sub.attendance_rate >= 75 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: `${sub.attendance_rate}%` }}></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4.5 pr-6">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                      sub.status === 'Safe' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
+                    }`}>
+                      {sub.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )
 }
 
-// Exams Component
+// 3. EXAMS COMPONENT
 export const Exams = () => (
-  <div className="space-y-6 animate-fade-in">
+  <div className="space-y-7 animate-fade-in font-sans">
     <div>
-      <h1 className="text-3xl font-bold text-white mb-1">Exams & Evaluations</h1>
-      <p className="text-sm text-slate-300 font-medium">View schedules, historical score breakdowns, and internal grade predictions.</p>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+          <FileText className="w-5 h-5" />
+        </span>
+        Exams & Grade Predictions
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">View upcoming semester timetables, hall passes, and internal grade predictions.</p>
     </div>
-    <div className="glass-card rounded-2xl p-6">
-      <h2 className="text-xl font-bold text-white mb-4">Upcoming End Semester Timetable</h2>
-      <div className="space-y-4">
+
+    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+      <h2 className="text-lg font-bold text-slate-900">Upcoming End Semester Timetable</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { date: 'Nov 12, 2026', code: 'CS301', name: 'Automata Theory', time: '10:00 AM - 01:00 PM', hall: 'Hall 4B' },
-          { date: 'Nov 14, 2026', code: 'CS302', name: 'Computer Networks', time: '10:00 AM - 01:00 PM', hall: 'Hall 2A' },
-          { date: 'Nov 17, 2026', code: 'CS303', name: 'Database Management Systems', time: '10:00 AM - 01:00 PM', hall: 'Hall 3C' },
+          { date: 'Nov 12, 2026', code: 'CS301', name: 'Automata Theory', time: '10:00 AM - 01:00 PM', hall: 'Hall 4B', grade: 'A (Predicted)' },
+          { date: 'Nov 14, 2026', code: 'CS302', name: 'Computer Networks', time: '10:00 AM - 01:00 PM', hall: 'Hall 2A', grade: 'A+ (Predicted)' },
+          { date: 'Nov 17, 2026', code: 'CS303', name: 'Database Management Systems', time: '10:00 AM - 01:00 PM', hall: 'Hall 3C', grade: 'A (Predicted)' },
         ].map((ex) => (
-          <div key={ex.code} className="flex justify-between items-center p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-            <div>
-              <span className="text-xs font-semibold text-indigo-400">{ex.date} • Location: {ex.hall}</span>
-              <h3 className="text-base font-bold text-white mt-0.5">{ex.name} ({ex.code})</h3>
+          <div key={ex.code} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-3 hover:bg-slate-50 transition-all">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">{ex.date}</span>
+              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{ex.grade}</span>
             </div>
-            <span className="text-sm text-slate-300 font-mono bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">{ex.time}</span>
+            <div>
+              <h3 className="text-base font-bold text-slate-900">{ex.name}</h3>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">Code: {ex.code} • Location: {ex.hall}</p>
+            </div>
+            <div className="text-xs font-semibold text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/80 text-center font-mono">
+              {ex.time}
+            </div>
           </div>
         ))}
       </div>
@@ -163,31 +241,46 @@ export const Exams = () => (
   </div>
 )
 
-// Assignments Component
+// 4. ASSIGNMENTS COMPONENT
 export const Assignments = () => (
-  <div className="space-y-6 animate-fade-in">
+  <div className="space-y-7 animate-fade-in font-sans">
     <div>
-      <h1 className="text-3xl font-bold text-white mb-1">Assignments</h1>
-      <p className="text-sm text-slate-300 font-medium">Upload reports, submit lab code, and view automated feedback.</p>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+          <Upload className="w-5 h-5" />
+        </span>
+        Assignments & Submissions
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Upload solutions, check assignment deadlines, and review grading reports.</p>
     </div>
-    <div className="glass-card rounded-2xl p-6 space-y-4">
-      <h2 className="text-xl font-bold text-white">Pending Assignments</h2>
+
+    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+      <h2 className="text-lg font-bold text-slate-900">Pending & Upcoming Tasks</h2>
       <div className="space-y-3">
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+        <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="text-base font-bold text-white">OS Lab: Thread Scheduling & Synchronization</h3>
-            <p className="text-sm text-red-400 font-semibold mt-1">Due in 2 days (Oct 31, 2026)</p>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200">Due in 2 days</span>
+              <span className="text-xs text-slate-400 font-mono">CS302 Lab</span>
+            </div>
+            <h3 className="text-base font-bold text-slate-900 mt-1.5">OS Lab: Thread Scheduling & Synchronization</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Submit C++/Java solution with test bench output.</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/20 shrink-0">
             <Upload className="w-4 h-4" /> Submit Solution
           </button>
         </div>
-        <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80 flex justify-between items-center">
+
+        <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="text-base font-bold text-white">DBMS Project: B+ Tree Index Implementation</h3>
-            <p className="text-sm text-slate-400 font-medium mt-1">Due in 6 days (Nov 04, 2026)</p>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">Due in 6 days</span>
+              <span className="text-xs text-slate-400 font-mono">CS303 Lab</span>
+            </div>
+            <h3 className="text-base font-bold text-slate-900 mt-1.5">DBMS Project: B+ Tree Index Implementation</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Submit GitHub repo link & PDF report.</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold transition-all">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all shrink-0">
             <Upload className="w-4 h-4" /> Submit Solution
           </button>
         </div>
@@ -196,7 +289,7 @@ export const Assignments = () => (
   </div>
 )
 
-// Library Component with Live Search API
+// 5. LIBRARY COMPONENT
 export const Library = () => {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
@@ -219,40 +312,46 @@ export const Library = () => {
   }, [])
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-1">Library Knowledge Base</h1>
-        <p className="text-sm text-slate-300 font-medium">Search reference books, research papers, and available university copies.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <BookOpen className="w-5 h-5" />
+          </span>
+          Library & Vector Search
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Search reference books, research papers, and available university copies.</p>
       </div>
+
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-3.5 w-4.5 h-4.5 text-slate-400" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search titles, authors, or subjects (e.g. 'Algorithms', 'Networks')..."
-            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-base text-white focus:outline-none focus:border-indigo-500"
+            className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 shadow-xs transition-all"
           />
         </div>
-        <button onClick={handleSearch} disabled={loading} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-base text-white font-semibold transition-all">
-          {loading ? 'Searching...' : 'Search Library'}
+        <button onClick={handleSearch} disabled={loading} className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-2xl text-sm text-white font-bold transition-all shadow-md shadow-indigo-500/20">
+          {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
 
-      <div className="glass-card rounded-2xl p-6 space-y-4">
-        <h2 className="text-xl font-bold text-white">Available Books ({results.length})</h2>
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Available Library Catalog ({results.length})</h2>
         <div className="space-y-3">
           {results.map((book) => (
-            <div key={book.id || book.title} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+            <div key={book.id || book.title} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <h3 className="text-base font-bold text-white">{book.title}</h3>
-                <p className="text-sm text-slate-300 mt-0.5">Author: {book.author} • Category: {book.category} • Location: {book.location}</p>
-                {book.isbn && <p className="text-xs text-slate-500 font-mono mt-1">ISBN: {book.isbn}</p>}
+                <h3 className="text-base font-bold text-slate-900">{book.title}</h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Author: {book.author} • Category: {book.category} • Location: <span className="font-bold text-slate-700">{book.location}</span></p>
+                {book.isbn && <p className="text-[11px] text-slate-400 font-mono mt-1">ISBN: {book.isbn}</p>}
               </div>
-              <span className={`text-xs px-3.5 py-1.5 rounded-full font-bold ${
-                book.copies_available > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+              <span className={`text-xs px-3.5 py-1.5 rounded-full font-extrabold border ${
+                book.copies_available > 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
               }`}>
                 {book.copies_available > 0 ? `${book.copies_available} Copies Available` : 'All Issued'}
               </span>
@@ -264,7 +363,7 @@ export const Library = () => {
   )
 }
 
-// Hostel Component with Live AI Priority Prediction
+// 6. HOSTEL COMPONENT
 export const Hostel = () => {
   const [complaintTitle, setComplaintTitle] = useState('')
   const [complaintText, setComplaintText] = useState('')
@@ -301,74 +400,78 @@ export const Hostel = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-1">Hostel Hub</h1>
-        <p className="text-sm text-slate-300 font-medium">File maintenance tickets, inspect AI priority rankings, and check room details.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+            <AlertTriangle className="w-5 h-5" />
+          </span>
+          Hostel Hub
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">File maintenance tickets, check room details, and inspect AI priority predictions.</p>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <form onSubmit={handleSubmit} className="glass-card rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-white">Submit Maintenance Request</h2>
+        <form onSubmit={handleSubmit} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">Submit Maintenance Request</h2>
           <input
             type="text"
             value={complaintTitle}
             onChange={(e) => setComplaintTitle(e.target.value)}
             placeholder="Complaint Subject (e.g. WiFi router power failure)"
-            className="w-full p-3 rounded-lg border border-slate-800 bg-slate-900 text-sm text-white focus:outline-none focus:border-indigo-500"
+            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
             required
           />
           <textarea
             value={complaintText}
             onChange={(e) => setComplaintText(e.target.value)}
             placeholder="Detailed description (e.g. Power outlet in Room 302-B sparked)..."
-            className="w-full h-24 p-3 rounded-lg border border-slate-800 bg-slate-900 text-sm text-white focus:outline-none focus:border-indigo-500"
+            className="w-full h-24 p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
             required
           />
-          <button type="submit" disabled={submitting} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm text-white font-semibold transition-all">
+          <button type="submit" disabled={submitting} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs font-bold text-white transition-all shadow-md shadow-indigo-500/20">
             {submitting ? 'Categorizing with AI...' : 'Submit & Predict AI Priority'}
           </button>
         </form>
 
-        <div className="glass-card rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-white">Allotted Room Details</h2>
-          <div className="space-y-2.5 text-sm text-slate-300">
-            <div className="flex justify-between py-2 border-b border-slate-800">
-              <span>Room Number</span>
-              <span className="font-semibold text-white">302-B</span>
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">Allotted Room Details</h2>
+          <div className="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+              <span className="text-slate-500">Room Number</span>
+              <span className="font-bold text-slate-900">302-B</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-800">
-              <span>Block & Wing</span>
-              <span className="font-semibold text-white">C-Block (Boys)</span>
+            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+              <span className="text-slate-500">Block & Wing</span>
+              <span className="font-bold text-slate-900">C-Block (Boys)</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-slate-800">
-              <span>Room Capacity</span>
-              <span className="font-semibold text-white">4 Occupants (1 Allotted)</span>
+            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+              <span className="text-slate-500">Room Capacity</span>
+              <span className="font-bold text-slate-900">4 Occupants (1 Allotted)</span>
             </div>
-            <div className="flex justify-between py-2">
-              <span>Hostel Warden</span>
-              <span className="font-semibold text-white">Mr. Robert Dev (+91-9876543210)</span>
+            <div className="flex justify-between py-2 font-medium">
+              <span className="text-slate-500">Hostel Warden</span>
+              <span className="font-bold text-slate-900">Mr. Robert Dev (+91-9876543210)</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <h2 className="text-lg font-bold text-white">Active Maintenance Tickets ({complaints.length})</h2>
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Active Maintenance Tickets ({complaints.length})</h2>
         <div className="space-y-3">
           {complaints.map((c) => (
-            <div key={c.id || c.title} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+            <div key={c.id || c.title} className="p-4.5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-white">{c.title}</h3>
-                <p className="text-sm text-slate-400 mt-0.5">{c.description}</p>
-                <span className="text-xs text-slate-500 font-mono mt-1 inline-block">Room: {c.room_number || '302-B'}</span>
+                <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">{c.description}</p>
+                <span className="text-[11px] text-slate-400 font-mono mt-1 block">Room: {c.room_number || '302-B'}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs px-3 py-1 rounded-full font-bold ${
-                  c.priority === 'High' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                }`}>
-                  Priority: {c.priority || 'Medium'}
-                </span>
-              </div>
+              <span className={`text-xs px-3 py-1 rounded-full font-extrabold border ${
+                c.priority === 'High' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-amber-50 text-amber-600 border-amber-200'
+              }`}>
+                Priority: {c.priority || 'Medium'}
+              </span>
             </div>
           ))}
         </div>
@@ -377,7 +480,7 @@ export const Hostel = () => {
   )
 }
 
-// Transport Component with Live Bus Route Tracking
+// 7. TRANSPORT COMPONENT
 export const Transport = () => {
   const [routes, setRoutes] = useState<any[]>([])
 
@@ -393,25 +496,31 @@ export const Transport = () => {
   }, [])
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-1">Transport & Bus Schedule</h1>
-        <p className="text-sm text-slate-300 font-medium">Track campus shuttles, live ETAs, driver contacts, and peak occupancy predictions.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <Bus className="w-5 h-5" />
+          </span>
+          Transport & Bus Tracking
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Track campus shuttles, live ETAs, driver contacts, and peak occupancy predictions.</p>
       </div>
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <Bus className="w-5 h-5 text-indigo-400" /> Active Campus Bus Routes
+
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <Bus className="w-5 h-5 text-indigo-600" /> Active Campus Bus Routes
         </h2>
         <div className="space-y-3">
           {routes.map((bus) => (
-            <div key={bus.route} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+            <div key={bus.route} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
               <div>
-                <h3 className="text-base font-bold text-white">{bus.route}</h3>
-                <p className="text-sm text-slate-400 mt-0.5">Vehicle: <span className="font-mono text-indigo-400">{bus.bus_number}</span> • Driver: {bus.driver_name || 'Ramesh Kumar'}</p>
-                <p className="text-xs text-slate-500 mt-1">Live ETA: <span className="text-emerald-400 font-bold">{bus.eta}</span></p>
+                <h3 className="text-base font-bold text-slate-900">{bus.route}</h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Vehicle: <span className="font-mono text-indigo-600 font-bold">{bus.bus_number}</span> • Driver: {bus.driver_name || 'Ramesh Kumar'}</p>
+                <p className="text-xs text-slate-400 font-medium mt-1">Live ETA: <span className="text-emerald-600 font-extrabold">{bus.eta}</span></p>
               </div>
-              <span className={`text-xs px-3 py-1 rounded-full font-bold ${
-                bus.demand === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              <span className={`text-xs px-3.5 py-1.5 rounded-full font-extrabold border ${
+                bus.demand === 'High' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
               }`}>
                 Peak Occupancy: {bus.demand}
               </span>
@@ -423,7 +532,7 @@ export const Transport = () => {
   )
 }
 
-// Full Dataset-Backed Placements Hub & AI Predictor
+// 8. PLACEMENTS COMPONENT
 export const Placements = () => {
   const [cgpa, setCgpa] = useState('8.50')
   const [branch, setBranch] = useState('CSE')
@@ -480,29 +589,29 @@ export const Placements = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-950 border border-indigo-500/30">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-7 rounded-[24px] bg-gradient-to-r from-[#EEF2FF] via-[#F3E8FF] to-[#E0E7FF] border border-indigo-100/80 shadow-xs">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold mb-2">
-            <Award className="w-3.5 h-3.5" /> Powered by 100,000+ Placement Dataset
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 text-indigo-600 text-xs font-extrabold mb-2 border border-white/80 shadow-2xs">
+            <Award className="w-3.5 h-3.5" /> 100,000+ Placement Dataset ML Model
           </div>
-          <h1 className="text-3xl font-extrabold text-white">Placements & Salary Predictor</h1>
-          <p className="text-sm text-slate-300 mt-1">Real ML models trained on dual datasets for readiness scoring, package estimation, and skill analysis.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Placements & Salary Predictor</h1>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">Dual ML models trained for readiness scoring, package LPA estimation, and skill gap analysis.</p>
         </div>
         {analytics && (
-          <div className="flex gap-4">
-            <div className="text-center px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800">
-              <span className="text-xs text-slate-400">Total Analyzed</span>
-              <div className="text-lg font-bold text-white">{analytics.total_records?.toLocaleString()}</div>
+          <div className="flex gap-3">
+            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase">Dataset Total</span>
+              <div className="text-base font-extrabold text-slate-900">{analytics.total_records?.toLocaleString()}</div>
             </div>
-            <div className="text-center px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800">
-              <span className="text-xs text-slate-400">Placement Rate</span>
-              <div className="text-lg font-bold text-emerald-400">{analytics.placement_rate}%</div>
+            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase">Placement Rate</span>
+              <div className="text-base font-extrabold text-emerald-600">{analytics.placement_rate}%</div>
             </div>
-            <div className="text-center px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800">
-              <span className="text-xs text-slate-400">Avg Salary Package</span>
-              <div className="text-lg font-bold text-indigo-400">${analytics.avg_salary_lpa} LPA</div>
+            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase">Avg Salary</span>
+              <div className="text-base font-extrabold text-indigo-600">${analytics.avg_salary_lpa} LPA</div>
             </div>
           </div>
         )}
@@ -510,36 +619,36 @@ export const Placements = () => {
 
       {/* Dataset Statistics Cards */}
       {analytics && analytics.branches && (
-        <div className="glass-card rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-400" /> Department Placement Performance (2026 Dataset)
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-indigo-600" /> Department Placement Performance (100k Dataset)
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {analytics.branches.map((b: any) => (
-              <div key={b.branch} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                <span className="text-xs text-indigo-400 font-bold">{b.branch}</span>
-                <div className="text-xl font-extrabold text-white">{b.placement_rate}%</div>
-                <p className="text-[11px] text-slate-400">Avg {b.avg_salary_lpa} LPA</p>
+              <div key={b.branch} className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
+                <span className="text-xs text-indigo-600 font-extrabold">{b.branch}</span>
+                <div className="text-lg font-extrabold text-slate-900">{b.placement_rate}%</div>
+                <p className="text-[11px] text-slate-500 font-medium">Avg ${b.avg_salary_lpa} LPA</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Calculator & Predictor */}
+      {/* Calculator & Resume Reviewer Split */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-card rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-indigo-400" /> ML Placement & Salary Calculator
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-indigo-600" /> ML Readiness & Salary Calculator
           </h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">CGPA (0 - 10)</label>
-              <input value={cgpa} onChange={(e) => setCgpa(e.target.value)} type="number" step="0.01" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white" />
+              <label className="block text-xs font-bold text-slate-600 mb-1">CGPA (0 - 10)</label>
+              <input value={cgpa} onChange={(e) => setCgpa(e.target.value)} type="number" step="0.01" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">Branch</label>
-              <select value={branch} onChange={(e) => setBranch(e.target.value)} className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white">
+              <label className="block text-xs font-bold text-slate-600 mb-1">Branch</label>
+              <select value={branch} onChange={(e) => setBranch(e.target.value)} className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500">
                 <option value="CSE">CSE</option>
                 <option value="IT">IT</option>
                 <option value="EEE">EEE</option>
@@ -548,108 +657,90 @@ export const Placements = () => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">College Tier</label>
-              <select value={tier} onChange={(e) => setTier(e.target.value)} className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white">
+              <label className="block text-xs font-bold text-slate-600 mb-1">College Tier</label>
+              <select value={tier} onChange={(e) => setTier(e.target.value)} className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500">
                 <option value="Tier 1">Tier 1</option>
                 <option value="Tier 2">Tier 2</option>
                 <option value="Tier 3">Tier 3</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">Coding Score (0-100)</label>
-              <input value={codingScore} onChange={(e) => setCodingScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white" />
+              <label className="block text-xs font-bold text-slate-600 mb-1">Coding Score (0-100)</label>
+              <input value={codingScore} onChange={(e) => setCodingScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">Mock Interview Score</label>
-              <input value={mockScore} onChange={(e) => setMockScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white" />
+              <label className="block text-xs font-bold text-slate-600 mb-1">Mock Interview Score</label>
+              <input value={mockScore} onChange={(e) => setMockScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1">Internships Completed</label>
-              <input value={internships} onChange={(e) => setInternships(e.target.value)} type="number" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white" />
+              <label className="block text-xs font-bold text-slate-600 mb-1">Internships</label>
+              <input value={internships} onChange={(e) => setInternships(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1">Technical Skills (comma separated)</label>
-            <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Python, SQL, React, System Design" className="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white" />
+            <label className="block text-xs font-bold text-slate-600 mb-1">Skills (comma separated)</label>
+            <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Python, SQL, React, System Design" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
           </div>
 
-          <button onClick={calculateReadiness} disabled={loading} className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-sm font-bold text-white transition-all">
-            {loading ? 'Predicting with ML Model...' : 'Calculate Placement Readiness & Salary Package'}
+          <button onClick={calculateReadiness} disabled={loading} className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-3 text-xs font-bold text-white transition-all shadow-md shadow-indigo-500/20">
+            {loading ? 'Predicting with ML...' : 'Calculate Placement Readiness & Expected Salary'}
           </button>
 
           {prediction && (
-            <div className="p-5 rounded-2xl bg-slate-900/90 border border-indigo-500/30 space-y-3 mt-4">
-              <div className="flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-3">
+              <div className="flex justify-between items-center">
                 <div>
-                  <span className="text-xs text-slate-400">Readiness Rating</span>
-                  <div className="text-xl font-bold text-white">{prediction.readiness_rating} ({prediction.readiness_score}%)</div>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase">Readiness</span>
+                  <div className="text-base font-extrabold text-slate-900">{prediction.readiness_rating} ({prediction.readiness_score}%)</div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-slate-400">Expected Salary Package</span>
-                  <div className="text-2xl font-extrabold text-emerald-400">${prediction.expected_salary_lpa} LPA</div>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase">Expected Salary</span>
+                  <div className="text-xl font-extrabold text-emerald-600">${prediction.expected_salary_lpa} LPA</div>
                 </div>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Actionable ML Recommendations:</h4>
-                <ul className="space-y-1">
-                  {prediction.recommendations?.map((rec: string, i: number) => (
-                    <li key={i} className="text-xs text-slate-300 flex items-start gap-1.5">
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" /> {rec}
-                    </li>
-                  ))}
-                </ul>
               </div>
             </div>
           )}
         </div>
 
-        {/* AI Resume Reviewer & Recruiters */}
         <div className="space-y-6">
-          <div className="glass-card rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-400" /> AI Resume Reviewer
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-600" /> AI Resume Reviewer
             </h2>
-            <p className="text-xs text-slate-300">Paste your resume content to evaluate score against recruiters' dataset expectations.</p>
+            <p className="text-xs text-slate-500 font-medium">Paste resume text to analyze impact score against recruiter dataset signals.</p>
             <textarea
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
-              placeholder="Paste resume text here (e.g. 'Built fullstack web app using Python, FastAPI, React, SQL. Improved latency by 35%...')"
-              className="w-full h-28 p-3 rounded-xl border border-slate-800 bg-slate-900 text-xs text-white focus:outline-none focus:border-indigo-500"
+              placeholder="Paste resume text here (e.g. 'Built web app using Python, FastAPI, React, SQL. Improved speed by 35%...')"
+              className="w-full h-24 p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:bg-white focus:border-indigo-500"
             />
-            <button onClick={handleResumeReview} disabled={evaluatingResume || !resumeText} className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-white transition-all">
+            <button onClick={handleResumeReview} disabled={evaluatingResume || !resumeText} className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold text-white transition-all shadow-xs">
               {evaluatingResume ? 'Analyzing Resume...' : 'Analyze Resume Score & Skill Gaps'}
             </button>
 
             {resumeResult && (
-              <div className="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/30 space-y-2">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">Resume Impact Score</span>
-                  <span className="text-lg font-bold text-indigo-400">{resumeResult.score}/100</span>
+                  <span className="text-xs font-bold text-slate-500">Score</span>
+                  <span className="text-base font-extrabold text-indigo-600">{resumeResult.score}/100</span>
                 </div>
-                <p className="text-xs text-slate-200">{resumeResult.feedback}</p>
-                {resumeResult.skills_detected?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {resumeResult.skills_detected.map((sk: string) => (
-                      <span key={sk} className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">{sk}</span>
-                    ))}
-                  </div>
-                )}
+                <p className="text-xs text-slate-700 font-medium">{resumeResult.feedback}</p>
               </div>
             )}
           </div>
 
-          <div className="glass-card rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-indigo-400" /> Active Campus Recruiters ({companies.length})
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-indigo-600" /> Active Campus Recruiters ({companies.length})
             </h2>
             <div className="grid grid-cols-2 gap-3">
               {companies.map((comp) => (
-                <div key={comp.id || comp.name} className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+                <div key={comp.id || comp.name} className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 flex justify-between items-center">
                   <div>
-                    <h3 className="text-sm font-bold text-white">{comp.name}</h3>
-                    <p className="text-[11px] text-slate-400">{comp.industry}</p>
+                    <h3 className="text-xs font-bold text-slate-900">{comp.name}</h3>
+                    <p className="text-[10px] text-slate-400 font-medium">{comp.industry}</p>
                   </div>
-                  <span className="text-xs font-bold text-indigo-400 font-mono">${comp.avg_package_lpa || 8.5} LPA</span>
+                  <span className="text-xs font-extrabold text-indigo-600 font-mono">${comp.avg_package_lpa || 8.5} LPA</span>
                 </div>
               ))}
             </div>
@@ -660,7 +751,7 @@ export const Placements = () => {
   )
 }
 
-// Finance Component
+// 9. FINANCE COMPONENT
 export const Finance = () => {
   const [feeInfo, setFeeInfo] = useState<any>(null)
   const [scholarships, setScholarships] = useState<any[]>([])
@@ -671,33 +762,39 @@ export const Finance = () => {
   }, [])
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-1">Finance & Fees</h1>
-        <p className="text-sm text-slate-300 font-medium">Check dues, inspect structural breakdown, and review scholarship matches.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <Landmark className="w-5 h-5" />
+          </span>
+          Finance & Fees
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Check dues, inspect structural breakdown, and review AI scholarship matching.</p>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card rounded-2xl p-6 space-y-3">
-          <span className="text-slate-400 text-xs">Total Semester Fee Pending</span>
-          <p className="text-3xl font-extrabold text-white">${feeInfo?.dues?.toLocaleString() || '1,250.00'}</p>
-          <p className="text-xs text-slate-400">Due Date: <span className="text-red-400 font-semibold">{feeInfo?.due_date || '2026-08-15'}</span></p>
-          <button className="w-full mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs text-white font-bold transition-all">
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-3">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pending Fee Dues</span>
+          <p className="text-3xl font-extrabold text-slate-900">${feeInfo?.dues?.toLocaleString() || '1,250.00'}</p>
+          <p className="text-xs text-slate-500 font-medium">Due Date: <span className="text-rose-600 font-bold">{feeInfo?.due_date || '2026-08-15'}</span></p>
+          <button className="w-full mt-2 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs text-white font-bold transition-all shadow-md shadow-indigo-500/20">
             Pay Dues Online
           </button>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 md:col-span-2 space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Landmark className="w-5 h-5 text-indigo-400" /> AI Scholarship Matches ({scholarships.length})
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 md:col-span-2 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Landmark className="w-5 h-5 text-indigo-600" /> AI Scholarship Matches ({scholarships.length})
           </h2>
           <div className="space-y-3">
             {scholarships.map((sch) => (
-              <div key={sch.id || sch.title} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center text-xs">
+              <div key={sch.id || sch.title} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center text-xs">
                 <div>
-                  <h3 className="text-base font-bold text-white">{sch.title}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Criteria: {sch.criteria} • Eligibility Match: <span className="text-emerald-400 font-bold">{sch.eligibility_match}%</span></p>
+                  <h3 className="text-sm font-bold text-slate-900">{sch.title}</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">Criteria: {sch.criteria} • Eligibility: <span className="text-emerald-600 font-extrabold">{sch.eligibility_match}% Match</span></p>
                 </div>
-                <span className="text-base font-extrabold text-emerald-400 font-mono">${sch.amount_usd}</span>
+                <span className="text-base font-extrabold text-emerald-600 font-mono">${sch.amount_usd}</span>
               </div>
             ))}
           </div>
@@ -707,22 +804,131 @@ export const Finance = () => {
   )
 }
 
-// Generic Placeholder Component for smaller modules
-const GenericPlaceholder = ({ title, desc }: { title: string; desc: string }) => (
-  <div className="flex flex-col items-center justify-center h-[calc(100vh-14rem)] text-center animate-fade-in">
-    <div className="p-4 rounded-full bg-slate-900 border border-slate-800 mb-4">
-      <Info className="w-8 h-8 text-indigo-500" />
+// 10. EVENTS COMPONENT
+export const Events = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <Calendar className="w-5 h-5" />
+        </span>
+        Campus Events & Hackathons
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Register for technical fests, guest lectures, AI hackathons, and sports tournaments.</p>
     </div>
-    <h1 className="text-xl font-bold text-white mb-2">{title}</h1>
-    <p className="text-xs text-slate-400 max-w-sm leading-relaxed">{desc}</p>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {[
+        { title: 'Annual AI & Robotics Summit 2026', date: 'Aug 20, 2026', loc: 'Auditorium A', category: 'Hackathon', status: 'Registration Open' },
+        { title: 'Cybersecurity & Ethical Hacking Fest', date: 'Sep 05, 2026', loc: 'CS Block Seminar Hall', category: 'Workshop', status: 'Registration Open' }
+      ].map((ev) => (
+        <div key={ev.title} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">{ev.category}</span>
+            <span className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">{ev.status}</span>
+          </div>
+          <h3 className="text-lg font-bold text-slate-900">{ev.title}</h3>
+          <p className="text-xs text-slate-500 font-medium">{ev.date} • {ev.loc}</p>
+          <button className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
+            Register Now
+          </button>
+        </div>
+      ))}
+    </div>
   </div>
 )
 
-export const Events = () => <GenericPlaceholder title="Campus Events" desc="Register for technical fests, guest lectures, hackathons, and sports events. AI suggestion lists incoming." />
-export const Clubs = () => <GenericPlaceholder title="Student Clubs" desc="Explore active university clubs: Robotics, Coding club, Drama, and Literature societies. Enrollments are open." />
-export const Notices = () => <GenericPlaceholder title="Notice Board" desc="View general circulars, holidays, and administrator updates. Filter notices based on roles and departments." />
-export const Research = () => <GenericPlaceholder title="Research & Journals" desc="Publish research papers, request supervisor approvals, and search index articles using library systems." />
+// 11. CLUBS COMPONENT
+export const Clubs = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+          <Users className="w-5 h-5" />
+        </span>
+        Student Clubs & Societies
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Explore active student societies, enrollments, and executive committee leads.</p>
+    </div>
 
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {[
+        { name: 'AI & Machine Learning Club', lead: 'Alex Vance', members: 142 },
+        { name: 'Competitive Coding Society', lead: 'Sarah Lin', members: 210 },
+        { name: 'Robotics & Hardware Guild', lead: 'David Miller', members: 95 }
+      ].map((club) => (
+        <div key={club.name} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+            <Users className="w-5 h-5" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900">{club.name}</h3>
+          <p className="text-xs text-slate-500 font-medium">Lead: {club.lead} • {club.members} Active Members</p>
+          <button className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all">
+            Join Club
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+// 12. NOTICES COMPONENT
+export const Notices = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+          <Bell className="w-5 h-5" />
+        </span>
+        Notice Board & Circulars
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Official administration announcements, holiday lists, and exam circulars.</p>
+    </div>
+
+    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+      {[
+        { title: 'Mid-Semester Exam Instructions & Regulations', date: 'Jul 28, 2026', cat: 'Academic' },
+        { title: 'Campus Wi-Fi Maintenance Window Announcement', date: 'Jul 25, 2026', cat: 'IT Services' }
+      ].map((n) => (
+        <div key={n.title} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+          <div>
+            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">{n.cat}</span>
+            <h3 className="text-sm font-bold text-slate-900 mt-1">{n.title}</h3>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">Published on {n.date}</p>
+          </div>
+          <button className="text-xs font-bold text-indigo-600 hover:underline">Read Circular</button>
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+// 13. RESEARCH COMPONENT
+export const Research = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <FileText className="w-5 h-5" />
+        </span>
+        Research & Journals
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Publish research papers, request supervisor reviews, and index journal citations.</p>
+    </div>
+
+    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+      <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+        <div>
+          <h3 className="text-base font-bold text-slate-900">Transformer Architectures in Embedded Edge Devices</h3>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">Authors: John Doe, Dr. Sarah Jenkins • Published in IEEE IEEE-AI 2026</p>
+        </div>
+        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Indexed</span>
+      </div>
+    </div>
+  </div>
+)
+
+// 14. AI INSIGHTS COMPONENT
 export const AIInsights = () => {
   const [adminStats, setAdminStats] = useState<any>(null)
 
@@ -731,37 +937,42 @@ export const AIInsights = () => {
   }, [])
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-1">Campus AI Analytics & Predictions</h1>
-        <p className="text-sm text-slate-300 font-medium">Predictive dashboards based on university operational logs and 100,000+ student dataset records.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <Sparkles className="w-5 h-5" />
+          </span>
+          Campus AI Analytics & Predictions
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Predictive dashboards based on university operational logs and 100,000+ student dataset records.</p>
       </div>
 
       {adminStats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card rounded-2xl p-6">
-            <span className="text-xs text-slate-400">Total Analyzed Records</span>
-            <div className="text-2xl font-extrabold text-white mt-1">{adminStats.total_analyzed_students?.toLocaleString()}</div>
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Analyzed Dataset Records</span>
+            <div className="text-3xl font-extrabold text-slate-900 mt-1">{adminStats.total_analyzed_students?.toLocaleString()}</div>
           </div>
-          <div className="glass-card rounded-2xl p-6">
-            <span className="text-xs text-slate-400">Campus Placement Forecast</span>
-            <div className="text-2xl font-extrabold text-emerald-400 mt-1">{adminStats.placement_rate_forecast}%</div>
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Placement Rate Forecast</span>
+            <div className="text-3xl font-extrabold text-emerald-600 mt-1">{adminStats.placement_rate_forecast}%</div>
           </div>
-          <div className="glass-card rounded-2xl p-6">
-            <span className="text-xs text-slate-400">Hostel Occupancy Rate</span>
-            <div className="text-2xl font-extrabold text-indigo-400 mt-1">{adminStats.hostel_occupancy_prediction}%</div>
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Hostel Occupancy Rate</span>
+            <div className="text-3xl font-extrabold text-indigo-600 mt-1">{adminStats.hostel_occupancy_prediction}%</div>
           </div>
         </div>
       )}
 
       {adminStats?.top_influencing_factors && (
-        <div className="glass-card rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-bold text-white">Top Predictive Signals for Student Success</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">Top Predictive Signals for Student Success</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {adminStats.top_influencing_factors.map((factor: any) => (
-              <div key={factor.feature} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                <span className="text-sm font-semibold text-slate-200">{factor.feature}</span>
-                <span className="text-xs font-mono font-bold text-indigo-400">Correlation: {factor.raw_correlation}</span>
+              <div key={factor.feature} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+                <span className="text-sm font-bold text-slate-800">{factor.feature}</span>
+                <span className="text-xs font-mono font-extrabold text-indigo-600">Correlation: {factor.raw_correlation}</span>
               </div>
             ))}
           </div>
@@ -771,5 +982,63 @@ export const AIInsights = () => {
   )
 }
 
-export const Settings = () => <GenericPlaceholder title="Account Settings" desc="Manage active sessions, reset password credentials, set default dark/light UI modes, and configure notification alerts." />
-export const Profile = () => <GenericPlaceholder title="Student Profile" desc="Manage contact details, department branches, academic semesters, list certifications, and view security records." />
+// 15. SETTINGS COMPONENT
+export const Settings = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
+          <Lock className="w-5 h-5" />
+        </span>
+        Account Settings
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">Manage security settings, notifications, active sessions, and password preferences.</p>
+    </div>
+
+    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-5 max-w-2xl">
+      <h2 className="text-lg font-bold text-slate-900">Security & Authentication</h2>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
+          <input type="email" value="john.doe@university.edu" disabled className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-500 font-medium" />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-slate-600 mb-1">New Password</label>
+          <input type="password" placeholder="••••••••" className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-indigo-500" />
+        </div>
+        <button className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
+          Update Security Settings
+        </button>
+      </div>
+    </div>
+  </div>
+)
+
+// 16. PROFILE COMPONENT
+export const Profile = () => (
+  <div className="space-y-7 animate-fade-in font-sans">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <User className="w-5 h-5" />
+        </span>
+        Student Profile
+      </h1>
+      <p className="text-sm text-slate-500 font-medium mt-1">View enrollment details, academic records, and security badge credentials.</p>
+    </div>
+
+    <div className="bg-white rounded-[24px] p-7 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col sm:flex-row items-center gap-6">
+      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-md shadow-indigo-500/20">
+        J
+      </div>
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-xl font-extrabold text-slate-900">John Doe</h2>
+        <p className="text-xs text-slate-500 font-medium">Roll Number: <span className="font-mono font-bold text-indigo-600">CS2023001</span> • Department of Computer Science</p>
+        <div className="flex flex-wrap gap-2 pt-2 justify-center sm:justify-start">
+          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">GPA: 8.42</span>
+          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">Semester V</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
