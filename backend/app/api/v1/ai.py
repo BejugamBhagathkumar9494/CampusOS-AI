@@ -78,7 +78,7 @@ def chat_with_agent(
             f"{prediction['training_rows']:,} 2026 placement records. "
             "Recommended focus areas: System Design and mock coding rounds."
         )
-            elif any(k in query for k in ["bus", "route", "eta", "transport"]):
+    elif any(k in query for k in ["bus", "route", "eta", "transport"]):
         # Transport Agent
         response_text = (
             "Checking live tracking... Bus TS-09-UA-1234 on Route 10A is currently 8 minutes away from the Main Gate. "
