@@ -13,6 +13,7 @@ from app.api.v1 import (
     ai,
     analytics,
     notifications,
+    academics,
 )
 
 app = FastAPI(
@@ -42,6 +43,7 @@ app.include_router(library.router, prefix=settings.API_V1_STR)
 app.include_router(transport.router, prefix=settings.API_V1_STR)
 app.include_router(placements.router, prefix=settings.API_V1_STR)
 app.include_router(finance.router, prefix=settings.API_V1_STR)
+app.include_router(academics.router, prefix=settings.API_V1_STR)
 app.include_router(ai.router, prefix=settings.API_V1_STR)
 app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
