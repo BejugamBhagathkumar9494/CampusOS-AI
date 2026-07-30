@@ -39,9 +39,10 @@ pyvenv.cfg
 .cache
 .mypy_cache/
 
-# Databases / Vector DB
+# Databases / Vector DB / Large Datasets
 *.db
 *.sqlite
+backend/campusos Datasets/studentVle.csv
 
 # Environment Files
 .env
