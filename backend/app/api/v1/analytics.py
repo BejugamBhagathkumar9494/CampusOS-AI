@@ -1,3 +1,4 @@
+from fastapi import APIRouter
 from app.services.ml_models.placement_predictor import get_placement_analytics_summary
 from app.services.ml_models.curriculum_analyzer import get_curriculum_analytics_summary
 from app.services.ml_models.performance_predictor import predict_student_risk
