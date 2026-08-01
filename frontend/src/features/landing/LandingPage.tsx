@@ -103,6 +103,18 @@ export default function LandingPage() {
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
   const [currentInstIndex, setCurrentInstIndex] = useState(0)
 
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.defaultMuted = true
+      heroVideoRef.current.muted = true
+      heroVideoRef.current.play().catch((err) => {
+        console.warn('Hero video autoplay error:', err)
+      })
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentInstIndex((prev) => (prev + 1) % institutionsList.length)
@@ -362,15 +374,17 @@ export default function LandingPage() {
         {/* Background Video & Ambient Overlay */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu">
           <video
+            ref={heroVideoRef}
             autoPlay
             loop
             muted
             playsInline
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000 transform-gpu will-change-transform"
             style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' }}
           >
-            <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
             <source src="/hero-bg.mp4" type="video/mp4" />
+            <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
           </video>
           {/* Subtle blue-to-purple gradient overlay & reduced dark opacity for campus visibility */}
           <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[1.5px]" />
