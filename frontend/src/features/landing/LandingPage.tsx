@@ -371,8 +371,12 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-0 pt-14 pb-14 lg:pt-20 lg:pb-20 px-6 sm:px-8 xl:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-4.5rem)]">
-        {/* Background Video & Ambient Overlay */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu">
+        {/* Background Video & Ambient Glowing AI Mesh Background */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu bg-slate-950">
+          {/* Animated AI Glowing Mesh Base (displays if video is loading or blocked by browser) */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e1b4b15_1px,transparent_1px),linear-gradient(to_bottom,#1e1b4b15_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+
           <video
             ref={heroVideoRef}
             autoPlay
@@ -380,16 +384,16 @@ export default function LandingPage() {
             muted
             playsInline
             preload="auto"
-            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000 transform-gpu will-change-transform"
+            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000 transform-gpu will-change-transform opacity-80"
             style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' }}
           >
             <source src="/hero-bg.mp4" type="video/mp4" />
             <source src="/15219398_1920_1080_60fps.mp4" type="video/mp4" />
           </video>
           {/* Subtle blue-to-purple gradient overlay & reduced dark opacity for campus visibility */}
-          <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[1.5px]" />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/55 via-slate-950/40 to-purple-950/50" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/15 via-transparent to-slate-950/75" />
+          <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/40 via-slate-950/30 to-purple-950/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-slate-950/80" />
 
           {/* Glowing Orbs */}
           <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[120px] mix-blend-screen animate-pulse-slow pointer-events-none" />

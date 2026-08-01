@@ -145,7 +145,7 @@ export const RegisterPage: React.FC = () => {
       </div>
 
       <div className="w-full lg:w-3/5 flex items-center justify-center p-6 sm:p-12 relative z-10 overflow-y-auto custom-scrollbar">
-        <div className="glass-card max-w-lg w-full rounded-2xl p-8 border border-white/10 shadow-2xl relative my-8">
+        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 max-w-lg w-full rounded-2xl p-8 shadow-2xl shadow-indigo-950/40 relative my-8">
           
           <div className="lg:hidden flex items-center justify-between mb-6">
             <Link to="/" className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export const RegisterPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="fullName" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5">
+                <label htmlFor="fullName" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
                   Full Name
                 </label>
                 <div className="relative">
@@ -194,13 +194,13 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="John Doe"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5">
+                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
@@ -212,14 +212,14 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@university.edu"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5">
+              <label htmlFor="role" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
                 Select Your Role
               </label>
               <select
@@ -227,7 +227,7 @@ export const RegisterPage: React.FC = () => {
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value as UserRole)}
                 disabled={isSubmitting}
-                className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm px-4 py-3 rounded-xl outline-none transition-all cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm px-4 py-3 rounded-xl outline-none transition-all cursor-pointer"
               >
                 <option value="" disabled>-- Choose your campus role --</option>
                 {roleOptions.map((opt) => (
@@ -240,7 +240,7 @@ export const RegisterPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5">
+                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -252,7 +252,7 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
                   <button
                     type="button"
@@ -265,7 +265,7 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5">
+                <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -277,7 +277,7 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
                   <button
                     type="button"

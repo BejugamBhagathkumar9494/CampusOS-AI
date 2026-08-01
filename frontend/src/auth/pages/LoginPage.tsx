@@ -108,7 +108,7 @@ export const LoginPage: React.FC = () => {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative z-10">
-        <div className="glass-card max-w-md w-full rounded-2xl p-8 border border-white/10 shadow-2xl relative">
+        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 max-w-md w-full rounded-2xl p-8 shadow-2xl shadow-indigo-950/40 relative">
           
           <div className="lg:hidden flex items-center justify-between mb-8">
             <Link to="/" className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -149,14 +149,14 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@university.edu"
                   disabled={isSubmitting}
-                  className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-300">
+                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-200">
                   Password
                 </label>
               </div>
@@ -169,7 +169,7 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   disabled={isSubmitting}
-                  className="w-full bg-slate-900 border border-white/10 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                 />
                 <button
                   type="button"

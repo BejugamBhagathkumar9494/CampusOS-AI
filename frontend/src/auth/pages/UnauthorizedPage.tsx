@@ -34,7 +34,7 @@ export const UnauthorizedPage: React.FC = () => {
       <div className="absolute top-1/4 left-1/4 h-72 w-72 rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-purple-500/10 blur-[100px] pointer-events-none"></div>
 
-      <div className="glass-card max-w-md w-full rounded-2xl p-8 border border-white/10 flex flex-col items-center text-center relative z-10 shadow-2xl">
+      <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 max-w-md w-full rounded-2xl p-8 flex flex-col items-center text-center relative z-10 shadow-2xl shadow-indigo-950/40">
         <div className="mb-6 p-4 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 animate-bounce">
           <ShieldAlert className="w-12 h-12" />
         </div>
