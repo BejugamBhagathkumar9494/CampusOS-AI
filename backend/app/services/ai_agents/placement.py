@@ -6,7 +6,7 @@ Deals with:
 - Interview prep simulator
 - Company recommendations
 """
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 def review_resume_llm(resume_text: str) -> Dict[str, Any]:
