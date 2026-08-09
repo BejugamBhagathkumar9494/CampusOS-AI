@@ -272,10 +272,123 @@ def init_db():
         db.add(fee)
         db.commit()
 
-        print("Database seeded successfully!")
+        # 12. Seed Exams, Predictions, Assignments, Drives, Leave Requests, Notifications, Clubs
+        from app.models.database_models import (
+            ExamTimetable, GradePrediction, Assignment, PlacementDrive,
+            HostelLeaveRequest, Notification, Announcement, Club, ClubMembership
+        )
+
+        # Exams
+        exam1 = ExamTimetable(
+            subject_id=subs_dict["CS301"].id,
+            semester=5,
+            exam_date=datetime.date.today() + datetime.timedelta(days=14),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(13, 0),
+            room_number="Hall 302",
+            exam_type="End Semester"
+        )
+        exam2 = ExamTimetable(
+            subject_id=subs_dict["CS302"].id,
+            semester=5,
+            exam_date=datetime.date.today() + datetime.timedelta(days=16),
+            start_time=datetime.time(14, 0),
+            end_time=datetime.time(17, 0),
+            room_number="Hall 104",
+            exam_type="End Semester"
+        )
+        exam3 = ExamTimetable(
+            subject_id=subs_dict["CS303"].id,
+            semester=5,
+            exam_date=datetime.date.today() + datetime.timedelta(days=18),
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(13, 0),
+            room_number="Lab 2",
+            exam_type="End Semester"
+        )
+        db.add_all([exam1, exam2, exam3])
+
+        # Grade Predictions
+        gp1 = GradePrediction(student_id=student_profile.id, subject_id=subs_dict["CS301"].id, predicted_grade="A", predicted_score="82-88%", confidence=84.5)
+        gp2 = GradePrediction(student_id=student_profile.id, subject_id=subs_dict["CS302"].id, predicted_grade="A+", predicted_score="92-96%", confidence=91.0)
+        gp3 = GradePrediction(student_id=student_profile.id, subject_id=subs_dict["CS303"].id, predicted_grade="A", predicted_score="85-90%", confidence=88.0)
+        db.add_all([gp1, gp2, gp3])
+
+        # Assignments
+        assign1 = Assignment(
+            title="DFA & NFA Simulator",
+            description="Implement a finite state machine simulator in Python or C++.",
+            faculty_id=1,
+            subject_id=subs_dict["CS301"].id,
+            deadline=datetime.datetime.utcnow() + datetime.timedelta(days=7)
+        )
+        assign2 = Assignment(
+            title="Socket Programming & TCP Handshake",
+            description="Write client-server socket scripts establishing TCP connection.",
+            faculty_id=1,
+            subject_id=subs_dict["CS302"].id,
+            deadline=datetime.datetime.utcnow() + datetime.timedelta(days=10)
+        )
+        db.add_all([assign1, assign2])
+
+        # Placement Drives
+        drive1 = PlacementDrive(
+            company_id=companies_data[0].id,
+            title="Software Development Engineer - I",
+            package_lpa=24.5,
+            min_cgpa=8.0,
+            max_backlogs=0,
+            location="Bengaluru / Hyderabad",
+            required_skills="Python, Data Structures, System Design, SQL",
+            deadline=datetime.date.today() + datetime.timedelta(days=20)
+        )
+        drive2 = PlacementDrive(
+            company_id=companies_data[3].id,
+            title="Digital Developer & Cloud Specialist",
+            package_lpa=7.5,
+            min_cgpa=6.5,
+            max_backlogs=1,
+            location="Pan India",
+            required_skills="Java, Python, Web Development",
+            deadline=datetime.date.today() + datetime.timedelta(days=25)
+        )
+        db.add_all([drive1, drive2])
+
+        # Hostel Leave Request
+        leave = HostelLeaveRequest(
+            student_id=student_profile.id,
+            reason="Weekend family visit to home town",
+            start_date=datetime.date.today() + datetime.timedelta(days=2),
+            end_date=datetime.date.today() + datetime.timedelta(days=5),
+            status="Pending"
+        )
+        db.add(leave)
+
+        # Notifications
+        notif1 = Notification(user_id=student_user.id, title="Welcome to CampusOS AI", message="Your student account has been verified and registered.", type="info")
+        notif2 = Notification(user_id=student_user.id, title="End-Semester Timetable Released", message="The End-Semester Exam Schedule for Semester V is now available under Exams.", type="alert")
+        db.add_all([notif1, notif2])
+
+        # Announcements
+        ann1 = Announcement(title="Annual AI & Tech Innovation Summit 2026", content="Registrations are open for the annual CampusOS Hackathon. Top projects win cash prizes and direct interview opportunities.", author_role="admin", target_role="all")
+        db.add(ann1)
+
+        # Clubs
+        club1 = Club(name="AI & Developers Club", description="Explore machine learning, open-source development, and build real-world AI applications.", category="Technical", president_name="Rahul Kumar")
+        club2 = Club(name="Cyber Security Guild", description="Participate in CTF competitions, ethical hacking workshops, and security research.", category="Technical", president_name="Arjun Patel")
+        db.add_all([club1, club2])
+        db.commit()
+
+        # Join Rahul to AI Club
+        mem = ClubMembership(club_id=club1.id, student_id=student_profile.id, status="Active")
+        db.add(mem)
+        db.commit()
+
+        print("Database seeded successfully with complete platform entities!")
 
     finally:
         db.close()
 
 if __name__ == "__main__":
     init_db()
+

@@ -188,3 +188,164 @@ class RAGSearchResultItem(BaseModel):
 class RAGSearchResponse(BaseModel):
     query: str
     results: List[RAGSearchResultItem]
+
+
+# Extended Platform Schemas
+class ExamTimetableResponse(BaseModel):
+    id: int
+    subject_code: str
+    subject_name: str
+    semester: int
+    exam_date: date
+    start_time: time
+    end_time: time
+    room_number: str
+    exam_type: str
+
+    class Config:
+        from_attributes = True
+
+
+class GradePredictionResponse(BaseModel):
+    id: int
+    subject_code: str
+    subject_name: str
+    predicted_grade: str
+    predicted_score: str
+    confidence: float
+
+    class Config:
+        from_attributes = True
+
+
+class AssignmentCreate(BaseModel):
+    title: str
+    description: str
+    subject_id: int
+    deadline: datetime
+
+
+class AssignmentResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    subject_code: str
+    subject_name: str
+    faculty_name: str
+    deadline: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AssignmentSubmissionCreate(BaseModel):
+    assignment_id: int
+    file_path: str
+
+
+class AssignmentSubmissionResponse(BaseModel):
+    id: int
+    assignment_id: int
+    assignment_title: str
+    student_id: int
+    student_name: str
+    file_path: str
+    submission_date: datetime
+    marks_obtained: Optional[float] = None
+    feedback: Optional[str] = None
+    status: str
+
+    class Config:
+        from_attributes = True
+
+
+class PlacementDriveCreate(BaseModel):
+    company_id: int
+    title: str
+    package_lpa: float
+    min_cgpa: float = 6.0
+    max_backlogs: int = 0
+    location: str
+    required_skills: str
+    deadline: date
+
+
+class PlacementDriveResponse(BaseModel):
+    id: int
+    company_name: str
+    title: str
+    package_lpa: float
+    min_cgpa: float
+    max_backlogs: int
+    location: str
+    required_skills: str
+    deadline: date
+    eligible: Optional[bool] = None
+
+    class Config:
+        from_attributes = True
+
+
+class HostelLeaveRequestCreate(BaseModel):
+    reason: str
+    start_date: date
+    end_date: date
+
+
+class HostelLeaveRequestResponse(BaseModel):
+    id: int
+    student_name: str
+    roll_number: str
+    reason: str
+    start_date: date
+    end_date: date
+    status: str
+    reviewed_by: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class NotificationResponse(BaseModel):
+    id: int
+    title: str
+    message: str
+    type: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+    target_role: str = "all"
+
+
+class AnnouncementResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    author_role: str
+    target_role: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ClubResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    category: str
+    president_name: Optional[str] = None
+    is_member: Optional[bool] = False
+
+    class Config:
+        from_attributes = True
+

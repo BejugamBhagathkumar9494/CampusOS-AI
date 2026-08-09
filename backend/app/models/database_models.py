@@ -394,3 +394,149 @@ class KnowledgeDocument(Base):
     # pgvector embedding representation
     embedding = Column(Vector(1536))  # e.g., text-embedding-3-small/large or custom-dimension
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# Extended CampusOS Platform Models
+class ExamTimetable(Base):
+    __tablename__ = "exam_timetables"
+
+    id = Column(Integer, primary_key=True, index=True)
+    subject_id = Column(Integer, ForeignKey("subjects.id", ondelete="CASCADE"))
+    semester = Column(Integer, nullable=False)
+    exam_date = Column(Date, nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    room_number = Column(String(50), nullable=False)
+    exam_type = Column(String(50), default="End Semester")  # Mid Semester, End Semester, Quiz
+
+    subject = relationship("Subject")
+
+
+class GradePrediction(Base):
+    __tablename__ = "grade_predictions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"))
+    subject_id = Column(Integer, ForeignKey("subjects.id", ondelete="CASCADE"))
+    predicted_grade = Column(String(10), nullable=False)  # A+, A, B+, B, C, F
+    predicted_score = Column(String(20), nullable=False)  # e.g., "82-88%"
+    confidence = Column(Float, default=85.0)  # Percentage confidence
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    student = relationship("Student")
+    subject = relationship("Subject")
+
+
+class Assignment(Base):
+    __tablename__ = "assignments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    faculty_id = Column(Integer, ForeignKey("faculty.id", ondelete="CASCADE"))
+    subject_id = Column(Integer, ForeignKey("subjects.id", ondelete="CASCADE"))
+    deadline = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    faculty = relationship("Faculty")
+    subject = relationship("Subject")
+    submissions = relationship("AssignmentSubmission", back_populates="assignment")
+
+
+class AssignmentSubmission(Base):
+    __tablename__ = "assignment_submissions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    assignment_id = Column(Integer, ForeignKey("assignments.id", ondelete="CASCADE"))
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"))
+    file_path = Column(String(255), nullable=False)
+    submission_date = Column(DateTime, default=datetime.utcnow)
+    marks_obtained = Column(Float, nullable=True)
+    feedback = Column(Text, nullable=True)
+    status = Column(String(30), default="Submitted")  # Submitted, Graded, Late
+
+    assignment = relationship("Assignment", back_populates="submissions")
+    student = relationship("Student")
+
+
+class PlacementDrive(Base):
+    __tablename__ = "placement_drives"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, ForeignKey("companies.id", ondelete="CASCADE"))
+    title = Column(String(200), nullable=False)
+    package_lpa = Column(Float, nullable=False)  # e.g., 12.5 LPA
+    min_cgpa = Column(Float, default=6.0)
+    max_backlogs = Column(Integer, default=0)
+    location = Column(String(100), nullable=False)
+    required_skills = Column(Text, nullable=False)  # Comma-separated or text
+    deadline = Column(Date, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    company = relationship("Company")
+
+
+class HostelLeaveRequest(Base):
+    __tablename__ = "hostel_leave_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"))
+    reason = Column(Text, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    status = Column(String(20), default="Pending")  # Pending, Approved, Rejected
+    reviewed_by = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    student = relationship("Student")
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    title = Column(String(150), nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String(50), default="info")  # info, warning, success, alert
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    content = Column(Text, nullable=False)
+    author_role = Column(String(50), nullable=False)
+    target_role = Column(String(50), default="all")  # all, student, faculty, etc.
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Club(Base):
+    __tablename__ = "clubs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(150), unique=True, nullable=False)
+    description = Column(Text, nullable=False)
+    category = Column(String(50), default="Technical")  # Technical, Cultural, Sports
+    president_name = Column(String(100), nullable=True)
+
+    memberships = relationship("ClubMembership", back_populates="club")
+
+
+class ClubMembership(Base):
+    __tablename__ = "club_memberships"
+
+    id = Column(Integer, primary_key=True, index=True)
+    club_id = Column(Integer, ForeignKey("clubs.id", ondelete="CASCADE"))
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"))
+    joined_date = Column(Date, default=datetime.utcnow)
+    status = Column(String(20), default="Active")  # Active, Inactive
+
+    club = relationship("Club", back_populates="memberships")
+    student = relationship("Student")
+

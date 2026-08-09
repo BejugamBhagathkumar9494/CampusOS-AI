@@ -51,6 +51,10 @@ app.include_router(ai.router, prefix=settings.API_V1_STR)
 app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
 
+from app.api.v1 import academics_extended
+app.include_router(academics_extended.router, prefix=f"{settings.API_V1_STR}/academic-ext")
+
+
 
 @app.get("/", tags=["General"])
 def read_root():

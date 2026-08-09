@@ -11,106 +11,137 @@ import {
   getFeeDetails,
   getScholarships,
   getAdminAnalytics,
-  getStudentAttendance
+  getStudentAttendance,
+  getExams,
+  getGradePredictions,
+  getAssignments,
+  submitAssignment,
+  getPlacementDrives,
+  applyPlacementDrive,
+  getHostelLeaveRequests,
+  applyHostelLeave,
+  getAnnouncements,
+  getClubs,
+  joinClub
 } from '../services/api'
+import { useAuth } from '../auth/hooks/useAuth'
+import { supabase } from '../services/supabaseClient'
 import {
-  BookOpen, Upload, Landmark, Bus, Cpu, Award, Briefcase, TrendingUp, Search, FileText, Check, Users, Calendar, AlertTriangle, Sparkles, User, Lock, Bell
+  BookOpen, Upload, Landmark, Bus, Cpu, Award, Briefcase, Search, FileText, Check, Users, Calendar, AlertTriangle, Sparkles, User, Lock, Bell
 } from 'lucide-react'
 
 // 1. ACADEMICS COMPONENT
-export const Academics = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-            <BookOpen className="w-5 h-5" />
-          </span>
-          Academics & Courses
-        </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">Manage enrolled courses, syllabi, study planners, and AI elective recommendations.</p>
-      </div>
-      <div className="px-4 py-2 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-2">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span className="text-xs font-bold text-slate-700">Semester V • 2026 Batch</span>
-      </div>
-    </div>
+export const Academics = () => {
+  const { profile } = useAuth();
+  const [courses] = useState<any[]>([
+    { code: 'CS301', name: 'Automata & Formal Languages', credits: 4, prof: 'Dr. Sarah Jenkins', progress: 78 },
+    { code: 'CS302', name: 'Computer Networks & Protocols', credits: 4, prof: 'Prof. Alan Vance', progress: 85 },
+    { code: 'CS303', name: 'Database Management Systems', credits: 4, prof: 'Dr. Emily Stone', progress: 92 }
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Current Enrolled Subjects */}
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-indigo-600" /> Current Enrolled Subjects
-        </h2>
-        <div className="space-y-3">
-          {[
-            { code: 'CS301', name: 'Automata & Formal Languages', credits: 4, prof: 'Dr. Sarah Jenkins', progress: 78 },
-            { code: 'CS302', name: 'Computer Networks & Protocols', credits: 4, prof: 'Prof. Alan Vance', progress: 85 },
-            { code: 'CS303', name: 'Database Management Systems', credits: 4, prof: 'Dr. Emily Stone', progress: 92 }
-          ].map((subject) => (
-            <div key={subject.code} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col justify-between gap-3 hover:bg-slate-50 transition-all">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100">{subject.code} • {subject.credits} Credits</span>
-                  <h3 className="text-base text-slate-900 font-bold mt-1.5">{subject.name}</h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">Instructor: {subject.prof}</p>
-                </div>
-                <button className="text-xs font-bold text-indigo-600 bg-white border border-indigo-100 hover:bg-indigo-50 px-3 py-1.5 rounded-xl transition-all shadow-2xs">
-                  Syllabus PDF
-                </button>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-[11px] font-bold text-slate-500">
-                  <span>Syllabus Completed</span>
-                  <span className="text-indigo-600">{subject.progress}%</span>
-                </div>
-                <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
-                  <div className="bg-gradient-to-r from-indigo-600 to-violet-600 h-2 rounded-full transition-all duration-500" style={{ width: `${subject.progress}%` }}></div>
-                </div>
-              </div>
-            </div>
-          ))}
+  ]);
+  const [enrollMsg, setEnrollMsg] = useState('');
+
+  const handleEnroll = (courseName: string) => {
+    setEnrollMsg(`Enrollment request for ${courseName} submitted to Academic Dean.`);
+    setTimeout(() => setEnrollMsg(''), 4000);
+  };
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <BookOpen className="w-5 h-5" />
+            </span>
+            Academics & Courses
+          </h1>
+          <p className="text-sm text-slate-500 font-medium mt-1">Manage enrolled courses, syllabi, study planners, and AI elective recommendations.</p>
+        </div>
+        <div className="px-4 py-2 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="text-xs font-bold text-slate-700">Semester V • {profile?.institution_id || 'STU001'}</span>
         </div>
       </div>
 
-      {/* AI Elective Recommender */}
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Cpu className="w-5 h-5 text-indigo-600" /> AI Elective Recommender
-        </h2>
-        <p className="text-xs text-slate-500 font-medium leading-relaxed">Based on your academic performance, coding scores, and placement dataset requirements:</p>
-        
-        <div className="space-y-3">
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-purple-50/80 border border-indigo-100 space-y-2">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold text-slate-900">Natural Language Processing & LLMs</h3>
-              <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">96% Match</span>
-            </div>
-            <p className="text-xs text-slate-600 font-medium">High placement weightage in 2026 data • Offered by Dr. Sarah Jenkins</p>
-            <button className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-              Request Enrollment
-            </button>
-          </div>
+      {enrollMsg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold animate-fade-in">
+          {enrollMsg}
+        </div>
+      )}
 
-          <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-2">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold text-slate-900">Distributed Systems & Cloud Architecture</h3>
-              <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">88% Match</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Current Enrolled Subjects */}
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-indigo-600" /> Current Enrolled Subjects
+          </h2>
+          <div className="space-y-3">
+            {courses.map((subject) => (
+              <div key={subject.code} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col justify-between gap-3 hover:bg-slate-50 transition-all">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100">{subject.code} • {subject.credits} Credits</span>
+                    <h3 className="text-base text-slate-900 font-bold mt-1.5">{subject.name}</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">Instructor: {subject.prof}</p>
+                  </div>
+                  <button onClick={() => alert(`Downloading official Syllabus PDF for ${subject.code}...`)} className="text-xs font-bold text-indigo-600 bg-white border border-indigo-100 hover:bg-indigo-50 px-3 py-1.5 rounded-xl transition-all shadow-2xs">
+                    Syllabus PDF
+                  </button>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px] font-bold text-slate-500">
+                    <span>Syllabus Completed</span>
+                    <span className="text-indigo-600">{subject.progress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                    <div className="bg-gradient-to-r from-indigo-600 to-violet-600 h-2 rounded-full transition-all duration-500" style={{ width: `${subject.progress}%` }}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Elective Recommender */}
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-indigo-600" /> AI Elective Recommender
+          </h2>
+          <p className="text-xs text-slate-500 font-medium leading-relaxed">Based on your academic performance, coding scores, and placement dataset requirements:</p>
+          
+          <div className="space-y-3">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-purple-50/80 border border-indigo-100 space-y-2">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-bold text-slate-900">Natural Language Processing & LLMs</h3>
+                <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">96% Match</span>
+              </div>
+              <p className="text-xs text-slate-600 font-medium">High placement weightage in 2026 data • Offered by Dr. Sarah Jenkins</p>
+              <button onClick={() => handleEnroll('Natural Language Processing & LLMs')} className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                Request Enrollment
+              </button>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Demanded by recruiters (TCS, Google, Amazon) • Offered by Prof. Vance</p>
-            <button className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all">
-              View Syllabus
-            </button>
+
+            <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-2">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-bold text-slate-900">Distributed Systems & Cloud Architecture</h3>
+                <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">88% Match</span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">Demanded by recruiters (TCS, Google, Amazon) • Offered by Prof. Vance</p>
+              <button onClick={() => handleEnroll('Distributed Systems & Cloud Architecture')} className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all">
+                Request Enrollment
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  );
+};
 
 // 2. ATTENDANCE COMPONENT
 export const Attendance = () => {
-  const [attendanceData, setAttendanceData] = useState<any>(null)
+  const [attendanceData, setAttendanceData] = useState<any>(null);
 
   useEffect(() => {
     getStudentAttendance(1)
@@ -123,9 +154,9 @@ export const Attendance = () => {
             { subject_name: 'Computer Networks', subject_code: 'CS302', total_classes: 34, attended_classes: 31, attendance_rate: 91.2, status: 'Safe' },
             { subject_name: 'Database Management Systems', subject_code: 'CS303', total_classes: 30, attended_classes: 27, attendance_rate: 90.0, status: 'Safe' }
           ]
-        })
-      })
-  }, [])
+        });
+      });
+  }, []);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -198,118 +229,186 @@ export const Attendance = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 3. EXAMS COMPONENT
-export const Exams = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
-          <FileText className="w-5 h-5" />
-        </span>
-        Exams & Grade Predictions
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">View upcoming semester timetables, hall passes, and internal grade predictions.</p>
-    </div>
+export const Exams = () => {
+  const [exams, setExams] = useState<any[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([]);
 
-    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-      <h2 className="text-lg font-bold text-slate-900">Upcoming End Semester Timetable</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          { date: 'Nov 12, 2026', code: 'CS301', name: 'Automata Theory', time: '10:00 AM - 01:00 PM', hall: 'Hall 4B', grade: 'A (Predicted)' },
-          { date: 'Nov 14, 2026', code: 'CS302', name: 'Computer Networks', time: '10:00 AM - 01:00 PM', hall: 'Hall 2A', grade: 'A+ (Predicted)' },
-          { date: 'Nov 17, 2026', code: 'CS303', name: 'Database Management Systems', time: '10:00 AM - 01:00 PM', hall: 'Hall 3C', grade: 'A (Predicted)' },
-        ].map((ex) => (
-          <div key={ex.code} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-3 hover:bg-slate-50 transition-all">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">{ex.date}</span>
-              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{ex.grade}</span>
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900">{ex.name}</h3>
-              <p className="text-xs text-slate-500 font-mono mt-0.5">Code: {ex.code} • Location: {ex.hall}</p>
-            </div>
-            <div className="text-xs font-semibold text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/80 text-center font-mono">
-              {ex.time}
-            </div>
-          </div>
-        ))}
+  useEffect(() => {
+    getExams().then((res) => setExams(res || [])).catch(() => {});
+    getGradePredictions().then((res) => setPredictions(res || [])).catch(() => {});
+  }, []);
+
+  const defaultExams = [
+    { date: 'May 15, 2026', subject_code: 'CS301', subject_name: 'Automata Theory', time: '10:00 AM - 01:00 PM', room_number: 'Hall 302' },
+    { date: 'May 17, 2026', subject_code: 'CS302', subject_name: 'Computer Networks', time: '02:00 PM - 05:00 PM', room_number: 'Hall 104' },
+    { date: 'May 19, 2026', subject_code: 'CS303', subject_name: 'Database Management Systems', time: '10:00 AM - 01:00 PM', room_number: 'Lab 2' }
+  ];
+
+  const displayExams = exams.length > 0 ? exams : defaultExams;
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+            <FileText className="w-5 h-5" />
+          </span>
+          Exams & Grade Predictions
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">View upcoming semester timetables, hall passes, and internal grade predictions.</p>
+      </div>
+
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Upcoming End Semester Timetable</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {displayExams.map((ex, idx) => {
+            const pred = predictions.find((p) => p.subject_code === ex.subject_code) || predictions[idx] || { predicted_grade: 'A' };
+            return (
+              <div key={ex.subject_code || idx} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-3 hover:bg-slate-50 transition-all">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">{ex.exam_date || ex.date || 'May 15, 2026'}</span>
+                  <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{pred.predicted_grade || 'A'} (Predicted)</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{ex.subject_name}</h3>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5">Code: {ex.subject_code} • Location: {ex.room_number || 'Hall 302'}</p>
+                </div>
+                <div className="text-xs font-semibold text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/80 text-center font-mono">
+                  {ex.start_time ? `${ex.start_time} - ${ex.end_time}` : ex.time || '10:00 AM - 01:00 PM'}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
-)
+  );
+};
 
 // 4. ASSIGNMENTS COMPONENT
-export const Assignments = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-          <Upload className="w-5 h-5" />
-        </span>
-        Assignments & Submissions
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">Upload solutions, check assignment deadlines, and review grading reports.</p>
-    </div>
+export const Assignments = () => {
+  const [assignments, setAssignments] = useState<any[]>([]);
 
-    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-      <h2 className="text-lg font-bold text-slate-900">Pending & Upcoming Tasks</h2>
-      <div className="space-y-3">
-        <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200">Due in 2 days</span>
-              <span className="text-xs text-slate-400 font-mono">CS302 Lab</span>
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mt-1.5">OS Lab: Thread Scheduling & Synchronization</h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">Submit C++/Java solution with test bench output.</p>
-          </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/20 shrink-0">
-            <Upload className="w-4 h-4" /> Submit Solution
-          </button>
+  const [activeModal, setActiveModal] = useState<number | null>(null);
+  const [submissionUrl, setSubmissionUrl] = useState('');
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    getAssignments().then((res) => setAssignments(res || [])).catch(() => {});
+  }, []);
+
+  const defaultAssigns = [
+    { id: 1, title: 'DFA & NFA Finite State Simulator', subject_code: 'CS301 Lab', description: 'Implement finite state machine simulator in C++ or Python.', deadline: '2026-08-16T23:59:00Z' },
+    { id: 2, title: 'Socket Programming & TCP Handshake', subject_code: 'CS302 Lab', description: 'Write client-server socket scripts establishing TCP connection.', deadline: '2026-08-20T23:59:00Z' }
+  ];
+
+  const list = assignments.length > 0 ? assignments : defaultAssigns;
+
+  const handleSubmitAssignment = async (assignId: number) => {
+    if (!submissionUrl) return;
+    try {
+      await submitAssignment(assignId, submissionUrl);
+      setMsg('Assignment submission recorded successfully!');
+      setActiveModal(null);
+      setSubmissionUrl('');
+      setTimeout(() => setMsg(''), 4000);
+    } catch (err) {
+      alert('Failed to submit assignment solution.');
+    }
+  };
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+            <Upload className="w-5 h-5" />
+          </span>
+          Assignments & Submissions
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Upload solutions, check assignment deadlines, and review grading reports.</p>
+      </div>
+
+      {msg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+          {msg}
         </div>
+      )}
 
-        <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">Due in 6 days</span>
-              <span className="text-xs text-slate-400 font-mono">CS303 Lab</span>
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Pending & Upcoming Tasks</h2>
+        <div className="space-y-3">
+          {list.map((item) => (
+            <div key={item.id} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                    Deadline: {new Date(item.deadline).toLocaleDateString()}
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">{item.subject_code}</span>
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mt-1.5">{item.title}</h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">{item.description}</p>
+              </div>
+              <button
+                onClick={() => setActiveModal(item.id)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/20 shrink-0"
+              >
+                <Upload className="w-4 h-4" /> Submit Solution
+              </button>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mt-1.5">DBMS Project: B+ Tree Index Implementation</h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">Submit GitHub repo link & PDF report.</p>
-          </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all shrink-0">
-            <Upload className="w-4 h-4" /> Submit Solution
-          </button>
+          ))}
         </div>
       </div>
+
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 border border-slate-200 shadow-2xl">
+            <h3 className="text-base font-bold text-slate-900">Upload Assignment Solution</h3>
+            <p className="text-xs text-slate-500">Provide GitHub repo URL or file storage link to submit your work.</p>
+            <input
+              type="text"
+              value={submissionUrl}
+              onChange={(e) => setSubmissionUrl(e.target.value)}
+              placeholder="https://github.com/username/assignment-repo"
+              className="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-900 outline-none focus:border-indigo-500"
+            />
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => setActiveModal(null)} className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs">Cancel</button>
+              <button onClick={() => handleSubmitAssignment(activeModal)} className="w-1/2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md">Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-)
+  );
+};
 
 // 5. LIBRARY COMPONENT
 export const Library = () => {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await searchLibraryBooks(query)
-      setResults(res.results || [])
+      const res = await searchLibraryBooks(query);
+      setResults(res.results || []);
     } catch {
-      setResults([])
+      setResults([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    handleSearch()
-  }, [])
+    handleSearch();
+  }, []);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -347,7 +446,7 @@ export const Library = () => {
             <div key={book.id || book.title} className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900">{book.title}</h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">Author: {book.author} • Category: {book.category} • Location: <span className="font-bold text-slate-700">{book.location}</span></p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Author: {book.author} • Category: {book.category} • Location: <span className="font-bold text-slate-700">{book.location || 'Rack C-4'}</span></p>
                 {book.isbn && <p className="text-[11px] text-slate-400 font-mono mt-1">ISBN: {book.isbn}</p>}
               </div>
               <span className={`text-xs px-3.5 py-1.5 rounded-full font-extrabold border ${
@@ -360,44 +459,79 @@ export const Library = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 6. HOSTEL COMPONENT
 export const Hostel = () => {
-  const [complaintTitle, setComplaintTitle] = useState('')
-  const [complaintText, setComplaintText] = useState('')
-  const [complaints, setComplaints] = useState<any[]>([])
-  const [submitting, setSubmitting] = useState(false)
+  const [complaintTitle, setComplaintTitle] = useState('');
+
+  const [complaintText, setComplaintText] = useState('');
+  const [complaints, setComplaints] = useState<any[]>([]);
+
+  const [leaveReason, setLeaveReason] = useState('');
+  const [leaveStart, setLeaveStart] = useState('');
+  const [leaveEnd, setLeaveEnd] = useState('');
+  const [leaveRequests, setLeaveRequests] = useState<any[]>([]);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'complaints' | 'leave'>('complaints');
 
   const fetchComplaints = async () => {
     try {
-      const data = await getHostelComplaints()
-      setComplaints(data.complaints || [])
+      const data = await getHostelComplaints();
+      setComplaints(data.complaints || []);
     } catch {
-      setComplaints([])
+      setComplaints([]);
     }
-  }
+  };
+
+  const fetchLeaves = async () => {
+    try {
+      const data = await getHostelLeaveRequests();
+      setLeaveRequests(data.leave_requests || []);
+    } catch {
+      setLeaveRequests([]);
+    }
+  };
 
   useEffect(() => {
-    fetchComplaints()
-  }, [])
+    fetchComplaints();
+    fetchLeaves();
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!complaintTitle || !complaintText) return
-    setSubmitting(true)
+  const handleSubmitComplaint = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!complaintTitle || !complaintText) return;
+    setSubmitting(true);
     try {
-      await fileHostelComplaint(complaintTitle, complaintText, '302-B')
-      setComplaintTitle('')
-      setComplaintText('')
-      await fetchComplaints()
+      await fileHostelComplaint(complaintTitle, complaintText, '302-B');
+      setComplaintTitle('');
+      setComplaintText('');
+      await fetchComplaints();
     } catch {
       // ignore
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
+
+  const handleSubmitLeave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leaveReason || !leaveStart || !leaveEnd) return;
+    setSubmitting(true);
+    try {
+      await applyHostelLeave(leaveReason, leaveStart, leaveEnd);
+      setLeaveReason('');
+      setLeaveStart('');
+      setLeaveEnd('');
+      await fetchLeaves();
+    } catch {
+      // ignore
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -406,83 +540,150 @@ export const Hostel = () => {
           <span className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
             <AlertTriangle className="w-5 h-5" />
           </span>
-          Hostel Hub
+          Hostel Hub & Leave Portal
         </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">File maintenance tickets, check room details, and inspect AI priority predictions.</p>
+        <p className="text-sm text-slate-500 font-medium mt-1">File maintenance tickets, check room details, and submit leave requests.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900">Submit Maintenance Request</h2>
-          <input
-            type="text"
-            value={complaintTitle}
-            onChange={(e) => setComplaintTitle(e.target.value)}
-            placeholder="Complaint Subject (e.g. WiFi router power failure)"
-            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
-            required
-          />
-          <textarea
-            value={complaintText}
-            onChange={(e) => setComplaintText(e.target.value)}
-            placeholder="Detailed description (e.g. Power outlet in Room 302-B sparked)..."
-            className="w-full h-24 p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
-            required
-          />
-          <button type="submit" disabled={submitting} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs font-bold text-white transition-all shadow-md shadow-indigo-500/20">
-            {submitting ? 'Categorizing with AI...' : 'Submit & Predict AI Priority'}
-          </button>
-        </form>
+      <div className="flex gap-2 border-b border-slate-200 pb-1">
+        <button
+          onClick={() => setActiveTab('complaints')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+            activeTab === 'complaints' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          Maintenance Tickets
+        </button>
+        <button
+          onClick={() => setActiveTab('leave')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+            activeTab === 'leave' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          Hostel Leave Requests ({leaveRequests.length})
+        </button>
+      </div>
 
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900">Allotted Room Details</h2>
-          <div className="space-y-3 text-xs sm:text-sm text-slate-700">
-            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
-              <span className="text-slate-500">Room Number</span>
-              <span className="font-bold text-slate-900">302-B</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
-              <span className="text-slate-500">Block & Wing</span>
-              <span className="font-bold text-slate-900">C-Block (Boys)</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
-              <span className="text-slate-500">Room Capacity</span>
-              <span className="font-bold text-slate-900">4 Occupants (1 Allotted)</span>
-            </div>
-            <div className="flex justify-between py-2 font-medium">
-              <span className="text-slate-500">Hostel Warden</span>
-              <span className="font-bold text-slate-900">Mr. Robert Dev (+91-9876543210)</span>
+      {activeTab === 'complaints' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmitComplaint} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900">Submit Maintenance Request</h2>
+            <input
+              type="text"
+              value={complaintTitle}
+              onChange={(e) => setComplaintTitle(e.target.value)}
+              placeholder="Complaint Subject (e.g. WiFi router power failure)"
+              className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
+              required
+            />
+            <textarea
+              value={complaintText}
+              onChange={(e) => setComplaintText(e.target.value)}
+              placeholder="Detailed description (e.g. Power outlet in Room 302-B sparked)..."
+              className="w-full h-24 p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500"
+              required
+            />
+            <button type="submit" disabled={submitting} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs font-bold text-white transition-all shadow-md shadow-indigo-500/20">
+              {submitting ? 'Categorizing with AI...' : 'Submit & Predict AI Priority'}
+            </button>
+          </form>
+
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900">Allotted Room Details</h2>
+            <div className="space-y-3 text-xs sm:text-sm text-slate-700">
+              <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+                <span className="text-slate-500">Room Number</span>
+                <span className="font-bold text-slate-900">302-B</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+                <span className="text-slate-500">Block & Wing</span>
+                <span className="font-bold text-slate-900">C-Block (Boys)</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-slate-100 font-medium">
+                <span className="text-slate-500">Room Capacity</span>
+                <span className="font-bold text-slate-900">4 Occupants (1 Allotted)</span>
+              </div>
+              <div className="flex justify-between py-2 font-medium">
+                <span className="text-slate-500">Hostel Warden</span>
+                <span className="font-bold text-slate-900">Mr. Ramesh Kumar (+91-9876543210)</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-        <h2 className="text-lg font-bold text-slate-900">Active Maintenance Tickets ({complaints.length})</h2>
-        <div className="space-y-3">
-          {complaints.map((c) => (
-            <div key={c.id || c.title} className="p-4.5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmitLeave} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+            <h2 className="text-lg font-bold text-slate-900">Apply for Hostel Leave</h2>
+            <input
+              type="text"
+              value={leaveReason}
+              onChange={(e) => setLeaveReason(e.target.value)}
+              placeholder="Reason for leave (e.g. Weekend family visit)"
+              className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 outline-none focus:border-indigo-500"
+              required
+            />
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">{c.description}</p>
-                <span className="text-[11px] text-slate-400 font-mono mt-1 block">Room: {c.room_number || '302-B'}</span>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Start Date</label>
+                <input type="date" value={leaveStart} onChange={(e) => setLeaveStart(e.target.value)} className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900" required />
               </div>
-              <span className={`text-xs px-3 py-1 rounded-full font-extrabold border ${
-                c.priority === 'High' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-amber-50 text-amber-600 border-amber-200'
-              }`}>
-                Priority: {c.priority || 'Medium'}
-              </span>
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">End Date</label>
+                <input type="date" value={leaveEnd} onChange={(e) => setLeaveEnd(e.target.value)} className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900" required />
+              </div>
             </div>
-          ))}
+            <button type="submit" disabled={submitting} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-md">
+              Submit Leave Application
+            </button>
+          </form>
+
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-3">
+            <h2 className="text-lg font-bold text-slate-900">Leave History ({leaveRequests.length})</h2>
+            {leaveRequests.map((l) => (
+              <div key={l.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center text-xs">
+                <div>
+                  <p className="font-bold text-slate-900">{l.reason}</p>
+                  <p className="text-[11px] text-slate-400">{l.start_date} to {l.end_date}</p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${
+                  l.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {l.status}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'complaints' && (
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <h2 className="text-lg font-bold text-slate-900">Active Maintenance Tickets ({complaints.length})</h2>
+          <div className="space-y-3">
+            {complaints.map((c) => (
+              <div key={c.id || c.title} className="p-4.5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">{c.description}</p>
+                  <span className="text-[11px] text-slate-400 font-mono mt-1 block">Room: {c.room_number || '302-B'}</span>
+                </div>
+                <span className={`text-xs px-3 py-1 rounded-full font-extrabold border ${
+                  c.priority === 'High' ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-amber-50 text-amber-600 border-amber-200'
+                }`}>
+                  Priority: {c.priority || 'Medium'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
 // 7. TRANSPORT COMPONENT
 export const Transport = () => {
-  const [routes, setRoutes] = useState<any[]>([])
+  const [routes, setRoutes] = useState<any[]>([]);
 
   useEffect(() => {
     getTransportRoutes()
@@ -491,9 +692,9 @@ export const Transport = () => {
         setRoutes([
           { route: 'Route 10A (Central Station to Campus)', bus_number: 'TS-09-UA-1234', eta: '8 mins', demand: 'High' },
           { route: 'Route 14B (Metro Link to North Gate)', bus_number: 'TS-09-UA-5678', eta: '14 mins', demand: 'Low' }
-        ])
-      })
-  }, [])
+        ]);
+      });
+  }, []);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -529,34 +730,38 @@ export const Transport = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 8. PLACEMENTS COMPONENT
 export const Placements = () => {
-  const [cgpa, setCgpa] = useState('8.50')
-  const [branch, setBranch] = useState('CSE')
-  const [tier, setTier] = useState('Tier 1')
-  const [codingScore, setCodingScore] = useState('85')
-  const [mockScore, setMockScore] = useState('78')
-  const [internships, setInternships] = useState('1')
-  const [skills, setSkills] = useState('Python, Data Structures, System Design, SQL')
+  const [cgpa, setCgpa] = useState('8.50');
+  const [branch, setBranch] = useState('CSE');
+  const [tier, setTier] = useState('Tier 1');
+  const [codingScore, setCodingScore] = useState('85');
+  const [mockScore, setMockScore] = useState('78');
+  const [internships, setInternships] = useState('1');
+  const [skills, setSkills] = useState('Python, Data Structures, System Design, SQL');
 
-  const [prediction, setPrediction] = useState<any>(null)
-  const [analytics, setAnalytics] = useState<any>(null)
-  const [companies, setCompanies] = useState<any[]>([])
-  const [resumeText, setResumeText] = useState('')
-  const [resumeResult, setResumeResult] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
-  const [evaluatingResume, setEvaluatingResume] = useState(false)
+  const [prediction, setPrediction] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [drives, setDrives] = useState<any[]>([]);
+  const [resumeText, setResumeText] = useState('');
+  const [resumeResult, setResumeResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [evaluatingResume, setEvaluatingResume] = useState(false);
+
+  const [applyMsg, setApplyMsg] = useState('');
 
   useEffect(() => {
-    getPlacementAnalytics().then(setAnalytics).catch(() => {})
-    getRecruitingCompanies().then(res => setCompanies(res.companies || [])).catch(() => {})
-  }, [])
+    getPlacementAnalytics().then(setAnalytics).catch(() => {});
+    getRecruitingCompanies().then(res => setCompanies(res.companies || [])).catch(() => {});
+    getPlacementDrives().then(res => setDrives(res.drives || [])).catch(() => {});
+  }, []);
 
   const calculateReadiness = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await predictPlacementReadiness({
         cgpa: Number(cgpa),
@@ -566,27 +771,37 @@ export const Placements = () => {
         mock_interview_score: Number(mockScore),
         internships_count: Number(internships),
         skills: skills.split(',').map(s => s.trim()).filter(Boolean)
-      })
-      setPrediction(res)
+      });
+      setPrediction(res);
     } catch {
       // fallback
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleResumeReview = async () => {
-    if (!resumeText) return
-    setEvaluatingResume(true)
+    if (!resumeText) return;
+    setEvaluatingResume(true);
     try {
-      const res = await reviewResume(resumeText)
-      setResumeResult(res)
+      const res = await reviewResume(resumeText);
+      setResumeResult(res);
     } catch {
       // fallback
     } finally {
-      setEvaluatingResume(false)
+      setEvaluatingResume(false);
     }
-  }
+  };
+
+  const handleApplyDrive = async (driveId: number) => {
+    try {
+      const res = await applyPlacementDrive(driveId);
+      setApplyMsg(res.message || 'Application submitted successfully!');
+      setTimeout(() => setApplyMsg(''), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to submit placement application.');
+    }
+  };
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -596,8 +811,8 @@ export const Placements = () => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 text-indigo-600 text-xs font-extrabold mb-2 border border-white/80 shadow-2xs">
             <Award className="w-3.5 h-3.5" /> 100,000+ Placement Dataset ML Model
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Placements & Salary Predictor</h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">Dual ML models trained for readiness scoring, package LPA estimation, and skill gap analysis.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Placements & Recruitment Drives</h1>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">Check drive eligibility, apply for active recruiters, and predict readiness scores.</p>
         </div>
         {analytics && (
           <div className="flex gap-3">
@@ -617,27 +832,48 @@ export const Placements = () => {
         )}
       </div>
 
-      {/* Dataset Statistics Cards */}
-      {analytics && analytics.branches && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-600" /> Department Placement Performance (100k Dataset)
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {analytics.branches.map((b: any) => (
-              <div key={b.branch} className="p-3.5 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-1">
-                <span className="text-xs text-indigo-600 font-extrabold">{b.branch}</span>
-                <div className="text-lg font-extrabold text-slate-900">{b.placement_rate}%</div>
-                <p className="text-[11px] text-slate-500 font-medium">Avg ${b.avg_salary_lpa} LPA</p>
-              </div>
-            ))}
-          </div>
+      {applyMsg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+          {applyMsg}
         </div>
       )}
 
+      {/* Recruitment Drives Section */}
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <Briefcase className="w-5 h-5 text-indigo-600" /> Active Placement Recruitment Drives ({drives.length})
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {drives.map((d) => (
+            <div key={d.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">{d.company_name}</span>
+                  <h3 className="text-base font-bold text-slate-900 mt-1">{d.title}</h3>
+                  <p className="text-xs text-slate-500 font-medium">Package: <span className="font-bold text-emerald-600">${d.package_lpa} LPA</span> • Location: {d.location}</p>
+                </div>
+                <span className={`text-[11px] font-extrabold px-2.5 py-1 rounded-full ${
+                  d.eligible ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                }`}>
+                  {d.eligible ? 'ELIGIBLE' : 'INELIGIBLE'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-mono">Min CGPA: {d.min_cgpa} • Skills: {d.required_skills}</p>
+              <button
+                onClick={() => handleApplyDrive(d.id)}
+                disabled={!d.eligible}
+                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-xs"
+              >
+                {d.eligible ? 'Apply for Drive' : 'Ineligible (CGPA Below Threshold)'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Calculator & Resume Reviewer Split */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-indigo-600" /> ML Readiness & Salary Calculator
           </h2>
@@ -669,7 +905,7 @@ export const Placements = () => {
               <input value={codingScore} onChange={(e) => setCodingScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Mock Interview Score</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1">Mock Score (0-100)</label>
               <input value={mockScore} onChange={(e) => setMockScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
             </div>
             <div>
@@ -703,7 +939,7 @@ export const Placements = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-5 h-5 text-indigo-600" /> AI Resume Reviewer
             </h2>
@@ -729,7 +965,7 @@ export const Placements = () => {
             )}
           </div>
 
-          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-indigo-600" /> Active Campus Recruiters ({companies.length})
             </h2>
@@ -746,20 +982,21 @@ export const Placements = () => {
             </div>
           </div>
         </div>
+
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 9. FINANCE COMPONENT
 export const Finance = () => {
-  const [feeInfo, setFeeInfo] = useState<any>(null)
-  const [scholarships, setScholarships] = useState<any[]>([])
+  const [feeInfo, setFeeInfo] = useState<any>(null);
+  const [scholarships, setScholarships] = useState<any[]>([]);
 
   useEffect(() => {
-    getFeeDetails('1').then(setFeeInfo).catch(() => {})
-    getScholarships('1').then(res => setScholarships(res.recommendations || [])).catch(() => {})
-  }, [])
+    getFeeDetails('1').then(setFeeInfo).catch(() => {});
+    getScholarships('1').then(res => setScholarships(res.recommendations || [])).catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -778,7 +1015,7 @@ export const Finance = () => {
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pending Fee Dues</span>
           <p className="text-3xl font-extrabold text-slate-900">${feeInfo?.dues?.toLocaleString() || '1,250.00'}</p>
           <p className="text-xs text-slate-500 font-medium">Due Date: <span className="text-rose-600 font-bold">{feeInfo?.due_date || '2026-08-15'}</span></p>
-          <button className="w-full mt-2 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs text-white font-bold transition-all shadow-md shadow-indigo-500/20">
+          <button onClick={() => alert('Online fee payment gateway initialized. Proceeding with secure checkout...')} className="w-full mt-2 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl text-xs text-white font-bold transition-all shadow-md shadow-indigo-500/20">
             Pay Dues Online
           </button>
         </div>
@@ -801,8 +1038,8 @@ export const Finance = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 10. EVENTS COMPONENT
 export const Events = () => (
@@ -829,112 +1066,126 @@ export const Events = () => (
           </div>
           <h3 className="text-lg font-bold text-slate-900">{ev.title}</h3>
           <p className="text-xs text-slate-500 font-medium">{ev.date} • {ev.loc}</p>
-          <button className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
+          <button onClick={() => alert(`Registered for ${ev.title}!`)} className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
             Register Now
           </button>
         </div>
       ))}
     </div>
   </div>
-)
+);
 
 // 11. CLUBS COMPONENT
-export const Clubs = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
-          <Users className="w-5 h-5" />
-        </span>
-        Student Clubs & Societies
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">Explore active student societies, enrollments, and executive committee leads.</p>
-    </div>
+export const Clubs = () => {
+  const [clubs, setClubs] = useState<any[]>([]);
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {[
-        { name: 'AI & Machine Learning Club', lead: 'Alex Vance', members: 142 },
-        { name: 'Competitive Coding Society', lead: 'Sarah Lin', members: 210 },
-        { name: 'Robotics & Hardware Guild', lead: 'David Miller', members: 95 }
-      ].map((club) => (
-        <div key={club.name} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-3">
-          <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+  useEffect(() => {
+    getClubs().then((res) => setClubs(res || [])).catch(() => {});
+  }, []);
+
+  const handleJoin = async (id: number) => {
+    try {
+      await joinClub(id);
+      setClubs(prev => prev.map(c => c.id === id ? { ...c, is_member: true } : c));
+    } catch {
+      alert('Failed to join club.');
+    }
+  };
+
+  const defaultClubs = [
+    { id: 1, name: 'AI & Machine Learning Club', category: 'Technical', president_name: 'Alex Vance', is_member: true },
+    { id: 2, name: 'Competitive Coding Society', category: 'Technical', president_name: 'Sarah Lin', is_member: false },
+    { id: 3, name: 'Robotics & Hardware Guild', category: 'Technical', president_name: 'David Miller', is_member: false }
+  ];
+
+  const list = clubs.length > 0 ? clubs : defaultClubs;
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
             <Users className="w-5 h-5" />
+          </span>
+          Student Clubs & Societies
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Explore active student societies, enrollments, and executive committee leads.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {list.map((club) => (
+          <div key={club.id} className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+              <Users className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">{club.name}</h3>
+            <p className="text-xs text-slate-500 font-medium">Lead: {club.president_name || 'Rahul Kumar'} • {club.category}</p>
+            <button
+              onClick={() => handleJoin(club.id)}
+              disabled={club.is_member}
+              className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                club.is_member ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+              }`}
+            >
+              {club.is_member ? 'Joined Member' : 'Join Club'}
+            </button>
           </div>
-          <h3 className="text-base font-bold text-slate-900">{club.name}</h3>
-          <p className="text-xs text-slate-500 font-medium">Lead: {club.lead} • {club.members} Active Members</p>
-          <button className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all">
-            Join Club
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)
-
-// 12. NOTICES COMPONENT
-export const Notices = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
-          <Bell className="w-5 h-5" />
-        </span>
-        Notice Board & Circulars
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">Official administration announcements, holiday lists, and exam circulars.</p>
-    </div>
-
-    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-      {[
-        { title: 'Mid-Semester Exam Instructions & Regulations', date: 'Jul 28, 2026', cat: 'Academic' },
-        { title: 'Campus Wi-Fi Maintenance Window Announcement', date: 'Jul 25, 2026', cat: 'IT Services' }
-      ].map((n) => (
-        <div key={n.title} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">{n.cat}</span>
-            <h3 className="text-sm font-bold text-slate-900 mt-1">{n.title}</h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Published on {n.date}</p>
-          </div>
-          <button className="text-xs font-bold text-indigo-600 hover:underline">Read Circular</button>
-        </div>
-      ))}
-    </div>
-  </div>
-)
-
-// 13. RESEARCH COMPONENT
-export const Research = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-          <FileText className="w-5 h-5" />
-        </span>
-        Research & Journals
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">Publish research papers, request supervisor reviews, and index journal citations.</p>
-    </div>
-
-    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-      <div className="p-5 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
-        <div>
-          <h3 className="text-base font-bold text-slate-900">Transformer Architectures in Embedded Edge Devices</h3>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">Authors: John Doe, Dr. Sarah Jenkins • Published in IEEE IEEE-AI 2026</p>
-        </div>
-        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Indexed</span>
+        ))}
       </div>
     </div>
-  </div>
-)
+  );
+};
+
+// 12. NOTICES COMPONENT
+export const Notices = () => {
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+
+  useEffect(() => {
+    getAnnouncements().then((res) => setAnnouncements(res || [])).catch(() => {});
+  }, []);
+
+  const defaultAnn = [
+    { id: 1, title: 'Mid-Semester Exam Instructions & Regulations', created_at: '2026-07-28', author_role: 'Academic' },
+    { id: 2, title: 'Campus Wi-Fi Maintenance Window Announcement', created_at: '2026-07-25', author_role: 'IT Services' }
+  ];
+
+  const list = announcements.length > 0 ? announcements : defaultAnn;
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+            <Bell className="w-5 h-5" />
+          </span>
+          Notice Board & Circulars
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Official administration announcements, holiday lists, and exam circulars.</p>
+      </div>
+
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        {list.map((n) => (
+          <div key={n.id} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
+            <div>
+              <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md uppercase">{n.author_role}</span>
+              <h3 className="text-sm font-bold text-slate-900 mt-1">{n.title}</h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">Published on {new Date(n.created_at).toLocaleDateString()}</p>
+            </div>
+            <button onClick={() => alert(n.content || n.title)} className="text-xs font-bold text-indigo-600 hover:underline">Read Circular</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // 14. AI INSIGHTS COMPONENT
 export const AIInsights = () => {
-  const [adminStats, setAdminStats] = useState<any>(null)
+  const [adminStats, setAdminStats] = useState<any>(null);
 
   useEffect(() => {
-    getAdminAnalytics().then(setAdminStats).catch(() => {})
-  }, [])
+    getAdminAnalytics().then(setAdminStats).catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
@@ -952,93 +1203,116 @@ export const AIInsights = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Analyzed Dataset Records</span>
-            <div className="text-3xl font-extrabold text-slate-900 mt-1">{adminStats.total_analyzed_students?.toLocaleString()}</div>
+            <div className="text-3xl font-extrabold text-slate-900 mt-1">{adminStats.total_analyzed_students?.toLocaleString() || '100,000'}</div>
           </div>
           <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Placement Rate Forecast</span>
-            <div className="text-3xl font-extrabold text-emerald-600 mt-1">{adminStats.placement_rate_forecast}%</div>
+            <div className="text-3xl font-extrabold text-emerald-600 mt-1">{adminStats.placement_rate_forecast || '88.4'}%</div>
           </div>
           <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Hostel Occupancy Rate</span>
-            <div className="text-3xl font-extrabold text-indigo-600 mt-1">{adminStats.hostel_occupancy_prediction}%</div>
-          </div>
-        </div>
-      )}
-
-      {adminStats?.top_influencing_factors && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900">Top Predictive Signals for Student Success</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {adminStats.top_influencing_factors.map((factor: any) => (
-              <div key={factor.feature} className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-800">{factor.feature}</span>
-                <span className="text-xs font-mono font-extrabold text-indigo-600">Correlation: {factor.raw_correlation}</span>
-              </div>
-            ))}
+            <div className="text-3xl font-extrabold text-indigo-600 mt-1">{adminStats.hostel_occupancy_prediction || '92.5'}%</div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // 15. SETTINGS COMPONENT
-export const Settings = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
-          <Lock className="w-5 h-5" />
-        </span>
-        Account Settings
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">Manage security settings, notifications, active sessions, and password preferences.</p>
-    </div>
+export const Settings = () => {
+  const { profile } = useAuth();
+  const [newPassword, setNewPassword] = useState('');
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
 
-    <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-5 max-w-2xl">
-      <h2 className="text-lg font-bold text-slate-900">Security & Authentication</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
-          <input type="email" value="john.doe@university.edu" disabled className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-500 font-medium" />
+  const handleUpdatePassword = async () => {
+    setMsg('');
+    setErr('');
+    if (newPassword.length < 6) {
+      setErr('Password must be at least 6 characters.');
+      return;
+    }
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setMsg('Security password updated successfully!');
+      setNewPassword('');
+    } catch (e: any) {
+      setErr(e.message || 'Failed to update password.');
+    }
+  };
+
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
+            <Lock className="w-5 h-5" />
+          </span>
+          Account Settings
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">Manage security settings, notifications, active sessions, and password preferences.</p>
+      </div>
+
+      {msg && <div className="p-4 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold max-w-2xl">{msg}</div>}
+      {err && <div className="p-4 rounded-xl bg-red-50 text-red-600 text-xs font-bold max-w-2xl">{err}</div>}
+
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-5 max-w-2xl">
+        <h2 className="text-lg font-bold text-slate-900">Security & Authentication</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
+            <input type="email" value={profile?.email || ''} disabled className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-500 font-medium" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">New Password</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-indigo-500"
+            />
+          </div>
+          <button onClick={handleUpdatePassword} className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
+            Update Security Settings
+          </button>
         </div>
-        <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1">New Password</label>
-          <input type="password" placeholder="••••••••" className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-indigo-500" />
-        </div>
-        <button className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl text-xs font-bold shadow-xs">
-          Update Security Settings
-        </button>
       </div>
     </div>
-  </div>
-)
+  );
+};
 
 // 16. PROFILE COMPONENT
-export const Profile = () => (
-  <div className="space-y-7 animate-fade-in font-sans">
-    <div>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-        <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
-          <User className="w-5 h-5" />
-        </span>
-        Student Profile
-      </h1>
-      <p className="text-sm text-slate-500 font-medium mt-1">View enrollment details, academic records, and security badge credentials.</p>
-    </div>
-
-    <div className="bg-white rounded-[24px] p-7 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col sm:flex-row items-center gap-6">
-      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-md shadow-indigo-500/20">
-        J
+export const Profile = () => {
+  const { profile } = useAuth();
+  return (
+    <div className="space-y-7 animate-fade-in font-sans">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <User className="w-5 h-5" />
+          </span>
+          {profile?.role === 'student' ? 'Student Profile' : 'User Profile'}
+        </h1>
+        <p className="text-sm text-slate-500 font-medium mt-1">View enrollment details, academic records, and security badge credentials.</p>
       </div>
-      <div className="space-y-1 text-center sm:text-left">
-        <h2 className="text-xl font-extrabold text-slate-900">John Doe</h2>
-        <p className="text-xs text-slate-500 font-medium">Roll Number: <span className="font-mono font-bold text-indigo-600">CS2023001</span> • Department of Computer Science</p>
-        <div className="flex flex-wrap gap-2 pt-2 justify-center sm:justify-start">
-          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">GPA: 8.42</span>
-          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">Semester V</span>
+
+      <div className="bg-white rounded-[24px] p-7 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-2xl font-extrabold shadow-md shadow-indigo-500/20 uppercase">
+          {profile?.full_name?.charAt(0) || 'U'}
+        </div>
+        <div className="space-y-1 text-center sm:text-left">
+          <h2 className="text-xl font-extrabold text-slate-900">{profile?.full_name || 'Campus User'}</h2>
+          <p className="text-xs text-slate-500 font-medium">Institution ID: <span className="font-mono font-bold text-indigo-600">{profile?.institution_id || 'N/A'}</span> • {profile?.email}</p>
+          <div className="flex flex-wrap gap-2 pt-2 justify-center sm:justify-start">
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 uppercase">Role: {profile?.role}</span>
+            <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200 capitalize">Status: {profile?.status || 'active'}</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  );
+};
+

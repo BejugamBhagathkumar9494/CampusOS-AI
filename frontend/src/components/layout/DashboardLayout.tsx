@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -25,6 +26,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 
+import { getNotifications, fetchWithAuth } from '../../services/api';
+
 interface SidebarItem {
   name: string;
   path: string;
@@ -33,12 +36,31 @@ interface SidebarItem {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [notifs, setNotifs] = useState<any[]>([]);
+  const [showNotifs, setShowNotifs] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
 
   const role = profile?.role || 'student';
   const fullName = profile?.full_name || 'User';
+
+  useEffect(() => {
+    getNotifications()
+      .then((data) => setNotifs(data || []))
+      .catch(() => setNotifs([]));
+  }, []);
+
+  const unreadCount = notifs.filter((n) => !n.is_read).length;
+
+  const markAllNotificationsRead = async () => {
+    try {
+      await fetchWithAuth('/notifications/read-all', { method: 'POST' });
+    } catch (e) {
+      console.warn('Mark read error:', e);
+    }
+  };
+
 
   const getRoleLabel = (r: string) => {
     switch (r) {
@@ -236,10 +258,62 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="relative p-2 rounded-2xl border border-slate-200/80 bg-slate-100/70 text-slate-600 hover:bg-slate-200/60 transition-colors">
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-              <Bell className="w-4.5 h-4.5" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifs(!showNotifs)}
+                className="relative p-2 rounded-2xl border border-slate-200/80 bg-slate-100/70 text-slate-600 hover:bg-slate-200/60 transition-colors"
+              >
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-extrabold bg-rose-500 text-white rounded-full ring-2 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
+                <Bell className="w-4.5 h-4.5" />
+              </button>
+
+              {/* Notification Popover Dropdown */}
+              {showNotifs && (
+                <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-fade-in">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                    <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Bell className="w-4 h-4 text-indigo-600" /> Notifications ({notifs.length})
+                    </h3>
+                    <button
+                      onClick={async () => {
+                        await markAllNotificationsRead();
+                        setNotifs(prev => prev.map(n => ({ ...n, is_read: true })));
+                      }}
+                      className="text-[11px] font-bold text-indigo-600 hover:underline"
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto space-y-2.5 custom-scrollbar">
+                    {notifs.length > 0 ? (
+                      notifs.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`p-3 rounded-xl border text-xs transition-colors ${
+                            n.is_read ? 'bg-slate-50 border-slate-100 text-slate-600' : 'bg-indigo-50/70 border-indigo-100 text-slate-900 font-medium'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <p className="font-bold text-slate-900">{n.title}</p>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="text-slate-600 mt-1 leading-snug">{n.message}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-400 py-4 text-center font-medium">No notifications yet.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="h-6 w-px bg-slate-200"></div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-xs">
@@ -250,6 +324,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </header>
+
 
         {/* Content viewport */}
         <main className="flex-1 overflow-y-auto bg-[#F8FAFC] p-6 md:p-8">
