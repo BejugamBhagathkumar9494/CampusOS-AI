@@ -136,3 +136,72 @@ The Swagger docs will be available at `http://localhost:8000/docs`.
    ```
 
 The application will be accessible at `http://localhost:5173`.
+
+---
+
+## 🔒 CampusOS Authentication & Authorization System
+
+CampusOS implements a zero-trust, multi-layered security architecture ensuring that **every user can only access features and data they are authorized to access**.
+
+### Security Architecture
+
+```text
+                    CAMPUSOS AI
+                         |
+                         v
+                  Authentication
+                         |
+                         v
+                   Supabase Auth
+                         |
+                         v
+                 Authenticated User
+                         |
+                         v
+                    User Profile
+                         |
+               ┌─────────┴─────────┐
+               v                   v
+           ROLE CHECK          USER ID CHECK
+        (Level 1 - RBAC)    (Level 2 - Owner Data)
+               |                   |
+               └─────────┬─────────┘
+                         v
+                  PERMISSION CHECK
+                         v
+               DATABASE / RLS POLICIES
+                         v
+                 Authorized Data & Features
+                         v
+                 Role-Specific Dashboard
+```
+
+### Access Control Levels
+
+1. **Level 1: Role-Based Access Control (RBAC):**
+   - Standardized database role identifiers: `student`, `faculty`, `admin`, `hostel_warden`, `placement_officer`, `super_admin`.
+   - Restricts UI routes and API endpoints to permitted roles.
+
+2. **Level 2: User-Specific Data Isolation:**
+   - Enforces ownership queries (`WHERE user_id = authenticated_user_id`) and Row Level Security (RLS) policies on database tables (`profiles`, `students`, `attendance`, `marks`, `complaints`, `applications`).
+   - Prevents parameter manipulation in client requests from accessing another user's private data.
+
+### Key Security Rules
+
+- **Zero-Trust Role Requests:** Requested roles during signup are validated against `authorized_users`. Self-registration as `admin` or `super_admin` is strictly blocked.
+- **Role-Free Login:** Login requires Email and Password only; roles are loaded securely from database profiles.
+- **Account Approval & Status:** Profiles carry status flags (`pending`, `active`, `suspended`, `rejected`). Only authorized Admins / Super Admins can approve or suspend accounts.
+- **Audit Logging:** Security events (`LOGIN`, `LOGOUT`, `USER_CREATED`, `USER_APPROVED`, `USER_SUSPENDED`, `ADMIN_CREATED`) are logged in `audit_logs`.
+
+### Pre-Approved Test Accounts (Development)
+
+| Institution ID | Email | Role | Default Password |
+| :--- | :--- | :--- | :--- |
+| `SA001` | `superadmin@campus.edu` | `super_admin` | `superadmin123` |
+| `ADM001` | `admin1@campus.edu` | `admin` | `admin123` |
+| `STU001` | `rahul.student@campus.edu` | `student` | `rahul123` |
+| `STU002` | `priya.student@campus.edu` | `student` | `priya123` |
+| `FAC001` | `arun.faculty@campus.edu` | `faculty` | `arun123` |
+| `WAR001` | `ramesh.warden@campus.edu` | `hostel_warden` | `ramesh123` |
+| `PO001` | `suresh.placement@campus.edu` | `placement_officer` | `suresh123` |
+

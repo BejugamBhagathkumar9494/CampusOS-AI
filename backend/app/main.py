@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1 import (
     auth,
+    admin_management,
     students,
     faculty,
     hostel,
@@ -36,7 +37,9 @@ app.add_middleware(
 
 # Include API Routers under v1 namespace
 app.include_router(auth.router, prefix=settings.API_V1_STR)
+app.include_router(admin_management.router, prefix=settings.API_V1_STR)
 app.include_router(students.router, prefix=settings.API_V1_STR)
+
 app.include_router(faculty.router, prefix=settings.API_V1_STR)
 app.include_router(hostel.router, prefix=settings.API_V1_STR)
 app.include_router(library.router, prefix=settings.API_V1_STR)

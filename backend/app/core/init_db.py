@@ -34,28 +34,48 @@ def init_db():
 
         print("Seeding database...")
 
-        # 2. Create Roles
+        # Import AuthorizedUser and Profile
+        from app.models.database_models import AuthorizedUser, Profile
+
+        # 2. Seed Authorized Users Registry
+        # Security: Pre-authorizes institution IDs to prevent unauthorized role claims.
+        authorized_records = [
+            {"institution_id": "STU001", "email": "rahul.student@campus.edu", "full_name": "Rahul Kumar", "role": "student"},
+            {"institution_id": "STU002", "email": "priya.student@campus.edu", "full_name": "Priya Kumar", "role": "student"},
+            {"institution_id": "FAC001", "email": "arun.faculty@campus.edu", "full_name": "Dr. Arun Kumar", "role": "faculty"},
+            {"institution_id": "FAC002", "email": "meena.faculty@campus.edu", "full_name": "Dr. Meena Kumar", "role": "faculty"},
+            {"institution_id": "WAR001", "email": "ramesh.warden@campus.edu", "full_name": "Ramesh Kumar", "role": "hostel_warden"},
+            {"institution_id": "PO001", "email": "suresh.placement@campus.edu", "full_name": "Suresh Kumar", "role": "placement_officer"},
+            {"institution_id": "ADM001", "email": "admin1@campus.edu", "full_name": "Admin One", "role": "admin"},
+            {"institution_id": "ADM002", "email": "admin2@campus.edu", "full_name": "Admin Two", "role": "admin"},
+            {"institution_id": "SA001", "email": "superadmin@campus.edu", "full_name": "Super Admin", "role": "super_admin"},
+        ]
+        for rec in authorized_records:
+            auth_record = AuthorizedUser(**rec, is_used=True)
+            db.add(auth_record)
+        db.commit()
+
+        # 3. Create Standard Roles (Stored as lowercase string identifiers)
         role_names = [
-            "Student",
-            "Faculty",
-            "Admin",
-            "Hostel Warden",
-            "Librarian",
-            "Placement Officer",
-            "Finance Officer",
-            "Transport Manager",
+            "student",
+            "faculty",
+            "admin",
+            "hostel_warden",
+            "placement_officer",
+            "super_admin"
         ]
         roles_dict = {}
         for name in role_names:
-            role = Role(name=name, description=f"{name} role description")
+            role = Role(name=name, description=f"{name.replace('_', ' ').title()} Role")
             db.add(role)
             roles_dict[name] = role
         db.commit()
 
-        # 3. Create Permissions
+        # 4. Create Permissions
         permissions_list = [
             "manage_users", "view_analytics", "manage_hostel", 
-            "manage_library", "manage_transport", "manage_placement", "manage_finance"
+            "manage_library", "manage_transport", "manage_placement", "manage_finance",
+            "manage_admins", "view_audit_logs"
         ]
         perms_dict = {}
         for p_name in permissions_list:
@@ -64,38 +84,70 @@ def init_db():
             perms_dict[p_name] = perm
         db.commit()
 
-        # Assign permissions to Admin
-        roles_dict["Admin"].permissions.extend(list(perms_dict.values()))
+        # Assign all permissions to Admin & Super Admin
+        roles_dict["admin"].permissions.extend(list(perms_dict.values()))
+        roles_dict["super_admin"].permissions.extend(list(perms_dict.values()))
         db.commit()
 
-        # 4. Create default users: Admin & Student (John Doe)
-        admin_user = User(
-            email="admin@university.edu",
-            hashed_password=get_password_hash("admin_password_2026"),
-            full_name="System Admin",
-            is_active=True
-        )
-        admin_user.roles.append(roles_dict["Admin"])
-        db.add(admin_user)
+        # 5. Create Default Development Accounts with Active Profiles
+        # Security: Password hashed securely using bcrypt passlib context
+        default_accounts = [
+            {"email": "superadmin@campus.edu", "name": "Super Admin", "role": "super_admin", "inst_id": "SA001", "pass": "superadmin123"},
+            {"email": "admin1@campus.edu", "name": "Admin One", "role": "admin", "inst_id": "ADM001", "pass": "admin123"},
+            {"email": "rahul.student@campus.edu", "name": "Rahul Kumar", "role": "student", "inst_id": "STU001", "pass": "rahul123"},
+            {"email": "priya.student@campus.edu", "name": "Priya Kumar", "role": "student", "inst_id": "STU002", "pass": "priya123"},
+            {"email": "arun.faculty@campus.edu", "name": "Dr. Arun Kumar", "role": "faculty", "inst_id": "FAC001", "pass": "arun123"},
+            {"email": "ramesh.warden@campus.edu", "name": "Ramesh Kumar", "role": "hostel_warden", "inst_id": "WAR001", "pass": "ramesh123"},
+            {"email": "suresh.placement@campus.edu", "name": "Suresh Kumar", "role": "placement_officer", "inst_id": "PO001", "pass": "suresh123"},
+        ]
 
-        student_user = User(
-            email="john.doe@university.edu",
-            hashed_password=get_password_hash("student_password_2026"),
-            full_name="John Doe",
-            is_active=True
-        )
-        student_user.roles.append(roles_dict["Student"])
-        db.add(student_user)
+        created_users = {}
+        for acc in default_accounts:
+            user_obj = User(
+                email=acc["email"],
+                hashed_password=get_password_hash(acc["pass"]),
+                full_name=acc["name"],
+                institution_id=acc["inst_id"],
+                status="active",
+                is_active=True
+            )
+            user_obj.roles.append(roles_dict[acc["role"]])
+            db.add(user_obj)
+            db.flush()
+            
+            profile_obj = Profile(
+                id=str(user_obj.id),
+                auth_user_id=str(user_obj.id),
+                full_name=acc["name"],
+                email=acc["email"],
+                role=acc["role"],
+                institution_id=acc["inst_id"],
+                status="active",
+                email_verified=True
+            )
+            db.add(profile_obj)
+            created_users[acc["email"]] = user_obj
         db.commit()
 
-        # Create Student Profile
+        # Create Student Profile for Rahul
+        student_user = created_users["rahul.student@campus.edu"]
         student_profile = Student(
             user_id=student_user.id,
-            roll_number="CS2023001",
+            roll_number="STU001",
             cgpa=8.42,
             current_semester=5
         )
         db.add(student_profile)
+
+        # Create Student Profile for Priya
+        priya_user = created_users["priya.student@campus.edu"]
+        priya_profile = Student(
+            user_id=priya_user.id,
+            roll_number="STU002",
+            cgpa=9.10,
+            current_semester=5
+        )
+        db.add(priya_profile)
         db.commit()
 
         # 5. Create default Subjects
