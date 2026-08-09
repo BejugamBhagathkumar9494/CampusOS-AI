@@ -34,8 +34,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const userProfile = await authService.getProfile(currUser.id);
-      setUser(currUser);
-      setProfile(userProfile);
+      if (userProfile) {
+        setUser(currUser);
+        setProfile(userProfile);
+      } else {
+        const metadata = currUser.user_metadata || {};
+        const fallbackProfile: UserProfile = {
+          id: currUser.id,
+          full_name: metadata.full_name || currUser.email?.split('@')[0] || 'Campus User',
+          email: currUser.email || '',
+          role: (metadata.role as UserRole) || 'student',
+          institution_id: metadata.institution_id || 'STU001',
+          status: 'active',
+          created_at: currUser.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setUser(currUser);
+        setProfile(fallbackProfile);
+      }
     } catch (err) {
       console.error('Failed to load user profile during auth state transition:', err);
     } finally {
@@ -47,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     try {
       const userProfile = await authService.getProfile(user.id);
-      setProfile(userProfile);
+      if (userProfile) setProfile(userProfile);
     } catch (err) {
       console.error('Failed to refresh user profile:', err);
     }
@@ -61,10 +77,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           await fetchProfileAndSetState(session.user);
         } else {
-          setLoading(false);
+          const fallbackUser = await authService.getCurrentUser();
+          if (fallbackUser) {
+            await fetchProfileAndSetState(fallbackUser);
+          } else {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
         }
       } catch (err) {
         console.error('Failed to retrieve initial auth session:', err);
+        setUser(null);
+        setProfile(null);
         setLoading(false);
       }
     };
@@ -101,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await fetchProfileAndSetState(currUser);
       } else {
         setLoading(false);
+        throw new Error('Authentication succeeded but current user session could not be established.');
       }
       return data;
     } catch (err) {
@@ -119,6 +145,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const data = await authService.signUp(email, password, fullName, role, institutionId);
+      const currUser = await authService.getCurrentUser();
+      if (currUser) {
+        await fetchProfileAndSetState(currUser);
+      } else {
+        setLoading(false);
+      }
       return data;
     } catch (err) {
       setLoading(false);

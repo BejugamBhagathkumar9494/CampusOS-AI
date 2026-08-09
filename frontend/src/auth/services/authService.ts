@@ -7,18 +7,43 @@ export const authService = {
    * Never trust client-side role claims; the role comes from the database.
    */
   async getProfile(userId: string): Promise<UserProfile | null> {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+    if (userId && userId !== 'me' && userId !== 'current_token_user') {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (!error && data) {
-        return data as UserProfile;
+        if (!error && data) {
+          return data as UserProfile;
+        }
+      } catch (e) {
+        console.warn('Supabase profile fetch error:', e);
       }
-    } catch (e) {
-      console.warn('Supabase profile fetch error:', e);
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.id === userId) {
+          const metadata = user.user_metadata || {};
+          const fallbackProfile: UserProfile = {
+            id: user.id,
+            full_name: metadata.full_name || user.email?.split('@')[0] || 'Campus User',
+            email: user.email || '',
+            role: (metadata.role as UserRole) || 'student',
+            institution_id: metadata.institution_id || 'STU001',
+            status: 'active',
+            created_at: user.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          (async () => {
+            try {
+              await supabase.from('profiles').upsert(fallbackProfile);
+            } catch (e) {}
+          })();
+          return fallbackProfile;
+        }
+      } catch (e) {}
     }
 
     // Check client demo session storage fallback
@@ -29,11 +54,11 @@ export const authService = {
       } catch (err) {}
     }
 
-    // Fallback: Query backend API /auth/me or /students/me
+    // Fallback: Query backend API /auth/me
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
       const token = localStorage.getItem('campusos_token') || (await supabase.auth.getSession()).data.session?.access_token;
-      if (token) {
+      if (token && token !== 'demo-local-access-token') {
         const res = await fetch(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -61,15 +86,34 @@ export const authService = {
    * Retrieves current authenticated session user.
    */
   async getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) return user;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) return user;
+    } catch (e) {}
+
+    // Check client demo session storage fallback
+    const mockUserJson = localStorage.getItem('campusos_mock_user');
+    if (mockUserJson) {
+      try {
+        const mockProf = JSON.parse(mockUserJson) as UserProfile;
+        return {
+          id: mockProf.id,
+          email: mockProf.email,
+          user_metadata: { role: mockProf.role, full_name: mockProf.full_name }
+        };
+      } catch (err) {}
+    }
 
     // Check backend or client token fallback
     const token = localStorage.getItem('campusos_token');
     if (token) {
-      const profile = await this.getProfile('me');
+      const profile = await this.getProfile('current_token_user');
       if (profile) {
-        return { id: profile.id, email: profile.email };
+        return {
+          id: profile.id,
+          email: profile.email,
+          user_metadata: { role: profile.role, full_name: profile.full_name }
+        };
       }
     }
     return null;
@@ -93,6 +137,7 @@ export const authService = {
    * 3. Resilient Client Session Fallback
    */
   async signIn(email: string, password: string) {
+    let supaErrorMsg: string | null = null;
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -104,8 +149,12 @@ export const authService = {
         localStorage.removeItem('campusos_mock_user');
         return data;
       }
-    } catch (supaErr) {
-      console.warn('Supabase auth failed, falling back to backend API login:', supaErr);
+      if (error) {
+        supaErrorMsg = error.message;
+      }
+    } catch (supaErr: any) {
+      supaErrorMsg = supaErr?.message || 'Supabase auth error';
+      console.warn('Supabase auth failed, trying backend API login fallback:', supaErr);
     }
 
     // Tier 2: Backend FastAPI Auth Login Fallback
@@ -150,21 +199,23 @@ export const authService = {
         return { access_token: 'demo-local-access-token', token_type: 'bearer' };
       }
 
-      const demoUsers: Record<string, { role: UserRole; name: string; id: string }> = {
-        'bhagath.student@campus.edu': { role: 'student', name: 'Bhagath Kumar', id: '3' },
-        'rahul.student@campus.edu': { role: 'student', name: 'Rahul Kumar', id: '3' },
-        'priya.student@campus.edu': { role: 'student', name: 'Priya Kumar', id: '4' },
-        'arun.faculty@campus.edu': { role: 'faculty', name: 'Dr. Arun Kumar', id: '5' },
-        'ramesh.warden@campus.edu': { role: 'hostel_warden', name: 'Ramesh Kumar', id: '6' },
-        'suresh.placement@campus.edu': { role: 'placement_officer', name: 'Suresh Kumar', id: '7' },
-        'admin1@campus.edu': { role: 'admin', name: 'Admin One', id: '2' },
-        'superadmin@campus.edu': { role: 'super_admin', name: 'Super Admin', id: '1' }
+      const demoUsers: Record<string, { role: UserRole; name: string; id: string; pass: string }> = {
+        'bhagath.student@campus.edu': { role: 'student', name: 'Bhagath Kumar', id: '3', pass: 'bhagath123' },
+        'rahul.student@campus.edu': { role: 'student', name: 'Rahul Kumar', id: '3', pass: 'rahul123' },
+        'priya.student@campus.edu': { role: 'student', name: 'Priya Kumar', id: '4', pass: 'priya123' },
+        'arun.faculty@campus.edu': { role: 'faculty', name: 'Dr. Arun Kumar', id: '5', pass: 'arun123' },
+        'ramesh.warden@campus.edu': { role: 'hostel_warden', name: 'Ramesh Kumar', id: '6', pass: 'ramesh123' },
+        'suresh.placement@campus.edu': { role: 'placement_officer', name: 'Suresh Kumar', id: '7', pass: 'suresh123' },
+        'admin1@campus.edu': { role: 'admin', name: 'Admin One', id: '2', pass: 'admin123' },
+        'superadmin@campus.edu': { role: 'super_admin', name: 'Super Admin', id: '1', pass: 'superadmin123' }
       };
 
       const matched = demoUsers[email.toLowerCase()];
-      let mockProfile: UserProfile;
       if (matched) {
-        mockProfile = {
+        if (matched.pass && matched.pass !== password) {
+          throw new Error('Incorrect email address or password.');
+        }
+        const mockProfile: UserProfile = {
           id: matched.id,
           full_name: matched.name,
           email: email,
@@ -174,34 +225,17 @@ export const authService = {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
-      } else {
-        const em = email.toLowerCase();
-        let role: UserRole = 'student';
-        if (em.includes('faculty')) role = 'faculty';
-        else if (em.includes('warden')) role = 'hostel_warden';
-        else if (em.includes('placement')) role = 'placement_officer';
-        else if (em.includes('superadmin')) role = 'super_admin';
-        else if (em.includes('admin')) role = 'admin';
-
-        const rawName = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ');
-        const formattedName = rawName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Campus User';
-
-        mockProfile = {
-          id: 'usr_' + Math.random().toString(36).substr(2, 9),
-          full_name: formattedName,
-          email: email,
-          role: role,
-          institution_id: 'STU001',
-          status: 'active',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
+        localStorage.setItem('campusos_mock_user', JSON.stringify(mockProfile));
+        localStorage.setItem('campusos_token', 'demo-local-access-token');
+        return { access_token: 'demo-local-access-token', token_type: 'bearer' };
       }
 
-      localStorage.setItem('campusos_mock_user', JSON.stringify(mockProfile));
-      localStorage.setItem('campusos_token', 'demo-local-access-token');
-      return { access_token: 'demo-local-access-token', token_type: 'bearer' };
+      // If Supabase gave an explicit error message (e.g. Invalid login credentials), throw it
+      if (supaErrorMsg) {
+        throw new Error(supaErrorMsg);
+      }
 
+      throw new Error('Account not found. Please check your credentials or create an account.');
     }
   },
 

@@ -21,7 +21,7 @@ class TestCampusOSAPI(unittest.TestCase):
         # Login with the seeded user
         response = self.client.post(
             "/api/v1/auth/login",
-            data={"username": "john.doe@university.edu", "password": "student_password_2026"},
+            data={"username": "rahul.student@campus.edu", "password": "rahul123"},
         )
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
@@ -33,10 +33,10 @@ class TestCampusOSAPI(unittest.TestCase):
         # Attempt login with invalid credentials
         response = self.client.post(
             "/api/v1/auth/login",
-            data={"username": "john.doe@university.edu", "password": "wrong_password"},
+            data={"username": "rahul.student@campus.edu", "password": "wrong_password"},
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["detail"], "Incorrect email or password")
+        self.assertEqual(response.json()["detail"], "Incorrect email address or password.")
 
 
 if __name__ == "__main__":

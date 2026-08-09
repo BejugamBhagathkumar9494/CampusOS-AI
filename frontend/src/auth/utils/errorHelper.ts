@@ -22,8 +22,11 @@ export const getFriendlyErrorMessage = (err: any, fallback: string): string => {
 
 
   // Translate specific codes or phrases
-  if (message.includes('Invalid login credentials')) {
+  if (message.includes('Invalid login credentials') || message.includes('Incorrect email address or password')) {
     return 'Incorrect email or password. Please try again.';
+  }
+  if (message.includes('Account not found')) {
+    return 'Account not found. Please check your email or create an account.';
   }
   if (message.includes('Email not confirmed')) {
     return 'Please verify your email address before logging in.';
