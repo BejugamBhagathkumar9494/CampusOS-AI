@@ -16,8 +16,9 @@ export const getFriendlyErrorMessage = (err: any, fallback: string): string => {
 
   // Check for empty, "{}" or standard network fetch failure
   if (!message || message === '{}' || message.toLowerCase().includes('failed to fetch')) {
-    return 'Connection failed. Please check your network connection and verify that the database/Supabase API is reachable.';
+    return 'Incorrect email address or password.';
   }
+
 
   // Translate specific codes or phrases
   if (message.includes('Invalid login credentials')) {

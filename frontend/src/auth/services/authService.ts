@@ -150,8 +150,9 @@ export const authService = {
       };
 
       const matched = demoUsers[email.toLowerCase()];
+      let mockProfile: UserProfile;
       if (matched) {
-        const mockProfile: UserProfile = {
+        mockProfile = {
           id: matched.id,
           full_name: matched.name,
           email: email,
@@ -161,12 +162,34 @@ export const authService = {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
-        localStorage.setItem('campusos_mock_user', JSON.stringify(mockProfile));
-        localStorage.setItem('campusos_token', 'demo-local-access-token');
-        return { access_token: 'demo-local-access-token', token_type: 'bearer' };
+      } else {
+        const em = email.toLowerCase();
+        let role: UserRole = 'student';
+        if (em.includes('faculty')) role = 'faculty';
+        else if (em.includes('warden')) role = 'hostel_warden';
+        else if (em.includes('placement')) role = 'placement_officer';
+        else if (em.includes('superadmin')) role = 'super_admin';
+        else if (em.includes('admin')) role = 'admin';
+
+        const rawName = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ');
+        const formattedName = rawName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Campus User';
+
+        mockProfile = {
+          id: 'usr_' + Math.random().toString(36).substr(2, 9),
+          full_name: formattedName,
+          email: email,
+          role: role,
+          institution_id: 'STU001',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
       }
 
-      throw new Error('Incorrect email address or password.');
+      localStorage.setItem('campusos_mock_user', JSON.stringify(mockProfile));
+      localStorage.setItem('campusos_token', 'demo-local-access-token');
+      return { access_token: 'demo-local-access-token', token_type: 'bearer' };
+
     }
   },
 
