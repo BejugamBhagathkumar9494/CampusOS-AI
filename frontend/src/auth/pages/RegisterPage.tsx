@@ -14,6 +14,7 @@ export const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole | ''>('');
+  const [institutionId, setInstitutionId] = useState('');
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,7 +22,7 @@ export const RegisterPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto redirect if already authenticated
+  // Security: Client-side routing redirects authenticated users to their trusted database role dashboard.
   useEffect(() => {
     if (isAuthenticated && role) {
       const dashboardRoutes = {
@@ -30,6 +31,7 @@ export const RegisterPage: React.FC = () => {
         admin: '/admin/dashboard',
         hostel_warden: '/hostel/dashboard',
         placement_officer: '/placement/dashboard',
+        super_admin: '/super-admin/dashboard',
       };
       navigate(dashboardRoutes[role] || '/', { replace: true });
     }
@@ -60,6 +62,18 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
+    if (!institutionId.trim()) {
+      setErrorMsg('Please enter your Institution ID / Role-specific ID.');
+      return;
+    }
+
+    // Never trust the role received from the frontend.
+    // The role selected by a user during signup is only a REQUESTED ROLE and must be verified by the backend.
+    if (selectedRole === 'admin' || selectedRole === 'super_admin') {
+      setErrorMsg('Administrator accounts cannot be created through public registration. Only an authorized Super Admin can grant administrative access.');
+      return;
+    }
+
     if (password.length < 6) {
       setErrorMsg('Password must be at least 6 characters long.');
       return;
@@ -72,10 +86,9 @@ export const RegisterPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(email, password, fullName, selectedRole as UserRole);
-      setSuccessMsg('Account created successfully! Redirecting you...');
+      await signUp(email, password, fullName, selectedRole as UserRole, institutionId);
+      setSuccessMsg('Account created successfully! Synchronizing credentials...');
       
-      // Give a tiny delay for state synchronizing, then redirect
       setTimeout(() => {
         const dashboardRoutes = {
           student: '/student/dashboard',
@@ -83,6 +96,7 @@ export const RegisterPage: React.FC = () => {
           admin: '/admin/dashboard',
           hostel_warden: '/hostel/dashboard',
           placement_officer: '/placement/dashboard',
+          super_admin: '/super-admin/dashboard',
         };
         navigate(dashboardRoutes[selectedRole as UserRole] || '/');
       }, 1500);
@@ -93,12 +107,13 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
-  const roleOptions: { value: UserRole; label: string; desc: string }[] = [
-    { value: 'student', label: 'Student', desc: 'Access class portals, academics, & placements' },
-    { value: 'faculty', label: 'Faculty Member', desc: 'Manage courses, grades, & schedules' },
-    { value: 'admin', label: 'Administrator', desc: 'Enterprise controls & campus analytics' },
-    { value: 'hostel_warden', label: 'Hostel Warden', desc: 'Manage rooms & student accommodations' },
-    { value: 'placement_officer', label: 'Placement Officer', desc: 'Coordinate corporate recruitment drives' },
+  // Normal users can register as Student, Faculty Member, Hostel Warden, or Placement Officer.
+  // Administrator accounts cannot be self-created.
+  const roleOptions: { value: UserRole; label: string; desc: string; sampleId: string }[] = [
+    { value: 'student', label: 'Student', desc: 'Access class portals, academics, & placements', sampleId: 'e.g. STU001' },
+    { value: 'faculty', label: 'Faculty Member', desc: 'Manage courses, grades, & schedules', sampleId: 'e.g. FAC001' },
+    { value: 'hostel_warden', label: 'Hostel Warden', desc: 'Manage rooms & student accommodations', sampleId: 'e.g. WAR001' },
+    { value: 'placement_officer', label: 'Placement Officer', desc: 'Coordinate corporate recruitment drives', sampleId: 'e.g. PO001' },
   ];
 
   return (
@@ -124,16 +139,16 @@ export const RegisterPage: React.FC = () => {
             Create Your Campus Account.
           </h2>
           <p className="text-slate-300 text-sm leading-relaxed">
-            Fill out the registration details. Once created, your profile will be safely synchronized automatically using our RBAC framework.
+            Register with your institution credentials. Identity and role access are strictly authorized by CampusOS database security.
           </p>
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Instant Database Profile Sync</span>
+              <span>Verified Institution Identity</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
               <ShieldCheck className="w-4 h-4 text-indigo-400" />
-              <span>Role-Specific Secured Routing</span>
+              <span>Zero-Trust Database RLS Enforcement</span>
             </div>
           </div>
         </div>
@@ -161,7 +176,7 @@ export const RegisterPage: React.FC = () => {
               Create Account
             </h1>
             <p className="text-slate-400 text-sm font-medium">
-              Join CampusOS and setup your academic workspace.
+              Join CampusOS and set up your authenticated workspace.
             </p>
           </div>
 
@@ -192,7 +207,7 @@ export const RegisterPage: React.FC = () => {
                     id="fullName"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="John Doe"
+                    placeholder="Rahul Kumar"
                     disabled={isSubmitting}
                     className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
@@ -210,7 +225,7 @@ export const RegisterPage: React.FC = () => {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@university.edu"
+                    placeholder="rahul.student@campus.edu"
                     disabled={isSubmitting}
                     className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
                   />
@@ -218,25 +233,51 @@ export const RegisterPage: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="role" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
-                Select Your Role
-              </label>
-              <select
-                id="role"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                disabled={isSubmitting}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm px-4 py-3 rounded-xl outline-none transition-all cursor-pointer"
-              >
-                <option value="" disabled>-- Choose your campus role --</option>
-                {roleOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-slate-950 text-slate-200">
-                    {opt.label} ({opt.value})
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="role" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
+                  Requested Role
+                </label>
+                <select
+                  id="role"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                  disabled={isSubmitting}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm px-4 py-3 rounded-xl outline-none transition-all cursor-pointer"
+                >
+                  <option value="" disabled>-- Select campus role --</option>
+                  {roleOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-slate-950 text-slate-200">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="institutionId" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
+                  Institution / Role ID
+                </label>
+                <div className="relative">
+                  <ShieldCheck className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    id="institutionId"
+                    value={institutionId}
+                    onChange={(e) => setInstitutionId(e.target.value.toUpperCase())}
+                    placeholder={
+                      selectedRole === 'student' ? 'STU001' :
+                      selectedRole === 'faculty' ? 'FAC001' :
+                      selectedRole === 'hostel_warden' ? 'WAR001' :
+                      selectedRole === 'placement_officer' ? 'PO001' : 'STU001 / FAC001'
+                    }
+                    disabled={isSubmitting}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500 uppercase tracking-wide font-mono"
+                  />
+                </div>
+              </div>
             </div>
+
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

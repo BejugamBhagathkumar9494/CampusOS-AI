@@ -1,16 +1,17 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '../../services/supabaseClient';
 import { authService } from '../services/authService';
-import { UserRole, UserProfile } from '../types';
+import { UserRole, UserProfile, AccountStatus } from '../types';
 
 interface AuthContextType {
   user: any | null;
   profile: UserProfile | null;
   role: UserRole | null;
+  status: AccountStatus | null;
   loading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<any>;
-  signUp: (email: string, password: string, fullName: string, role: UserRole) => Promise<any>;
+  signUp: (email: string, password: string, fullName: string, role: UserRole, institutionId?: string) => Promise<any>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -22,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Authentication verifies identity; trusted role and account status are retrieved from DB profile.
   const fetchProfileAndSetState = async (currUser: any) => {
     if (!currUser) {
       setUser(null);
@@ -31,12 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // Fetch user profile from Database
       const userProfile = await authService.getProfile(currUser.id);
       setUser(currUser);
       setProfile(userProfile);
     } catch (err) {
-      console.error('Failed to load profile during auth state change:', err);
+      console.error('Failed to load user profile during auth state transition:', err);
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // 1. Initial Session Retrieval
+    // Initial session retrieval
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -63,14 +64,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         }
       } catch (err) {
-        console.error('Failed to get initial auth session:', err);
+        console.error('Failed to retrieve initial auth session:', err);
         setLoading(false);
       }
     };
 
     initializeAuth();
 
-    // 2. Auth State Change Listener
+    // Auth State Change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -102,10 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: UserRole) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+    role: UserRole,
+    institutionId?: string
+  ) => {
     setLoading(true);
     try {
-      const data = await authService.signUp(email, password, fullName, role);
+      const data = await authService.signUp(email, password, fullName, role, institutionId);
       return data;
     } catch (err) {
       setLoading(false);
@@ -127,6 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const role = profile ? profile.role : null;
+  const status = profile ? profile.status : 'active';
   const isAuthenticated = !!user;
 
   return (
@@ -135,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         profile,
         role,
+        status,
         loading,
         isAuthenticated,
         signIn,
@@ -147,3 +156,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+

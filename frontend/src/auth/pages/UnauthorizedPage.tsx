@@ -24,7 +24,9 @@ export const UnauthorizedPage: React.FC = () => {
       admin: '/admin/dashboard',
       hostel_warden: '/hostel/dashboard',
       placement_officer: '/placement/dashboard',
+      super_admin: '/super-admin/dashboard',
     };
+
     navigate(dashboardRoutes[role] || '/');
   };
 

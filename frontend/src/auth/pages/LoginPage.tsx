@@ -14,7 +14,9 @@ export const LoginPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto redirect if already authenticated
+  // Authentication verifies the user's identity.
+  // Role selection during login is forbidden to prevent client-side tampering.
+  // The trusted role is loaded directly from the database profile upon session verification.
   useEffect(() => {
     if (isAuthenticated && role) {
       const dashboardRoutes = {
@@ -23,10 +25,12 @@ export const LoginPage: React.FC = () => {
         admin: '/admin/dashboard',
         hostel_warden: '/hostel/dashboard',
         placement_officer: '/placement/dashboard',
+        super_admin: '/super-admin/dashboard',
       };
       navigate(dashboardRoutes[role] || '/', { replace: true });
     }
   }, [isAuthenticated, role, navigate]);
+
 
   const validateEmail = (val: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
