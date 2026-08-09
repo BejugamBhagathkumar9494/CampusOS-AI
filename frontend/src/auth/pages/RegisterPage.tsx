@@ -103,9 +103,11 @@ export const RegisterPage: React.FC = () => {
     } catch (err: any) {
       console.error('Registration error:', err);
       setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during registration.'));
+    } finally {
       setIsSubmitting(false);
     }
   };
+
 
   // Normal users can register as Student, Faculty Member, Hostel Warden, or Placement Officer.
   // Administrator accounts cannot be self-created.

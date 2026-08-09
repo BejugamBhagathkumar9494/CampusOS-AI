@@ -95,11 +95,13 @@ def init_db():
             {"email": "superadmin@campus.edu", "name": "Super Admin", "role": "super_admin", "inst_id": "SA001", "pass": "superadmin123"},
             {"email": "admin1@campus.edu", "name": "Admin One", "role": "admin", "inst_id": "ADM001", "pass": "admin123"},
             {"email": "rahul.student@campus.edu", "name": "Rahul Kumar", "role": "student", "inst_id": "STU001", "pass": "rahul123"},
+            {"email": "bhagath.student@campus.edu", "name": "Bhagath Kumar", "role": "student", "inst_id": "STU003", "pass": "bhagath123"},
             {"email": "priya.student@campus.edu", "name": "Priya Kumar", "role": "student", "inst_id": "STU002", "pass": "priya123"},
             {"email": "arun.faculty@campus.edu", "name": "Dr. Arun Kumar", "role": "faculty", "inst_id": "FAC001", "pass": "arun123"},
             {"email": "ramesh.warden@campus.edu", "name": "Ramesh Kumar", "role": "hostel_warden", "inst_id": "WAR001", "pass": "ramesh123"},
             {"email": "suresh.placement@campus.edu", "name": "Suresh Kumar", "role": "placement_officer", "inst_id": "PO001", "pass": "suresh123"},
         ]
+
 
         created_users = {}
         for acc in default_accounts:
@@ -138,6 +140,17 @@ def init_db():
             current_semester=5
         )
         db.add(student_profile)
+
+        # Create Student Profile for Bhagath
+        bhagath_user = created_users["bhagath.student@campus.edu"]
+        bhagath_profile = Student(
+            user_id=bhagath_user.id,
+            roll_number="STU003",
+            cgpa=8.85,
+            current_semester=5
+        )
+        db.add(bhagath_profile)
+
 
         # Create Student Profile for Priya
         priya_user = created_users["priya.student@campus.edu"]

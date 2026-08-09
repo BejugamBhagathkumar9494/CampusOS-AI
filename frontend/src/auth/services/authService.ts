@@ -138,40 +138,76 @@ export const authService = {
       throw new Error('Administrative accounts cannot be created via public registration. Contact Super Admin.');
     }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: role,
-          institution_id: institutionId,
-        },
-      },
-    });
+    let supaSuccess = false;
+    let supaData = null;
 
-    if (error) throw error;
-
-    // Call FastAPI backend register endpoint as sync fallback if needed
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-      await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          full_name: fullName,
-          role,
-          institution_id: institutionId
-        })
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: role,
+            institution_id: institutionId,
+          },
+        },
       });
+
+      if (!error && data) {
+        supaSuccess = true;
+        supaData = data;
+      }
     } catch (e) {
-      console.warn('Backend sync registration optional call:', e);
+      console.warn('Supabase signUp failed, falling back to backend API registration:', e);
     }
 
-    return data;
+    // Call FastAPI backend register endpoint
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const regRes = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        full_name: fullName,
+        role,
+        institution_id: institutionId
+      })
+    });
+
+    if (!regRes.ok) {
+      const errJson = await regRes.json().catch(() => ({}));
+      if (!supaSuccess) {
+        throw new Error(errJson.detail || 'Failed to create user account.');
+      }
+    }
+
+    // Perform auto-login via backend API to issue token
+    try {
+      const loginParams = new URLSearchParams();
+      loginParams.append('username', email);
+      loginParams.append('password', password);
+
+      const loginRes = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: loginParams.toString()
+      });
+
+      if (loginRes.ok) {
+        const loginData = await loginRes.json();
+        if (loginData?.access_token) {
+          localStorage.setItem('campusos_token', loginData.access_token);
+        }
+      }
+    } catch (loginErr) {
+      console.warn('Backend auto-login after signup fallback warning:', loginErr);
+    }
+
+    return supaData || { user: { email } };
   },
+
 
   /**
    * Requests password reset email link.
