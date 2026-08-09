@@ -138,6 +138,18 @@ export const authService = {
       }
 
       // Tier 3: Standalone Preview / Client Session Fallback when backend is unreachable
+      const localUsers = JSON.parse(localStorage.getItem('campusos_local_users') || '{}');
+      const registeredAccount = localUsers[email.toLowerCase()];
+
+      if (registeredAccount) {
+        if (registeredAccount.password && registeredAccount.password !== password) {
+          throw new Error('Incorrect email address or password.');
+        }
+        localStorage.setItem('campusos_mock_user', JSON.stringify(registeredAccount.profile));
+        localStorage.setItem('campusos_token', 'demo-local-access-token');
+        return { access_token: 'demo-local-access-token', token_type: 'bearer' };
+      }
+
       const demoUsers: Record<string, { role: UserRole; name: string; id: string }> = {
         'bhagath.student@campus.edu': { role: 'student', name: 'Bhagath Kumar', id: '3' },
         'rahul.student@campus.edu': { role: 'student', name: 'Rahul Kumar', id: '3' },
@@ -192,8 +204,6 @@ export const authService = {
 
     }
   },
-
-
 
   /**
    * Signs up a user with Full Name, Email, Password, Role, and Institution ID.
@@ -297,12 +307,18 @@ export const authService = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+
+      const localUsers = JSON.parse(localStorage.getItem('campusos_local_users') || '{}');
+      localUsers[email.toLowerCase()] = { profile: newProfile, password: password };
+      localStorage.setItem('campusos_local_users', JSON.stringify(localUsers));
+
       localStorage.setItem('campusos_mock_user', JSON.stringify(newProfile));
       localStorage.setItem('campusos_token', 'demo-local-access-token');
     }
 
     return supaData || { user: { email } };
   },
+
 
 
 
