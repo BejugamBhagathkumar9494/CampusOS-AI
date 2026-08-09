@@ -47,10 +47,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       case 'admin': return 'Administrator';
       case 'hostel_warden': return 'Hostel Warden';
       case 'placement_officer': return 'Placement Officer';
+      case 'super_admin': return 'Super Admin';
       default: return 'User';
     }
   };
 
+  // Dynamic Sidebar Navigation based on authenticated role
+  // Hiding menu items provides UI isolation; backend API endpoints enforce data authorization.
   const getSidebarItems = (userRole: string): SidebarItem[] => {
     const studentItems: SidebarItem[] = [
       { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
@@ -81,6 +84,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const adminItems: SidebarItem[] = [
       { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+      { name: 'User Management', path: '/admin/users', icon: Users },
       { name: 'AI Assistant', path: '/admin/ai-assistant', icon: MessageSquare },
       { name: 'Finance', path: '/admin/finance', icon: DollarSign },
       { name: 'Events', path: '/admin/events', icon: Calendar },
@@ -88,6 +92,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       { name: 'Student Clubs', path: '/admin/clubs', icon: Users },
       { name: 'Settings', path: '/admin/settings', icon: Settings },
       { name: 'Profile', path: '/admin/profile', icon: User },
+    ];
+
+    const superAdminItems: SidebarItem[] = [
+      { name: 'Dashboard', path: '/super-admin/dashboard', icon: LayoutDashboard },
+      { name: 'User & Role Control', path: '/super-admin/users', icon: Users },
+      { name: 'AI Assistant', path: '/super-admin/ai-assistant', icon: MessageSquare },
+      { name: 'Audit Logs', path: '/super-admin/audit-logs', icon: FileText },
+      { name: 'Settings', path: '/super-admin/settings', icon: Settings },
+      { name: 'Profile', path: '/super-admin/profile', icon: User },
     ];
 
     const wardenItems: SidebarItem[] = [
@@ -110,6 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     switch (userRole) {
       case 'faculty': return facultyItems;
       case 'admin': return adminItems;
+      case 'super_admin': return superAdminItems;
       case 'hostel_warden': return wardenItems;
       case 'placement_officer': return placementItems;
       case 'student':
@@ -119,7 +133,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const sidebarItems = getSidebarItems(role);
-  const homePath = `/${role === 'hostel_warden' ? 'hostel' : role === 'placement_officer' ? 'placement' : role}/dashboard`;
+  const homePath = `/${role === 'hostel_warden' ? 'hostel' : role === 'placement_officer' ? 'placement' : role === 'super_admin' ? 'super-admin' : role}/dashboard`;
+
 
   const handleSignOut = async () => {
     await signOut();

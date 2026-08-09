@@ -6,11 +6,14 @@ import ProtectedRoute from './auth/components/ProtectedRoute';
 import LandingPage from './features/landing/LandingPage';
 import LoginPage from './auth/pages/LoginPage';
 import RegisterPage from './auth/pages/RegisterPage';
+import ForgotPasswordPage from './auth/pages/ForgotPasswordPage';
+import ResetPasswordPage from './auth/pages/ResetPasswordPage';
 import UnauthorizedPage from './auth/pages/UnauthorizedPage';
 
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './features/dashboard/Dashboard';
 import AIAssistant from './features/ai-assistant/AIAssistant';
+import UserManagementPage from './features/admin/UserManagementPage';
 import {
   Academics,
   Attendance,
@@ -29,7 +32,7 @@ import {
   Profile,
 } from './features/placeholders';
 
-// Automatically routes users to their role-specific home dashboard
+// Automatically routes users to their trusted role-specific home dashboard
 const DashboardRedirect = () => {
   const { isAuthenticated, role, loading } = useAuth();
 
@@ -41,7 +44,7 @@ const DashboardRedirect = () => {
             <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20"></div>
             <div className="absolute inset-0 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
           </div>
-          <p className="text-sm font-semibold tracking-wide text-indigo-400">Verifying session...</p>
+          <p className="text-sm font-semibold tracking-wide text-indigo-400">Verifying session identity...</p>
         </div>
       </div>
     );
@@ -57,6 +60,7 @@ const DashboardRedirect = () => {
     admin: '/admin/dashboard',
     hostel_warden: '/hostel/dashboard',
     placement_officer: '/placement/dashboard',
+    super_admin: '/super-admin/dashboard',
   };
 
   return <Navigate to={dashboardRoutes[role] || '/login'} replace />;
@@ -71,6 +75,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Fallback Legacy Dashboard routes redirect automatically */}
@@ -134,11 +140,32 @@ export default function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="users" element={<UserManagementPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="finance" element={<Finance />} />
                     <Route path="events" element={<Events />} />
                     <Route path="notices" element={<Notices />} />
                     <Route path="clubs" element={<Clubs />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="*" element={<Navigate to="dashboard" replace />} />
+                  </Routes>
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* SUPER ADMIN DASHBOARD ROUTES */}
+          <Route
+            path="/super-admin/*"
+            element={
+              <ProtectedRoute allowedRoles={['super_admin']}>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="users" element={<UserManagementPage />} />
+                    <Route path="audit-logs" element={<UserManagementPage />} />
+                    <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />
@@ -194,3 +221,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

@@ -93,7 +93,9 @@ export default function LandingPage() {
       admin: '/admin/dashboard',
       hostel_warden: '/hostel/dashboard',
       placement_officer: '/placement/dashboard',
+      super_admin: '/super-admin/dashboard',
     };
+
     return routes[role] || '/login';
   };
 
