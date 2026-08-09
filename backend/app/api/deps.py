@@ -71,6 +71,9 @@ def get_current_user(
     return user
 
 
+get_current_active_user = get_current_user
+
+
 def check_role(allowed_roles: List[str]):
     # Never trust the role received from the frontend or request body.
     # The user's role must come directly from the trusted database profile.
