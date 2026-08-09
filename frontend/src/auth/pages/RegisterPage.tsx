@@ -87,19 +87,11 @@ export const RegisterPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await signUp(email, password, fullName, selectedRole as UserRole, institutionId);
-      setSuccessMsg('Account created successfully! Synchronizing credentials...');
+      setSuccessMsg('Account registered successfully! If pending administrator approval, your account will be activated by campus admin.');
       
       setTimeout(() => {
-        const dashboardRoutes = {
-          student: '/student/dashboard',
-          faculty: '/faculty/dashboard',
-          admin: '/admin/dashboard',
-          hostel_warden: '/hostel/dashboard',
-          placement_officer: '/placement/dashboard',
-          super_admin: '/super-admin/dashboard',
-        };
-        navigate(dashboardRoutes[selectedRole as UserRole] || '/');
-      }, 1500);
+        navigate('/login');
+      }, 2000);
     } catch (err: any) {
       console.error('Registration error:', err);
       setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during registration.'));

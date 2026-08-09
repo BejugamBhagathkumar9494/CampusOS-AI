@@ -367,43 +367,94 @@ export const authService = {
   },
 
   /**
-   * Updates user status (active, suspended, rejected) for Admin management.
+   * Updates user status (active, pending, suspended, rejected) for Admin management.
    */
   async updateUserStatus(userId: string, newStatus: AccountStatus) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ status: newStatus })
-      .eq('id', userId);
+    try {
+      const { fetchWithAuth } = await import('../../services/api');
+      await fetchWithAuth(`/admin-management/users/${userId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+      });
+    } catch (apiErr) {
+      console.warn('Backend API status update fallback to Supabase:', apiErr);
+    }
 
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ status: newStatus })
+        .eq('id', userId);
+
+      if (!error) return data;
+    } catch (supaErr) {
+      console.warn('Supabase status update warning:', supaErr);
+    }
   },
 
   /**
    * Fetches audit logs for Admin / Super Admin dashboard.
    */
   async fetchAuditLogs(): Promise<AuditLogEntry[]> {
-    const { data, error } = await supabase
-      .from('audit_logs')
-      .select('*')
-      .order('timestamp', { ascending: false })
-      .limit(50);
+    try {
+      const { fetchWithAuth } = await import('../../services/api');
+      const backendLogs = await fetchWithAuth('/admin-management/audit-logs');
+      if (Array.isArray(backendLogs) && backendLogs.length > 0) {
+        return backendLogs.map((l: any) => ({
+          id: Number(l.id) || 1,
+          actor_user_id: l.actor_user_id,
+          action: l.action,
+          target_user_id: l.target_user_id,
+          timestamp: l.timestamp,
+          metadata_json: l.metadata_json
+        }));
+      }
+    } catch (apiErr) {}
 
-    if (error) return [];
-    return data as AuditLogEntry[];
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(50);
+
+      if (!error && data) return data as AuditLogEntry[];
+    } catch (err) {}
+
+    return [];
   },
 
   /**
    * Fetches all registered users for Admin approval panel.
    */
   async fetchUsers(): Promise<UserProfile[]> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { fetchWithAuth } = await import('../../services/api');
+      const backendUsers = await fetchWithAuth('/admin-management/users');
+      if (Array.isArray(backendUsers) && backendUsers.length > 0) {
+        return backendUsers.map((u: any) => ({
+          id: String(u.id),
+          full_name: u.full_name,
+          email: u.email,
+          role: u.role as UserRole,
+          institution_id: u.institution_id,
+          status: u.status as AccountStatus,
+          created_at: u.created_at || new Date().toISOString(),
+          updated_at: u.updated_at || new Date().toISOString()
+        }));
+      }
+    } catch (apiErr) {}
 
-    if (error) return [];
-    return data as UserProfile[];
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) return data as UserProfile[];
+    } catch (err) {}
+
+    return [];
   },
 
   /**

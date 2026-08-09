@@ -27,9 +27,43 @@ def init_db():
     
     db = SessionLocal()
     try:
-        # Check if database is already seeded
-        if db.query(Role).first():
-            print("Database already seeded.")
+        # Ensure initial Admin and Super Admin accounts exist
+        admin_user = db.query(User).filter(User.email == "admin1@campus.edu").first()
+        if not admin_user:
+            admin_role = db.query(Role).filter(Role.name == "admin").first()
+            if not admin_role:
+                admin_role = Role(name="admin", description="Administrator Role")
+                db.add(admin_role)
+                db.commit()
+
+            admin_user = User(
+                email="admin1@campus.edu",
+                hashed_password=get_password_hash("admin123"),
+                full_name="Admin One",
+                institution_id="ADM001",
+                status="active",
+                is_active=True
+            )
+            admin_user.roles.append(admin_role)
+            db.add(admin_user)
+            db.flush()
+
+            admin_prof = Profile(
+                id=str(admin_user.id),
+                auth_user_id=str(admin_user.id),
+                full_name="Admin One",
+                email="admin1@campus.edu",
+                role="admin",
+                institution_id="ADM001",
+                status="active",
+                email_verified=True
+            )
+            db.add(admin_prof)
+            db.commit()
+            print("Initial Administrator bootstrapped: admin1@campus.edu / admin123")
+
+        if db.query(Role).first() and db.query(User).filter(User.email == "rahul.student@campus.edu").first():
+            print("Database already fully seeded.")
             return
 
         print("Seeding database...")

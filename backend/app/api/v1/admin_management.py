@@ -41,34 +41,54 @@ def get_all_users(
 
 @router.patch("/users/{user_id}/status")
 def update_user_status(
-    user_id: int,
+    user_id: str,
     payload: UserStatusUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(check_role(["admin", "super_admin"]))
 ):
     """Approve, suspend, or reject a user account."""
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
     new_status = payload.status.lower()
     if new_status not in ["active", "pending", "suspended", "rejected"]:
         raise HTTPException(status_code=400, detail="Invalid status value")
 
-    # Prevent regular admins from modifying Super Admin accounts
-    user_roles = [r.name.lower() for r in user.roles]
-    current_user_roles = [r.name.lower() for r in current_user.roles]
-    if "super_admin" in user_roles and "super_admin" not in current_user_roles:
-        raise HTTPException(status_code=403, detail="Only Super Admin can modify Super Admin accounts.")
+    # Find user by int ID, email, or Profile matching user_id
+    user = None
+    if user_id.isdigit():
+        user = db.query(User).filter(User.id == int(user_id)).first()
+    
+    profile = None
+    if not user:
+        profile = db.query(Profile).filter((Profile.id == user_id) | (Profile.auth_user_id == user_id) | (Profile.email == user_id)).first()
+        if profile:
+            user = db.query(User).filter((User.id == profile.auth_user_id) | (User.email == profile.email)).first()
+    else:
+        profile = db.query(Profile).filter((Profile.auth_user_id == str(user.id)) | (Profile.email == user.email)).first()
 
-    old_status = user.status
-    user.status = new_status
-    user.is_active = (new_status == "active")
+    if not user and not profile:
+        raise HTTPException(status_code=404, detail="User account not found")
 
-    # Sync profile status
-    profile = db.query(Profile).filter(Profile.auth_user_id == str(user.id)).first()
+    old_status = user.status if user else (profile.status if profile else "unknown")
+
+    if user:
+        user_roles = [r.name.lower() for r in user.roles]
+        current_user_roles = [r.name.lower() for r in current_user.roles]
+        if "super_admin" in user_roles and "super_admin" not in current_user_roles:
+            raise HTTPException(status_code=403, detail="Only Super Admin can modify Super Admin accounts.")
+
+        user.status = new_status
+        user.is_active = (new_status == "active")
+
     if profile:
         profile.status = new_status
+
+    # Try updating Supabase profiles table using Supabase Admin client if available
+    try:
+        from app.core.supabase import get_supabase_admin_client
+        supa_admin = get_supabase_admin_client()
+        target_id = profile.id if profile else (str(user.id) if user else user_id)
+        supa_admin.from_("profiles").update({"status": new_status}).eq("id", target_id).execute()
+    except Exception as supa_err:
+        print(f"Supabase profile status update warning: {supa_err}")
 
     # Map action to audit event
     action_map = {
@@ -81,7 +101,7 @@ def update_user_status(
     audit_entry = AuditLog(
         actor_user_id=str(current_user.id),
         action=action_map.get(new_status, "STATUS_CHANGED"),
-        target_user_id=str(user.id),
+        target_user_id=str(user.id if user else (profile.id if profile else user_id)),
         metadata_json=json.dumps({"old_status": old_status, "new_status": new_status})
     )
     db.add(audit_entry)
