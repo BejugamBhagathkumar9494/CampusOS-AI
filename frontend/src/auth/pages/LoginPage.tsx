@@ -59,13 +59,14 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await signIn(email, password);
-      // Context state will trigger redirect via useEffect above
     } catch (err: any) {
       console.error('Sign In Error:', err);
       setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during sign in.'));
+    } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen w-screen bg-slate-950 text-slate-100 relative overflow-hidden font-sans">

@@ -14,45 +14,58 @@ export const authService = {
         .eq('id', userId)
         .single();
 
-      if (error || !data) {
-        // Fallback: Query backend API /students/me or user endpoint
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          const res = await fetch(`${API_URL}/students/me`, {
-            headers: { Authorization: `Bearer ${session.access_token}` }
-          });
-          if (res.ok) {
-            const studentData = await res.json();
-            return {
-              id: userId,
-              full_name: studentData.user?.full_name || 'Campus User',
-              email: studentData.user?.email || session.user.email || '',
-              role: (studentData.user?.role || 'student') as UserRole,
-              institution_id: studentData.roll_number,
-              status: (studentData.user?.status || 'active') as AccountStatus,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
-          }
-        }
-        return null;
+      if (!error && data) {
+        return data as UserProfile;
       }
-
-      return data as UserProfile;
-    } catch (err) {
-      console.error('Error fetching user profile:', err);
-      return null;
+    } catch (e) {
+      console.warn('Supabase profile fetch error:', e);
     }
+
+    // Fallback: Query backend API /auth/me or /students/me
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      const token = localStorage.getItem('campusos_token') || (await supabase.auth.getSession()).data.session?.access_token;
+      if (token) {
+        const res = await fetch(`${API_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const u = await res.json();
+          return {
+            id: String(u.id),
+            full_name: u.full_name,
+            email: u.email,
+            role: u.role as UserRole,
+            institution_id: u.institution_id,
+            status: u.status as AccountStatus,
+            created_at: u.created_at || new Date().toISOString(),
+            updated_at: u.updated_at || new Date().toISOString()
+          };
+        }
+      }
+    } catch (err) {
+      console.error('Backend profile fetch fallback error:', err);
+    }
+    return null;
   },
 
   /**
    * Retrieves current authenticated session user.
    */
   async getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) return null;
-    return user;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) return user;
+
+    
+    // Check backend token fallback
+    const token = localStorage.getItem('campusos_token');
+    if (token) {
+      const profile = await this.getProfile('me');
+      if (profile) {
+        return { id: profile.id, email: profile.email };
+      }
+    }
+    return null;
   },
 
   /**
@@ -67,18 +80,48 @@ export const authService = {
   },
 
   /**
-   * Signs in a user using Supabase Email & Password Auth.
+   * Signs in a user using Supabase Email & Password Auth with FastAPI Backend fallback.
    * Role selection during login is prohibited.
    */
   async signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!error && data?.session) {
+        localStorage.removeItem('campusos_token');
+        return data;
+      }
+    } catch (supaErr) {
+      console.warn('Supabase auth failed, falling back to backend API login:', supaErr);
+    }
+
+    // Backend FastAPI Auth Login Fallback
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const params = new URLSearchParams();
+    params.append('username', email);
+    params.append('password', password);
+
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
     });
 
-    if (error) throw error;
-    return data;
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Incorrect email address or password.');
+    }
+
+    const tokenData = await res.json();
+    if (tokenData?.access_token) {
+      localStorage.setItem('campusos_token', tokenData.access_token);
+    }
+    return tokenData;
   },
+
 
   /**
    * Signs up a user with Full Name, Email, Password, Role, and Institution ID.

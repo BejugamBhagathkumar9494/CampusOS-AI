@@ -11,7 +11,8 @@ from app.core.security import (
     get_password_hash, 
     verify_password
 )
-from app.api.deps import get_db
+from app.api.deps import get_db, get_current_user
+
 from app.models import User, Role, Student
 from app.models.database_models import Profile, AuthorizedUser, AuditLog
 from app.schemas import UserCreate, UserResponse, Token
@@ -162,6 +163,28 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         "refresh_token": create_refresh_token(subject=user.email),
         "token_type": "bearer",
     }
+
+
+@router.get("/me")
+def get_current_user_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Retrieve authenticated user's profile and database role."""
+    roles = [r.name.lower() for r in current_user.roles]
+    primary_role = roles[0] if roles else "student"
+    return {
+        "id": str(current_user.id),
+        "full_name": current_user.full_name,
+        "email": current_user.email,
+        "role": primary_role,
+        "institution_id": current_user.institution_id,
+        "status": current_user.status,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+        "updated_at": current_user.updated_at
+    }
+
 
 
 @router.post("/refresh", response_model=Token)

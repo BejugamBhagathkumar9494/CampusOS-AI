@@ -8,12 +8,13 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 export async function getAuthToken(): Promise<string> {
   try {
     const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || '';
+    if (session?.access_token) return session.access_token;
   } catch (error) {
     console.error('Error fetching Supabase auth session token:', error);
-    return '';
   }
+  return localStorage.getItem('campusos_token') || '';
 }
+
 
 /**
  * Performs authenticated requests to the backend API with fallback for missing session.

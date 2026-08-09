@@ -96,6 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const data = await authService.signIn(email, password);
+      const currUser = await authService.getCurrentUser();
+      if (currUser) {
+        await fetchProfileAndSetState(currUser);
+      } else {
+        setLoading(false);
+      }
       return data;
     } catch (err) {
       setLoading(false);
@@ -123,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     setLoading(true);
     try {
+      localStorage.removeItem('campusos_token');
       await authService.signOut();
       setUser(null);
       setProfile(null);
@@ -132,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     }
   };
+
 
   const role = profile ? profile.role : null;
   const status = profile ? profile.status : 'active';
