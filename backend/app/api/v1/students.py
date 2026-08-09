@@ -9,9 +9,9 @@ from app.schemas import StudentResponse
 router = APIRouter(prefix="/students", tags=["Students"])
 
 
-@router.get("/", dependencies=[Depends(check_role(["Admin", "Faculty"]))])
+@router.get("/", dependencies=[Depends(check_role(["admin", "faculty", "super_admin"]))])
 def get_students(db: Session = Depends(get_db)):
-    """Get list of students (Admin/Faculty only)."""
+    """Get list of students (Admin/Faculty/Super Admin only)."""
     students = db.query(Student).all()
     return [{
         "id": s.id,
@@ -28,12 +28,13 @@ def get_current_student(
     db: Session = Depends(get_db), 
     current_user: User = Depends(get_current_user)
 ):
-    """Get profile of current logged in student."""
+    # Restrict this query to the authenticated user's ID.
+    # This prevents one student from accessing another student's private data.
     student = db.query(Student).filter(Student.user_id == current_user.id).first()
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Student profile not found"
+            detail="Student profile not found for authenticated user"
         )
     return student
 
@@ -43,12 +44,13 @@ def get_student_attendance(student_id: int, db: Session = Depends(get_db), curre
     """Get attendance statistics for a student."""
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student record not found")
         
+    # Level 2 Security: Verify user-specific ownership or elevated role
     if student.user_id != current_user.id:
-        user_roles = [r.name for r in current_user.roles]
-        if "Admin" not in user_roles and "Faculty" not in user_roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        user_roles = [r.name.lower() for r in current_user.roles]
+        if not any(r in user_roles for r in ["admin", "faculty", "super_admin"]):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied. You cannot view another student's attendance records.")
             
     # Calculate attendance per subject
     attendance_records = db.query(Attendance).filter(Attendance.student_id == student_id).all()
@@ -97,12 +99,13 @@ def get_student_marks(student_id: int, db: Session = Depends(get_db), current_us
     """Get marks/grades for all semesters of a student."""
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student record not found")
         
+    # Level 2 Security: Verify user-specific ownership or elevated role
     if student.user_id != current_user.id:
-        user_roles = [r.name for r in current_user.roles]
-        if "Admin" not in user_roles and "Faculty" not in user_roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        user_roles = [r.name.lower() for r in current_user.roles]
+        if not any(r in user_roles for r in ["admin", "faculty", "super_admin"]):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied. You cannot view another student's marks.")
             
     marks = db.query(Mark).filter(Mark.student_id == student_id).all()
     return {
@@ -120,4 +123,5 @@ def get_student_marks(student_id: int, db: Session = Depends(get_db), current_us
             for m in marks
         ]
     }
+
 

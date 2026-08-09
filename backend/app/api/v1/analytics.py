@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.api.deps import get_db, get_current_user, check_role
+from app.models import User, Student
 from app.services.ml_models.placement_predictor import get_placement_analytics_summary
 from app.services.ml_models.curriculum_analyzer import get_curriculum_analytics_summary
 from app.services.ml_models.performance_predictor import predict_student_risk
@@ -7,7 +9,10 @@ router = APIRouter(prefix="/analytics", tags=["Campus Analytics"])
 
 
 @router.get("/student/{student_id}")
-def get_student_analytics(student_id: str):
+def get_student_analytics(
+    student_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """Retrieve personalized student success predictions based on academic and placement datasets."""
     summary = get_placement_analytics_summary()
     curriculum_sum = get_curriculum_analytics_summary()
@@ -29,8 +34,8 @@ def get_student_analytics(student_id: str):
     }
 
 
-@router.get("/faculty")
-def get_faculty_analytics():
+@router.get("/faculty", dependencies=[Depends(check_role(["faculty", "admin", "super_admin"]))])
+def get_faculty_analytics(current_user: User = Depends(get_current_user)):
     """Retrieve dashboard data for faculty metrics."""
     summary = get_placement_analytics_summary()
     return {
@@ -41,8 +46,9 @@ def get_faculty_analytics():
     }
 
 
-@router.get("/admin")
-def get_admin_analytics():
+# Security Comment: Admin analytics are restricted to Admin and Super Admin roles.
+@router.get("/admin", dependencies=[Depends(check_role(["admin", "super_admin"]))])
+def get_admin_analytics(current_user: User = Depends(get_current_user)):
     """Retrieve campus-wide predictive metrics computed from the 100,000+ student dataset."""
     summary = get_placement_analytics_summary()
     return {
@@ -56,3 +62,4 @@ def get_admin_analytics():
         "branch_analytics": summary.get("branches", []),
         "top_influencing_factors": summary.get("top_influencing_factors", [])
     }
+

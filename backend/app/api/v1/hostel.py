@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.api.deps import get_db
-from app.models import HostelRoom, HostelComplaint
+from app.api.deps import get_db, get_current_user, check_role
+from app.models import HostelRoom, HostelComplaint, User, Student
 
 router = APIRouter(prefix="/hostel", tags=["Hostel Management"])
 
@@ -14,7 +14,10 @@ class ComplaintRequest(BaseModel):
 
 
 @router.get("/rooms")
-def get_rooms(db: Session = Depends(get_db)):
+def get_rooms(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Get list of rooms and their availability."""
     rooms = db.query(HostelRoom).all()
     if rooms:
@@ -40,15 +43,30 @@ def get_rooms(db: Session = Depends(get_db)):
     }
 
 
-@router.post("/allocate")
+# Security Comment: Room allocation is restricted to Hostel Warden, Admin, and Super Admin roles.
+@router.post("/allocate", dependencies=[Depends(check_role(["hostel_warden", "admin", "super_admin"]))])
 def allocate_room(student_id: str, room_id: str):
     return {"message": f"Room {room_id} allocated to student {student_id}", "status": "Success"}
 
 
 @router.get("/complaints")
-def get_complaints(db: Session = Depends(get_db)):
-    """Get hostel maintenance complaints prioritized by AI."""
-    complaints = db.query(HostelComplaint).all()
+def get_complaints(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get hostel maintenance complaints. Students only see their own complaints; Wardens see all."""
+    user_roles = [r.name.lower() for r in current_user.roles]
+    is_elevated = any(r in user_roles for r in ["hostel_warden", "admin", "super_admin"])
+
+    query = db.query(HostelComplaint)
+    if not is_elevated:
+        student = db.query(Student).filter(Student.user_id == current_user.id).first()
+        if student:
+            query = query.filter(HostelComplaint.student_id == student.id)
+        else:
+            return {"complaints": []}
+
+    complaints = query.all()
     if complaints:
         return {
             "complaints": [
@@ -80,7 +98,11 @@ def get_complaints(db: Session = Depends(get_db)):
 
 
 @router.post("/complaints")
-def file_complaint(payload: ComplaintRequest):
+def file_complaint(
+    payload: ComplaintRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """File a new room maintenance complaint with AI priority scoring."""
     desc = (payload.title + " " + payload.description).lower()
     if any(k in desc for k in ["fire", "water leak", "electric spark", "short circuit", "smoke"]):
@@ -100,3 +122,4 @@ def file_complaint(payload: ComplaintRequest):
             "status": "Pending"
         }
     }
+

@@ -1,10 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.api.deps import get_current_user
+from app.models import User
 
 router = APIRouter(prefix="/faculty", tags=["Faculty"])
 
 
 @router.get("/")
-def get_faculty_list():
+def get_faculty_list(current_user: User = Depends(get_current_user)):
     """Get list of faculty members."""
     return {
         "faculty": [
@@ -16,7 +18,7 @@ def get_faculty_list():
 
 
 @router.get("/{faculty_id}/schedule")
-def get_faculty_schedule(faculty_id: str):
+def get_faculty_schedule(faculty_id: str, current_user: User = Depends(get_current_user)):
     """Get weekly class schedule for a faculty member."""
     return {
         "faculty_id": faculty_id,
@@ -29,7 +31,7 @@ def get_faculty_schedule(faculty_id: str):
 
 
 @router.get("/departments")
-def get_departments():
+def get_departments(current_user: User = Depends(get_current_user)):
     """Get list of academic departments."""
     return {
         "departments": [
@@ -40,3 +42,4 @@ def get_departments():
             {"id": 5, "name": "Civil Engineering", "code": "CIVIL", "student_count": 200},
         ]
     }
+

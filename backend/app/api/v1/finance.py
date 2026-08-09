@@ -1,10 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.api.deps import get_current_user
+from app.models import User
 
 router = APIRouter(prefix="/finance", tags=["Finance Management"])
 
 
 @router.get("/fees")
-def get_fees(student_id: str = "1"):
+def get_fees(
+    student_id: str = "1",
+    current_user: User = Depends(get_current_user)
+):
     """Get fee details (dues, structural breakdown, paid status)."""
     return {
         "student_id": student_id,
@@ -20,7 +25,11 @@ def get_fees(student_id: str = "1"):
 
 
 @router.post("/transaction")
-def initiate_transaction(amount: float = 1250.0, student_id: str = "1"):
+def initiate_transaction(
+    amount: float = 1250.0,
+    student_id: str = "1",
+    current_user: User = Depends(get_current_user)
+):
     """Initiate a payment transaction."""
     import uuid
     tx_ref = f"TX_{uuid.uuid4().hex[:8].upper()}"
@@ -34,7 +43,10 @@ def initiate_transaction(amount: float = 1250.0, student_id: str = "1"):
 
 
 @router.get("/scholarships")
-def get_scholarships(student_id: str = "1"):
+def get_scholarships(
+    student_id: str = "1",
+    current_user: User = Depends(get_current_user)
+):
     """Get AI scholarship recommendations matching student grades and financial status."""
     return {
         "student_id": student_id,
@@ -57,3 +69,4 @@ def get_scholarships(student_id: str = "1"):
             }
         ]
     }
+

@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
-from app.models import Company
+from app.api.deps import get_db, get_current_user, check_role
+from app.models import Company, User, Student
 from app.services.ml_models.placement_predictor import (
     predict_placement_readiness,
     get_placement_analytics_summary
@@ -37,13 +37,16 @@ class ResumeReviewRequest(BaseModel):
 
 
 @router.get("/analytics")
-def get_dataset_analytics():
+def get_dataset_analytics(current_user: User = Depends(get_current_user)):
     """Retrieve campus placement analytics computed from 100,000+ dataset records."""
     return get_placement_analytics_summary()
 
 
 @router.get("/companies")
-def get_companies(db: Session = Depends(get_db)):
+def get_companies(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """Retrieve recruiting companies and placement records."""
     companies_in_db = db.query(Company).all()
     if companies_in_db:
@@ -74,8 +77,20 @@ def get_companies(db: Session = Depends(get_db)):
 
 
 @router.post("/applications")
-def apply_to_company(company_id: str, student_id: str):
+def apply_to_company(
+    company_id: str,
+    student_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Level 2 Security: Verify student application ownership
+    student = db.query(Student).filter(Student.user_id == current_user.id).first()
+    user_roles = [r.name.lower() for r in current_user.roles]
+    if student and str(student.id) != student_id and not any(r in user_roles for r in ["placement_officer", "admin", "super_admin"]):
+        raise HTTPException(status_code=403, detail="Not authorized to submit placement applications for another student.")
+        
     return {"message": f"Application for student {student_id} submitted successfully to company {company_id}"}
+
 
 
 @router.post("/resume-review")
