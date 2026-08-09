@@ -236,49 +236,74 @@ export const authService = {
 
     // Call FastAPI backend register endpoint
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-    const regRes = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        password,
-        full_name: fullName,
-        role,
-        institution_id: institutionId
-      })
-    });
+    let backendSuccess = false;
 
-    if (!regRes.ok) {
-      const errJson = await regRes.json().catch(() => ({}));
-      if (!supaSuccess) {
-        throw new Error(errJson.detail || 'Failed to create user account.');
+    try {
+      const regRes = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          full_name: fullName,
+          role,
+          institution_id: institutionId
+        })
+      });
+
+      if (regRes.ok) {
+        backendSuccess = true;
+        try {
+          const loginParams = new URLSearchParams();
+          loginParams.append('username', email);
+          loginParams.append('password', password);
+
+          const loginRes = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: loginParams.toString()
+          });
+
+          if (loginRes.ok) {
+            const loginData = await loginRes.json();
+            if (loginData?.access_token) {
+              localStorage.setItem('campusos_token', loginData.access_token);
+              localStorage.removeItem('campusos_mock_user');
+            }
+          }
+        } catch (loginErr) {
+          console.warn('Backend auto-login after signup fallback warning:', loginErr);
+        }
+      } else {
+        const errJson = await regRes.json().catch(() => ({}));
+        if (!supaSuccess) {
+          throw new Error(errJson.detail || 'Failed to create user account.');
+        }
+      }
+    } catch (apiErr: any) {
+      if (apiErr.message && !apiErr.message.toLowerCase().includes('failed to fetch')) {
+        throw apiErr;
       }
     }
 
-    // Perform auto-login via backend API to issue token
-    try {
-      const loginParams = new URLSearchParams();
-      loginParams.append('username', email);
-      loginParams.append('password', password);
-
-      const loginRes = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: loginParams.toString()
-      });
-
-      if (loginRes.ok) {
-        const loginData = await loginRes.json();
-        if (loginData?.access_token) {
-          localStorage.setItem('campusos_token', loginData.access_token);
-        }
-      }
-    } catch (loginErr) {
-      console.warn('Backend auto-login after signup fallback warning:', loginErr);
+    if (!supaSuccess && !backendSuccess) {
+      const newProfile: UserProfile = {
+        id: 'usr_' + Math.random().toString(36).substr(2, 9),
+        full_name: fullName,
+        email: email,
+        role: role,
+        institution_id: institutionId || 'STU001',
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      localStorage.setItem('campusos_mock_user', JSON.stringify(newProfile));
+      localStorage.setItem('campusos_token', 'demo-local-access-token');
     }
 
     return supaData || { user: { email } };
   },
+
 
 
   /**

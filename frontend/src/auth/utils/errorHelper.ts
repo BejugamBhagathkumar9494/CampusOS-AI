@@ -16,8 +16,9 @@ export const getFriendlyErrorMessage = (err: any, fallback: string): string => {
 
   // Check for empty, "{}" or standard network fetch failure
   if (!message || message === '{}' || message.toLowerCase().includes('failed to fetch')) {
-    return 'Incorrect email address or password.';
+    return fallback || 'An unexpected error occurred. Please try again.';
   }
+
 
 
   // Translate specific codes or phrases
