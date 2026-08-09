@@ -8,11 +8,13 @@ interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
 }
 
+// Route protection prevents unauthorized roles from accessing dashboards and features belonging to other roles.
+// Hiding UI routes improves UX, while backend API endpoints enforce data-level authorization.
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   allowedRoles,
 }) => {
-  const { isAuthenticated, role, loading } = useAuth();
+  const { isAuthenticated, role, status, loading } = useAuth();
 
   if (loading) {
     return (
@@ -23,7 +25,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             <div className="absolute inset-0 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
           </div>
           <p className="text-sm font-semibold tracking-wide text-indigo-400 animate-pulse">
-            Verifying Identity...
+            Verifying Identity & Role Permissions...
           </p>
         </div>
       </div>
@@ -34,6 +36,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
+  // Suspended or rejected users are denied access to protected features
+  if (status && status !== 'active') {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Super Admin possesses system-level permissions to access all permitted campus modules
+  if (role === 'super_admin') {
+    return <>{children}</>;
+  }
+
   if (allowedRoles && role && !allowedRoles.includes(role)) {
     return <Navigate to="/unauthorized" replace />;
   }
@@ -41,3 +53,4 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   return <>{children}</>;
 };
 export default ProtectedRoute;
+

@@ -39,6 +39,44 @@ role_permissions = Table(
 )
 
 
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID string matching Supabase auth.users id
+    auth_user_id = Column(String(36), unique=True, nullable=False, index=True)
+    full_name = Column(String(100), nullable=False)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    role = Column(String(50), nullable=False, index=True)  # student, faculty, admin, hostel_warden, placement_officer, super_admin
+    institution_id = Column(String(50), unique=True, nullable=True, index=True)
+    status = Column(String(20), default="active", nullable=False)  # pending, active, suspended, rejected
+    email_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class AuthorizedUser(Base):
+    __tablename__ = "authorized_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    institution_id = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(255), nullable=False, index=True)
+    full_name = Column(String(100), nullable=False)
+    role = Column(String(50), nullable=False)  # student, faculty, admin, hostel_warden, placement_officer, super_admin
+    is_used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    actor_user_id = Column(String(36), nullable=True, index=True)
+    action = Column(String(100), nullable=False, index=True)
+    target_user_id = Column(String(36), nullable=True, index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    metadata_json = Column(Text, nullable=True)  # JSON-encoded additional parameters
+
+
 class Permission(Base):
     __tablename__ = "permissions"
 
@@ -64,6 +102,8 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(100), nullable=False)
+    institution_id = Column(String(50), nullable=True)
+    status = Column(String(20), default="active")  # pending, active, suspended, rejected
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -76,6 +116,7 @@ class User(Base):
     chat_histories = relationship("AIChatHistory", back_populates="user")
     borrow_records = relationship("BorrowHistory", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
+
 
 
 class Student(Base):

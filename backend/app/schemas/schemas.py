@@ -19,11 +19,26 @@ class TokenPayload(BaseModel):
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
+    institution_id: Optional[str] = None
+    status: Optional[str] = "active"
     is_active: Optional[bool] = True
 
 
 class UserCreate(UserBase):
     password: str
+    role: str = "student"
+
+
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    full_name: str
+    institution_id: str
+    role: str = "admin"
+    password: str
+
+
+class UserStatusUpdate(BaseModel):
+    status: str  # active, suspended, rejected, pending
 
 
 class UserUpdate(BaseModel):
@@ -42,11 +57,25 @@ class RoleSchema(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    role: Optional[str] = None
     created_at: datetime
     roles: List[RoleSchema] = []
 
     class Config:
         from_attributes = True
+
+
+class AuditLogResponse(BaseModel):
+    id: int
+    actor_user_id: Optional[str] = None
+    action: str
+    target_user_id: Optional[str] = None
+    timestamp: datetime
+    metadata_json: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
 
 
 # Student Schemas
