@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../../auth/hooks/useAuth';
 import { UserProfile, AuditLogEntry, AccountStatus } from '../../auth/types';
 import { authService } from '../../auth/services/authService';
+import { getApiBaseUrl } from '../../services/api';
 
 export const UserManagementPage: React.FC = () => {
   const { profile } = useAuth();
@@ -81,7 +82,7 @@ export const UserManagementPage: React.FC = () => {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      const API_URL = getApiBaseUrl();
       const sessionRes = await fetch(`${API_URL}/admin-management/create-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

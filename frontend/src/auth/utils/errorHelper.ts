@@ -22,6 +22,9 @@ export const getFriendlyErrorMessage = (err: any, fallback: string): string => {
 
 
   // Translate specific codes or phrases
+  if (message === 'Not Found' || message.toLowerCase() === 'not found') {
+    return 'Service endpoint not found. Please check your backend connection or try again.';
+  }
   if (message.includes('Invalid login credentials') || message.includes('Incorrect email address or password')) {
     return 'Incorrect email or password. Please try again.';
   }
@@ -40,3 +43,4 @@ export const getFriendlyErrorMessage = (err: any, fallback: string): string => {
 
   return message;
 };
+

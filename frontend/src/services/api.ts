@@ -1,6 +1,16 @@
 import { supabase } from './supabaseClient';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+/**
+ * Normalizes the VITE_API_URL environment variable to ensure it ends with '/api/v1' without trailing slashes.
+ */
+export function getApiBaseUrl(): string {
+  let url = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').trim();
+  url = url.replace(/\/+$/, '');
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`;
+  }
+  return url;
+}
 
 /**
  * Retrieves the current authenticated user's access token from Supabase.
@@ -30,6 +40,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const API_URL = getApiBaseUrl();
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,

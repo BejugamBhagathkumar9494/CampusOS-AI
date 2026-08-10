@@ -11,8 +11,10 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 -- 2. ENUM TYPES
 DO $$ BEGIN
-    CREATE TYPE user_role_enum AS ENUM ('student', 'faculty', 'admin', 'hostel_warden', 'placement_officer');
+    CREATE TYPE user_role_enum AS ENUM ('student', 'faculty', 'admin', 'hostel_warden', 'placement_officer', 'super_admin');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+ALTER TYPE user_role_enum ADD VALUE IF NOT EXISTS 'super_admin';
 
 DO $$ BEGIN
     CREATE TYPE complaint_status_enum AS ENUM ('pending', 'in_progress', 'resolved', 'rejected');
@@ -389,15 +391,42 @@ CREATE OR REPLACE TRIGGER trg_update_complaints BEFORE UPDATE ON public.complain
 -- Auth Registration -> Profile Creation Trigger
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  assigned_role public.user_role_enum;
+  raw_role text;
 BEGIN
+  raw_role := LOWER(COALESCE(NEW.raw_user_meta_data->>'role', 'student'));
+  IF raw_role = 'faculty' THEN
+    assigned_role := 'faculty'::public.user_role_enum;
+  ELSIF raw_role = 'admin' THEN
+    assigned_role := 'admin'::public.user_role_enum;
+  ELSIF raw_role = 'hostel_warden' THEN
+    assigned_role := 'hostel_warden'::public.user_role_enum;
+  ELSIF raw_role = 'placement_officer' THEN
+    assigned_role := 'placement_officer'::public.user_role_enum;
+  ELSIF raw_role = 'super_admin' THEN
+    assigned_role := 'super_admin'::public.user_role_enum;
+  ELSE
+    assigned_role := 'student'::public.user_role_enum;
+  END IF;
+
   INSERT INTO public.profiles (id, full_name, email, role, avatar_url)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
     NEW.email,
-    COALESCE((NEW.raw_user_meta_data->>'role')::user_role_enum, 'student'::user_role_enum),
+    assigned_role,
     NEW.raw_user_meta_data->>'avatar_url'
-  );
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    email = EXCLUDED.email,
+    role = EXCLUDED.role,
+    updated_at = NOW();
+
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  -- Prevent trigger failure from returning 500 on Supabase auth signup
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

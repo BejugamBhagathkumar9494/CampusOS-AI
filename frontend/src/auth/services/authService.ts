@@ -1,5 +1,6 @@
 import { supabase } from '../../services/supabaseClient';
 import { UserRole, UserProfile, AccountStatus, AuditLogEntry } from '../types';
+import { getApiBaseUrl } from '../../services/api';
 
 export const authService = {
   /**
@@ -56,7 +57,7 @@ export const authService = {
 
     // Fallback: Query backend API /auth/me
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      const API_URL = getApiBaseUrl();
       const token = localStorage.getItem('campusos_token') || (await supabase.auth.getSession()).data.session?.access_token;
       if (token && token !== 'demo-local-access-token') {
         const res = await fetch(`${API_URL}/auth/me`, {
@@ -158,7 +159,7 @@ export const authService = {
     }
 
     // Tier 2: Backend FastAPI Auth Login Fallback
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const API_URL = getApiBaseUrl();
     const params = new URLSearchParams();
     params.append('username', email);
     params.append('password', password);
@@ -179,10 +180,12 @@ export const authService = {
         return tokenData;
       }
 
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.detail || 'Incorrect email address or password.');
+      if (res.status === 400 || res.status === 401 || res.status === 403) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Incorrect email address or password.');
+      }
     } catch (apiErr: any) {
-      if (apiErr.message && !apiErr.message.toLowerCase().includes('failed to fetch')) {
+      if (apiErr.message && !apiErr.message.toLowerCase().includes('failed to fetch') && apiErr.message !== 'Not Found') {
         throw apiErr;
       }
 
@@ -255,7 +258,7 @@ export const authService = {
     }
 
     let supaSuccess = false;
-    let supaData = null;
+    let supaData: any = null;
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -270,16 +273,18 @@ export const authService = {
         },
       });
 
-      if (!error && data) {
+      if (!error && data?.user) {
         supaSuccess = true;
         supaData = data;
+      } else if (error) {
+        console.warn('Supabase signUp error message:', error.message);
       }
     } catch (e) {
       console.warn('Supabase signUp failed, falling back to backend API registration:', e);
     }
 
     // Call FastAPI backend register endpoint
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const API_URL = getApiBaseUrl();
     let backendSuccess = false;
 
     try {
@@ -321,11 +326,13 @@ export const authService = {
       } else {
         const errJson = await regRes.json().catch(() => ({}));
         if (!supaSuccess) {
-          throw new Error(errJson.detail || 'Failed to create user account.');
+          if (errJson.detail && errJson.detail !== 'Not Found' && regRes.status !== 404) {
+            throw new Error(errJson.detail);
+          }
         }
       }
     } catch (apiErr: any) {
-      if (apiErr.message && !apiErr.message.toLowerCase().includes('failed to fetch')) {
+      if (apiErr.message && !apiErr.message.toLowerCase().includes('failed to fetch') && apiErr.message !== 'Not Found') {
         throw apiErr;
       }
     }
