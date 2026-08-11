@@ -50,8 +50,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     email TEXT UNIQUE NOT NULL,
     role user_role_enum NOT NULL DEFAULT 'student',
     department TEXT,
+    institution_id TEXT UNIQUE,
     avatar_url TEXT,
     phone TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -72,9 +74,9 @@ CREATE TABLE IF NOT EXISTS public.students (
     profile_id UUID UNIQUE NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     roll_number TEXT UNIQUE NOT NULL,
     department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
-    batch_year INT NOT NULL,
-    cgpa NUMERIC(3,2) DEFAULT 0.00,
-    semester INT DEFAULT 1,
+    batch_year INT NOT NULL DEFAULT 2026,
+    cgpa NUMERIC(3,2) DEFAULT 8.00,
+    semester INT DEFAULT 5,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -85,8 +87,8 @@ CREATE TABLE IF NOT EXISTS public.faculty (
     profile_id UUID UNIQUE NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     employee_id TEXT UNIQUE NOT NULL,
     department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
-    designation TEXT,
-    specialization TEXT,
+    designation TEXT DEFAULT 'Professor',
+    specialization TEXT DEFAULT 'Computer Science',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -116,7 +118,7 @@ CREATE TABLE IF NOT EXISTS public.placement_officers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     profile_id UUID UNIQUE NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     officer_code TEXT UNIQUE NOT NULL,
-    designation TEXT,
+    designation TEXT DEFAULT 'Head of Placements',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -126,10 +128,21 @@ CREATE TABLE IF NOT EXISTS public.courses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code TEXT UNIQUE NOT NULL,
     title TEXT NOT NULL,
-    credits INT NOT NULL DEFAULT 3,
+    credits INT NOT NULL DEFAULT 4,
     department_id UUID REFERENCES public.departments(id) ON DELETE CASCADE,
     faculty_id UUID REFERENCES public.faculty(id) ON DELETE SET NULL,
+    instructor_name TEXT DEFAULT 'Faculty Instructor',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Course Enrollments Table
+CREATE TABLE IF NOT EXISTS public.course_enrollments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    status TEXT DEFAULT 'active',
+    UNIQUE (course_id, student_id)
 );
 
 -- Attendance Table
@@ -137,7 +150,7 @@ CREATE TABLE IF NOT EXISTS public.attendance (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
     course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
-    date DATE NOT NULL,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
     status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'late', 'excused')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -153,6 +166,31 @@ CREATE TABLE IF NOT EXISTS public.assignments (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Assignment Submissions Table
+CREATE TABLE IF NOT EXISTS public.assignment_submissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    assignment_id UUID NOT NULL REFERENCES public.assignments(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    file_url TEXT NOT NULL,
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    status TEXT DEFAULT 'submitted' CHECK (status IN ('submitted', 'graded', 'late')),
+    marks NUMERIC(5,2),
+    feedback TEXT,
+    UNIQUE (assignment_id, student_id)
+);
+
+-- Student Marks Table
+CREATE TABLE IF NOT EXISTS public.student_marks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
+    eval_type TEXT NOT NULL CHECK (eval_type IN ('internal', 'assignment', 'exam', 'quiz')),
+    marks_obtained NUMERIC(5,2) NOT NULL,
+    max_marks NUMERIC(5,2) NOT NULL DEFAULT 100,
+    remarks TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Examinations Table
 CREATE TABLE IF NOT EXISTS public.examinations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -161,6 +199,19 @@ CREATE TABLE IF NOT EXISTS public.examinations (
     exam_date TIMESTAMPTZ NOT NULL,
     location TEXT,
     total_marks INT DEFAULT 100,
+    semester INT DEFAULT 5,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Announcements Table
+CREATE TABLE IF NOT EXISTS public.announcements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    target_role TEXT DEFAULT 'all',
+    department_id UUID REFERENCES public.departments(id) ON DELETE SET NULL,
+    course_id UUID REFERENCES public.courses(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -180,6 +231,31 @@ CREATE TABLE IF NOT EXISTS public.rooms (
     room_number TEXT NOT NULL,
     capacity INT DEFAULT 2,
     occupied INT DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (hostel_id, room_number)
+);
+
+-- Hostel Allocations Table
+CREATE TABLE IF NOT EXISTS public.hostel_allocations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    room_id UUID NOT NULL REFERENCES public.rooms(id) ON DELETE CASCADE,
+    student_id UUID UNIQUE NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    bed_number TEXT NOT NULL,
+    allocated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (room_id, bed_number)
+);
+
+-- Hostel Leave Requests Table
+CREATE TABLE IF NOT EXISTS public.hostel_leave_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    hostel_id UUID REFERENCES public.hostels(id) ON DELETE SET NULL,
+    room_number TEXT,
+    reason TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    approved_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -195,7 +271,7 @@ CREATE TABLE IF NOT EXISTS public.complaints (
     complainant_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    category TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'General',
     status complaint_status_enum DEFAULT 'pending',
     priority complaint_priority_enum DEFAULT 'medium',
     assigned_to UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -213,7 +289,7 @@ CREATE TABLE IF NOT EXISTS public.companies (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Placements Table
+-- Placements Table / Drives
 CREATE TABLE IF NOT EXISTS public.placements (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
@@ -223,6 +299,16 @@ CREATE TABLE IF NOT EXISTS public.placements (
     drive_date TIMESTAMPTZ,
     status TEXT DEFAULT 'active',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Placement Applications Table
+CREATE TABLE IF NOT EXISTS public.placement_applications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    placement_id UUID NOT NULL REFERENCES public.placements(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    status placement_status_enum DEFAULT 'applied',
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (placement_id, student_id)
 );
 
 -- Resumes Table
@@ -280,6 +366,35 @@ CREATE TABLE IF NOT EXISTS public.events (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Event Registrations Table
+CREATE TABLE IF NOT EXISTS public.event_registrations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (event_id, student_id)
+);
+
+-- Clubs Table
+CREATE TABLE IF NOT EXISTS public.clubs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT UNIQUE NOT NULL,
+    description TEXT,
+    category TEXT,
+    head_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Club Memberships Table
+CREATE TABLE IF NOT EXISTS public.club_memberships (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    club_id UUID NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    role TEXT DEFAULT 'member',
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (club_id, student_id)
+);
+
 -- Transport Routes Table
 CREATE TABLE IF NOT EXISTS public.transport_routes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -313,7 +428,18 @@ CREATE TABLE IF NOT EXISTS public.fee_payments (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 5. AI & ML EXTENSION TABLES (Future Proofing for RAG, Vector Search & Predictors)
+-- Audit Logs Table
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    actor_user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    entity TEXT NOT NULL,
+    entity_id TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 5. AI & ML EXTENSION TABLES
 
 -- Knowledge Base Documents
 CREATE TABLE IF NOT EXISTS public.knowledge_documents (
@@ -378,7 +504,8 @@ CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON public.notifications(r
 CREATE INDEX IF NOT EXISTS idx_issued_books_student ON public.issued_books(student_id);
 CREATE INDEX IF NOT EXISTS idx_fee_payments_student ON public.fee_payments(student_id);
 CREATE INDEX IF NOT EXISTS idx_ai_chat_user_session ON public.ai_chat_history(user_id, session_id);
-CREATE INDEX IF NOT EXISTS idx_vector_embedding_cosine ON public.vector_embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS idx_announcements_target ON public.announcements(target_role);
+CREATE INDEX IF NOT EXISTS idx_course_enrollments_student ON public.course_enrollments(student_id);
 
 -- 7. TRIGGERS FOR UPDATED_AT & AUTH USER REGISTRATION SYNC
 
@@ -410,13 +537,14 @@ BEGIN
     assigned_role := 'student'::public.user_role_enum;
   END IF;
 
-  INSERT INTO public.profiles (id, full_name, email, role, avatar_url)
+  INSERT INTO public.profiles (id, full_name, email, role, avatar_url, institution_id)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
     NEW.email,
     assigned_role,
-    NEW.raw_user_meta_data->>'avatar_url'
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.raw_user_meta_data->>'institution_id'
   )
   ON CONFLICT (id) DO UPDATE SET
     full_name = EXCLUDED.full_name,
@@ -426,7 +554,6 @@ BEGIN
 
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-  -- Prevent trigger failure from returning 500 on Supabase auth signup
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -438,7 +565,6 @@ CREATE TRIGGER on_auth_user_created
 
 -- 8. ROW LEVEL SECURITY (RLS) & POLICIES
 
--- RLS Role Helpers
 CREATE OR REPLACE FUNCTION public.current_user_role()
 RETURNS user_role_enum AS $$
   SELECT role FROM public.profiles WHERE id = auth.uid();
@@ -446,7 +572,7 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
-  SELECT COALESCE(public.current_user_role() = 'admin', FALSE);
+  SELECT COALESCE(public.current_user_role() IN ('admin', 'super_admin'), FALSE);
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- Enable RLS on all tables
@@ -458,102 +584,118 @@ ALTER TABLE public.administrators ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hostel_wardens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.placement_officers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.assignments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.assignment_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.student_marks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.examinations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hostels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hostel_allocations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hostel_leave_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.complaints ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.placements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.placement_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.resumes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.library_books ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.issued_books ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.event_registrations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.clubs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.club_memberships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transport_routes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.buses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fee_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.knowledge_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vector_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_chat_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ml_predictions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_agent_logs ENABLE ROW LEVEL SECURITY;
 
--- Profiles Policies
-CREATE POLICY "Users can view own profile or admins can view all"
-  ON public.profiles FOR SELECT
-  USING (id = auth.uid() OR public.is_admin());
+-- Allow read/write policies for authenticated campus application users
+CREATE POLICY "Authenticated profiles access" ON public.profiles FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated departments access" ON public.departments FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated students access" ON public.students FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated faculty access" ON public.faculty FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated administrators access" ON public.administrators FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated wardens access" ON public.hostel_wardens FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated placement officers access" ON public.placement_officers FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated courses access" ON public.courses FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated course_enrollments access" ON public.course_enrollments FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated attendance access" ON public.attendance FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated assignments access" ON public.assignments FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated assignment_submissions access" ON public.assignment_submissions FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated student_marks access" ON public.student_marks FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated examinations access" ON public.examinations FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated announcements access" ON public.announcements FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated hostels access" ON public.hostels FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated rooms access" ON public.rooms FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated hostel_allocations access" ON public.hostel_allocations FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated hostel_leave_requests access" ON public.hostel_leave_requests FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated complaints access" ON public.complaints FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated companies access" ON public.companies FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated placements access" ON public.placements FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated placement_applications access" ON public.placement_applications FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated resumes access" ON public.resumes FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated library_books access" ON public.library_books FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated issued_books access" ON public.issued_books FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated notifications access" ON public.notifications FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated events access" ON public.events FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated event_registrations access" ON public.event_registrations FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated clubs access" ON public.clubs FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated club_memberships access" ON public.club_memberships FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated transport_routes access" ON public.transport_routes FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated buses access" ON public.buses FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated fee_payments access" ON public.fee_payments FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated audit_logs access" ON public.audit_logs FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated knowledge_documents access" ON public.knowledge_documents FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated vector_embeddings access" ON public.vector_embeddings FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated ai_chat_history access" ON public.ai_chat_history FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated ml_predictions access" ON public.ml_predictions FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated ai_agent_logs access" ON public.ai_agent_logs FOR ALL USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Users can update own profile"
-  ON public.profiles FOR UPDATE
-  USING (id = auth.uid());
+-- 9. INITIAL SAMPLE SEED DATA
 
--- Students Policies
-CREATE POLICY "Students can view own profile record or admin/faculty"
-  ON public.students FOR SELECT
-  USING (
-    profile_id = auth.uid() 
-    OR public.is_admin() 
-    OR public.current_user_role() = 'faculty'
-  );
+INSERT INTO public.departments (code, name, head_of_department) VALUES
+('CSE', 'Computer Science & Engineering', 'Dr. Sarah Jenkins'),
+('ECE', 'Electronics & Communication', 'Dr. Alan Vance'),
+('MECH', 'Mechanical Engineering', 'Dr. James Wilson')
+ON CONFLICT (code) DO NOTHING;
 
--- Attendance Policies
-CREATE POLICY "Students can view own attendance"
-  ON public.attendance FOR SELECT
-  USING (
-    student_id IN (SELECT id FROM public.students WHERE profile_id = auth.uid())
-    OR public.is_admin()
-    OR public.current_user_role() = 'faculty'
-  );
+INSERT INTO public.hostels (name, block_code, total_capacity) VALUES
+('Cauvery Hall of Residence', 'BLOCK-A', 150),
+('Ganga Hostel', 'BLOCK-B', 120),
+('Narmada Hostel', 'BLOCK-C', 100)
+ON CONFLICT (name) DO NOTHING;
 
-CREATE POLICY "Faculty and admin can manage attendance"
-  ON public.attendance FOR ALL
-  USING (public.current_user_role() IN ('faculty', 'admin'));
+INSERT INTO public.library_books (isbn, title, author, category, copies_available) VALUES
+('978-0131103627', 'The C Programming Language', 'Brian W. Kernighan, Dennis M. Ritchie', 'Computer Science', 5),
+('978-0262033848', 'Introduction to Algorithms', 'Thomas H. Cormen', 'Computer Science', 8),
+('978-0134685991', 'Effective Java', 'Joshua Bloch', 'Software Engineering', 3),
+('978-0132350884', 'Clean Code', 'Robert C. Martin', 'Software Engineering', 4)
+ON CONFLICT (isbn) DO NOTHING;
 
--- Complaints Policies
-CREATE POLICY "Users can view their own complaints or wardens/admins"
-  ON public.complaints FOR SELECT
-  USING (
-    complainant_id = auth.uid() 
-    OR public.current_user_role() IN ('hostel_warden', 'admin')
-  );
+INSERT INTO public.companies (name, website, industry, location) VALUES
+('Tata Consultancy Services', 'https://tcs.com', 'IT Services', 'Bengaluru'),
+('Google', 'https://careers.google.com', 'Technology', 'Hyderabad'),
+('Amazon', 'https://amazon.jobs', 'E-Commerce / Cloud', 'Bengaluru')
+ON CONFLICT DO NOTHING;
 
-CREATE POLICY "Users can insert complaints"
-  ON public.complaints FOR INSERT
-  WITH CHECK (complainant_id = auth.uid());
+INSERT INTO public.clubs (name, description, category) VALUES
+('Coding Club', 'Competitive programming, open source, and hackathons.', 'Technical'),
+('Robotics Society', 'Hardware engineering, microcontrollers, and IoT.', 'Technical'),
+('Cultural Forum', 'Music, dance, dramatics, and campus festivals.', 'Cultural')
+ON CONFLICT (name) DO NOTHING;
 
--- Placements & Resumes Policies
-CREATE POLICY "Placement Officers and admins full access to placements"
-  ON public.placements FOR ALL
-  USING (public.current_user_role() IN ('placement_officer', 'admin'));
-
-CREATE POLICY "Students can view active placements"
-  ON public.placements FOR SELECT
-  USING (status = 'active' OR public.current_user_role() IN ('placement_officer', 'admin'));
-
-CREATE POLICY "Students can manage own resumes"
-  ON public.resumes FOR ALL
-  USING (
-    student_id IN (SELECT id FROM public.students WHERE profile_id = auth.uid())
-    OR public.current_user_role() IN ('placement_officer', 'admin')
-  );
-
--- AI Chat History Policies
-CREATE POLICY "Users can access own AI chat history"
-  ON public.ai_chat_history FOR ALL
-  USING (user_id = auth.uid() OR public.is_admin());
-
--- Default Read-Only Policies for Catalog Tables (Courses, Library, Events, Routes)
-CREATE POLICY "Authenticated users can read courses" ON public.courses FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can read library_books" ON public.library_books FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can read events" ON public.events FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can read transport_routes" ON public.transport_routes FOR SELECT USING (auth.role() = 'authenticated');
-
--- Admin Catch-All Full Management Policies
-CREATE POLICY "Admins full access to all data" ON public.departments FOR ALL USING (public.is_admin());
-CREATE POLICY "Admins full access to hostels" ON public.hostels FOR ALL USING (public.is_admin());
-CREATE POLICY "Admins full access to fee payments" ON public.fee_payments FOR ALL USING (public.is_admin());
+INSERT INTO public.transport_routes (route_name, start_point, end_point, stops) VALUES
+('Route 10A', 'Central Railway Station', 'Main Campus Gate', ARRAY['City Center', 'Tech Park', 'North Gate']),
+('Route 04B', 'South City Mall', 'Hostel Block A', ARRAY['South Avenue', 'Subway Square', 'West Gate'])
+ON CONFLICT DO NOTHING;
 
 -- ==============================================================================
 -- END OF MIGRATION SCRIPT

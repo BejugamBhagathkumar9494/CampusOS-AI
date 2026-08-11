@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -25,8 +24,8 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
-
-import { getNotifications, fetchWithAuth } from '../../services/api';
+import { notificationService } from '../../services/notificationService';
+import { supabase } from '../../services/supabaseClient';
 
 interface SidebarItem {
   name: string;
@@ -46,21 +45,51 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const fullName = profile?.full_name || 'User';
 
   useEffect(() => {
-    getNotifications()
-      .then((data) => setNotifs(data || []))
-      .catch(() => setNotifs([]));
-  }, []);
+    let isMounted = true;
+
+    async function loadNotifs() {
+      if (profile?.id) {
+        try {
+          const list = await notificationService.getNotifications(profile.id);
+          if (isMounted) setNotifs(list);
+        } catch (e) {
+          console.warn('Failed to load notifications:', e);
+        }
+      }
+    }
+
+    loadNotifs();
+
+    // Supabase Realtime Listener for real-time notifications cross-role sync
+    const channel = supabase
+      .channel('public:notifications')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications' },
+        (payload) => {
+          if (profile?.id && payload.new.recipient_id === profile.id) {
+            setNotifs((prev) => [payload.new, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, [profile]);
 
   const unreadCount = notifs.filter((n) => !n.is_read).length;
 
   const markAllNotificationsRead = async () => {
     try {
-      await fetchWithAuth('/notifications/read-all', { method: 'POST' });
+      await Promise.all(notifs.map((n) => notificationService.markAsRead(n.id)));
+      setNotifs((prev) => prev.map((n) => ({ ...n, is_read: true })));
     } catch (e) {
       console.warn('Mark read error:', e);
     }
   };
-
 
   const getRoleLabel = (r: string) => {
     switch (r) {
@@ -74,8 +103,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  // Dynamic Sidebar Navigation based on authenticated role
-  // Hiding menu items provides UI isolation; backend API endpoints enforce data authorization.
   const getSidebarItems = (userRole: string): SidebarItem[] => {
     const studentItems: SidebarItem[] = [
       { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
@@ -157,7 +184,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const sidebarItems = getSidebarItems(role);
   const homePath = `/${role === 'hostel_warden' ? 'hostel' : role === 'placement_officer' ? 'placement' : role === 'super_admin' ? 'super-admin' : role}/dashboard`;
 
-
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
@@ -165,7 +191,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8FAFC] text-slate-900 font-sans">
-      {/* Sidebar Panel */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 border-r border-slate-200/80 bg-white shadow-[1px_0_15px_rgba(0,0,0,0.02)] transition-transform duration-300 md:relative md:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -188,7 +213,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </div>
 
-        {/* Navigation list */}
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scrollbar">
           {sidebarItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -210,7 +234,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* Footer info & Logout */}
         <div className="p-4 border-t border-slate-100 bg-slate-50/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
@@ -234,9 +257,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Top Navbar */}
         <header className="flex items-center justify-between h-16 px-6 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-xs">
           <div className="flex items-center gap-4">
             <button
@@ -271,7 +292,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Bell className="w-4.5 h-4.5" />
               </button>
 
-              {/* Notification Popover Dropdown */}
               {showNotifs && (
                 <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-fade-in">
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -279,10 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <Bell className="w-4 h-4 text-indigo-600" /> Notifications ({notifs.length})
                     </h3>
                     <button
-                      onClick={async () => {
-                        await markAllNotificationsRead();
-                        setNotifs(prev => prev.map(n => ({ ...n, is_read: true })));
-                      }}
+                      onClick={markAllNotificationsRead}
                       className="text-[11px] font-bold text-indigo-600 hover:underline"
                     >
                       Mark all read
@@ -325,8 +342,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-
-        {/* Content viewport */}
         <main className="flex-1 overflow-y-auto bg-[#F8FAFC] p-6 md:p-8">
           {children}
         </main>

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { 
   Sparkles, Calendar, BookOpen, Clock, AlertTriangle, 
   Users, CheckSquare, Building2, ShieldCheck, 
@@ -5,6 +6,9 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { analyticsService } from '../../services/analyticsService';
+import { courseService } from '../../services/courseService';
+import { announcementService } from '../../services/announcementService';
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -13,7 +17,7 @@ export default function Dashboard() {
 
   switch (role) {
     case 'faculty':
-      return <FacultyDashboard name={name} />;
+      return <FacultyDashboard name={name} profileId={profile?.id} />;
     case 'admin':
       return <AdminDashboard name={name} />;
     case 'hostel_warden':
@@ -22,40 +26,98 @@ export default function Dashboard() {
       return <PlacementOfficerDashboard name={name} />;
     case 'student':
     default:
-      return <StudentDashboard name={name} />;
+      return <StudentDashboard name={name} profileId={profile?.id} />;
   }
 }
 
 interface DashboardProps {
   name: string;
+  profileId?: string;
 }
 
 // ----------------------------------------------------
 // 1. STUDENT DASHBOARD
 // ----------------------------------------------------
-function StudentDashboard({ name }: DashboardProps) {
-  const recommendations = [
+function StudentDashboard({ name, profileId }: DashboardProps) {
+  const [stats, setStats] = useState({
+    attendance_percentage: 87.5,
+    cgpa: 8.4,
+    issued_books: 0,
+    open_complaints: 1
+  });
+  const [classes, setClasses] = useState<any[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadStudentData() {
+      try {
+        if (profileId) {
+          const sData = await analyticsService.getStudentAnalytics(profileId);
+          if (isMounted) setStats(sData);
+
+          const studentCourses = await courseService.getStudentCourses(profileId);
+          if (isMounted && studentCourses.length > 0) {
+            const formatted = studentCourses.map((c, idx) => ({
+              name: c.title,
+              time: idx === 0 ? '09:00 AM' : idx === 1 ? '10:15 AM' : '02:30 PM',
+              room: `Room ${301 + idx} • Main Block`,
+              professor: c.instructor_name || 'Prof. Faculty',
+              color: idx % 3 === 0 ? 'purple' : idx % 3 === 1 ? 'blue' : 'emerald'
+            }));
+            setClasses(formatted);
+          }
+        }
+        const ann = await announcementService.getAnnouncements('student');
+        if (isMounted && ann.length > 0) {
+          setAnnouncements(ann.slice(0, 3));
+        }
+      } catch (err) {
+        console.error('Error fetching student dashboard analytics:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadStudentData();
+    return () => { isMounted = false; };
+  }, [profileId]);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center font-sans text-slate-500 text-xs font-semibold">
+        Loading dashboard analytics from Supabase...
+      </div>
+    );
+  }
+
+  const recommendations = announcements.length > 0 ? announcements.map((a, idx) => ({
+    id: idx + 1,
+    text: `${a.title}: ${a.content}`,
+    color: idx % 3 === 0 ? 'purple' : idx % 3 === 1 ? 'blue' : 'emerald',
+    iconType: idx % 3 === 0 ? 'clipboard' : idx % 3 === 1 ? 'cap' : 'briefcase'
+  })) : [
     {
       id: 1,
-      text: "Your attendance in 'Automata Theory' is at 74%. Attend tomorrow's session to cross the 75% threshold.",
+      text: `Your attendance is currently at ${stats.attendance_percentage}%. Keep attending lectures to maintain threshold.`,
       color: "purple",
       iconType: "clipboard"
     },
     {
       id: 2,
-      text: "Academic risk model predicts upcoming mid-terms for 'Discrete Math' may be difficult. Generate a practice quiz.",
+      text: `Academic status active with current CGPA ${stats.cgpa}. Practice quizzes available in AI Assistant.`,
       color: "blue",
       iconType: "cap"
     },
     {
       id: 3,
-      text: "TCS Placement drive has opened. Run your dataset-backed readiness prediction before applying.",
+      text: "Placement drives are active. Run your dataset-backed readiness prediction before applying.",
       color: "emerald",
       iconType: "briefcase"
     },
   ];
 
-  const classes = [
+  const displayClasses = classes.length > 0 ? classes : [
     { name: 'Automata Theory', time: '09:00 AM', room: 'Room 301 • Main Block', professor: 'Dr. Sarah Jenkins', color: 'purple' },
     { name: 'Computer Networks', time: '10:15 AM', room: 'Room 204 • Main Block', professor: 'Prof. Alan Vance', color: 'blue' },
     { name: 'Data Structures Lab', time: '02:30 PM', room: 'Lab 1 • CS Block', professor: 'Dr. James Wilson', color: 'emerald' },
@@ -71,7 +133,7 @@ function StudentDashboard({ name }: DashboardProps) {
               Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600">{name}!</span> 👋
             </h1>
             <p className="text-slate-600 text-sm sm:text-base max-w-lg leading-relaxed font-medium">
-              CampusOS AI has analyzed your academics, hostel status, and placement goals. Here are your personalized recommendations.
+              CampusOS AI has connected your academics, hostel status, and placement goals directly to Supabase.
             </p>
           </div>
 
@@ -79,75 +141,53 @@ function StudentDashboard({ name }: DashboardProps) {
             {/* Top floating glass badges */}
             <div className="absolute -top-3 left-4 lg:left-0 z-20 flex gap-2">
               <div className="px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-xs font-extrabold text-slate-700 border border-white/80 shadow-xs">
-                GPA: <span className="text-emerald-600">8.42</span>
+                CGPA: <span className="text-emerald-600">{stats.cgpa}</span>
               </div>
               <div className="px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-xs font-extrabold text-slate-700 border border-white/80 shadow-xs">
-                Streak: <span className="text-indigo-600">12 days</span>
+                Status: <span className="text-indigo-600">Active</span>
               </div>
             </div>
 
             {/* University Campus Vector SVG Illustration */}
             <div className="w-full max-w-[340px] h-[160px] relative flex items-center justify-center">
               <svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
-                {/* Soft sky background */}
                 <ellipse cx="200" cy="180" rx="190" ry="40" fill="#E0E7FF" fillOpacity="0.6" />
-                
-                {/* Clouds */}
                 <path d="M50 40 Q65 30 80 40 Q95 30 110 40 Q115 55 50 55 Z" fill="#FFFFFF" fillOpacity="0.8" />
                 <path d="M280 35 Q295 25 310 35 Q325 25 340 35 Q345 50 280 50 Z" fill="#FFFFFF" fillOpacity="0.8" />
-
-                {/* Flying Birds */}
                 <path d="M120 25 Q125 20 130 25 Q135 20 140 25" stroke="#818CF8" strokeWidth="1.5" strokeLinecap="round" fill="none" />
                 <path d="M145 30 Q150 26 155 30 Q160 26 165 30" stroke="#818CF8" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-                {/* Side Wings Building Left */}
                 <rect x="110" y="80" width="60" height="70" rx="4" fill="#FFFFFF" />
                 <rect x="110" y="80" width="60" height="10" fill="#818CF8" fillOpacity="0.3" />
                 <rect x="120" y="95" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="145" y="95" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="120" y="120" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="145" y="120" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
-
-                {/* Side Wings Building Right */}
                 <rect x="230" y="80" width="60" height="70" rx="4" fill="#FFFFFF" />
                 <rect x="230" y="80" width="60" height="10" fill="#818CF8" fillOpacity="0.3" />
                 <rect x="240" y="95" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="265" y="95" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="240" y="120" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
                 <rect x="265" y="120" width="12" height="15" rx="2" fill="#93C5FD" fillOpacity="0.6" />
-
-                {/* Main Central Building */}
                 <rect x="160" y="60" width="80" height="90" rx="6" fill="#FFFFFF" stroke="#E0E7FF" strokeWidth="2" />
                 <polygon points="150,60 200,20 250,60" fill="#4F46E5" />
                 <polygon points="165,60 200,28 235,60" fill="#6366F1" />
-
-                {/* Clock Tower */}
                 <rect x="185" y="10" width="30" height="40" rx="3" fill="#4338CA" />
                 <polygon points="180,10 200,-5 220,10" fill="#3730A3" />
                 <circle cx="200" cy="25" r="7" fill="#FFFFFF" />
                 <line x1="200" y1="25" x2="200" y2="21" stroke="#4338CA" strokeWidth="1.5" strokeLinecap="round" />
                 <line x1="200" y1="25" x2="203" y2="25" stroke="#4338CA" strokeWidth="1.5" strokeLinecap="round" />
-
-                {/* Columns & Portico */}
                 <rect x="175" y="105" width="50" height="45" fill="#EEF2FF" />
                 <rect x="180" y="110" width="6" height="40" fill="#6366F1" fillOpacity="0.4" />
                 <rect x="192" y="110" width="6" height="40" fill="#6366F1" fillOpacity="0.4" />
                 <rect x="204" y="110" width="6" height="40" fill="#6366F1" fillOpacity="0.4" />
                 <rect x="216" y="110" width="6" height="40" fill="#6366F1" fillOpacity="0.4" />
-
-                {/* Grand Arched Entrance */}
                 <path d="M190 150 V130 A10 10 0 0 1 210 130 V150 Z" fill="#312E81" />
-
-                {/* Lush Trees */}
                 <circle cx="95" cy="135" r="18" fill="#10B981" />
                 <circle cx="85" cy="145" r="14" fill="#059669" />
                 <rect x="92" y="150" width="6" height="20" fill="#78350F" />
-
                 <circle cx="305" cy="135" r="18" fill="#10B981" />
                 <circle cx="315" cy="145" r="14" fill="#059669" />
                 <rect x="302" y="150" width="6" height="20" fill="#78350F" />
-
-                {/* Floating AI Glow Nodes */}
                 <circle cx="70" cy="70" r="6" fill="#818CF8" fillOpacity="0.5" />
                 <circle cx="330" cy="80" r="8" fill="#C084FC" fillOpacity="0.5" />
                 <circle cx="140" cy="15" r="4" fill="#34D399" fillOpacity="0.6" />
@@ -156,7 +196,6 @@ function StudentDashboard({ name }: DashboardProps) {
           </div>
         </div>
 
-        {/* Ambient background glow circles */}
         <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl pointer-events-none" />
       </div>
@@ -172,7 +211,7 @@ function StudentDashboard({ name }: DashboardProps) {
               </div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Attendance</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">87.5%</div>
+            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">{stats.attendance_percentage}%</div>
             <p className="text-xs font-semibold text-emerald-600">Above minimum requirement</p>
           </div>
 
@@ -220,7 +259,7 @@ function StudentDashboard({ name }: DashboardProps) {
               </div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Library Dues</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">0 Books</div>
+            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">{stats.issued_books} Books</div>
             <p className="text-xs font-medium text-slate-500">No active fines</p>
           </div>
 
@@ -240,8 +279,8 @@ function StudentDashboard({ name }: DashboardProps) {
               </div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Hostel Complaints</span>
             </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">1 Open</div>
-            <p className="text-xs font-semibold text-rose-500">AI Priority: Medium</p>
+            <div className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">{stats.open_complaints} Open</div>
+            <p className="text-xs font-semibold text-rose-500">Live DB Status</p>
           </div>
 
           <div className="pt-4 flex items-end justify-end">
@@ -254,11 +293,10 @@ function StudentDashboard({ name }: DashboardProps) {
 
       {/* Main split: AI Insights & Schedule */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: AI Insights & Actions */}
         <div className="lg:col-span-2 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-5">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-600" /> AI Insights & Actions
+              <Sparkles className="w-5 h-5 text-indigo-600" /> Announcements & AI Insights
             </h2>
           </div>
 
@@ -274,7 +312,6 @@ function StudentDashboard({ name }: DashboardProps) {
                   <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">{rec.text}</p>
                 </div>
 
-                {/* Vector SVG Illustration Icons */}
                 <div className="shrink-0 hidden sm:block">
                   {rec.iconType === 'clipboard' && (
                     <svg className="w-12 h-12 drop-shadow-xs" viewBox="0 0 60 60" fill="none">
@@ -317,7 +354,6 @@ function StudentDashboard({ name }: DashboardProps) {
           </div>
         </div>
 
-        {/* Right 1 Col: Today's Schedule */}
         <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4 relative overflow-hidden flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -330,7 +366,7 @@ function StudentDashboard({ name }: DashboardProps) {
             </div>
 
             <div className="space-y-3">
-              {classes.map((cls, idx) => (
+              {displayClasses.map((cls, idx) => (
                 <div key={idx} className="p-3.5 rounded-2xl bg-slate-50/60 border border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`text-[11px] font-extrabold px-2.5 py-1.5 rounded-xl shrink-0 ${
@@ -355,7 +391,6 @@ function StudentDashboard({ name }: DashboardProps) {
             </div>
           </div>
 
-          {/* Decorative Campus Hills Landscape footer */}
           <div className="pt-6 relative -mx-6 -mb-6 h-16 overflow-hidden pointer-events-none">
             <svg viewBox="0 0 300 60" fill="none" className="w-full h-full">
               <path d="M0 40 Q75 20 150 35 Q225 50 300 30 V60 H0 Z" fill="#E0E7FF" fillOpacity="0.5" />
@@ -373,11 +408,26 @@ function StudentDashboard({ name }: DashboardProps) {
 // ----------------------------------------------------
 // 2. FACULTY DASHBOARD
 // ----------------------------------------------------
-function FacultyDashboard({ name }: DashboardProps) {
+function FacultyDashboard({ name, profileId }: DashboardProps) {
+  const [stats, setStats] = useState({
+    courses_handled: 3,
+    total_students: 120,
+    pending_grading: 0,
+    overall_attendance: 94.2
+  });
+
+  useEffect(() => {
+    if (profileId) {
+      analyticsService.getFacultyAnalytics(profileId)
+        .then(res => setStats(res))
+        .catch(err => console.error(err));
+    }
+  }, [profileId]);
+
   const alerts = [
-    "12 assignments for 'Computer Networks (CS302)' remain ungraded. Due date has passed.",
-    "Student attendance rate in 'Discrete Math (CS204)' has dropped by 4.2% this week.",
-    "Academic coordinator has requested syllabus revision for next semester AI electives.",
+    `${stats.pending_grading} assignments remain pending for grading in Supabase.`,
+    "Student attendance rate in assigned courses is monitored live.",
+    "Academic coordinator board sync is active with backend PostgreSQL database.",
   ];
 
   const lectures = [
@@ -403,7 +453,7 @@ function FacultyDashboard({ name }: DashboardProps) {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Courses Handled</span>
             <BookOpen className="w-5 h-5 text-indigo-600" />
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mb-1">3 Active</p>
+          <p className="text-2xl font-extrabold text-slate-900 mb-1">{stats.courses_handled} Active</p>
           <span className="text-xs font-medium text-slate-500">Computer Science Dept</span>
         </div>
 
@@ -412,8 +462,8 @@ function FacultyDashboard({ name }: DashboardProps) {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Students</span>
             <Users className="w-5 h-5 text-indigo-600" />
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mb-1">120 Active</p>
-          <span className="text-xs font-semibold text-emerald-600">94.2% overall attendance</span>
+          <p className="text-2xl font-extrabold text-slate-900 mb-1">{stats.total_students} Enrolled</p>
+          <span className="text-xs font-semibold text-emerald-600">{stats.overall_attendance}% overall attendance</span>
         </div>
 
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
@@ -421,8 +471,8 @@ function FacultyDashboard({ name }: DashboardProps) {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Grading Backlog</span>
             <CheckSquare className="w-5 h-5 text-indigo-600" />
           </div>
-          <p className="text-2xl font-extrabold text-slate-900 mb-1">14 Submissions</p>
-          <span className="text-xs font-semibold text-rose-500">OS Lab Report</span>
+          <p className="text-2xl font-extrabold text-slate-900 mb-1">{stats.pending_grading} Submissions</p>
+          <span className="text-xs font-semibold text-rose-500">Pending Evaluation</span>
         </div>
 
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
@@ -482,10 +532,23 @@ function FacultyDashboard({ name }: DashboardProps) {
 // 3. ADMIN DASHBOARD
 // ----------------------------------------------------
 function AdminDashboard({ name }: DashboardProps) {
+  const [stats, setStats] = useState({
+    total_students: 450,
+    total_faculty: 32,
+    active_courses: 24,
+    open_complaints: 0
+  });
+
+  useEffect(() => {
+    analyticsService.getAdminAnalytics()
+      .then(res => setStats(res))
+      .catch(err => console.error(err));
+  }, []);
+
   const operations = [
-    "Database backup completed. Next incremental sync scheduled at 23:00.",
-    "Unresolved high-priority complaint logged in Hostel D (electrical surge). Warden notified.",
-    "Bus Route 10A requires routine mechanical validation. Certification is due in 3 days.",
+    `Database status operational in Supabase PostgreSQL (${stats.total_students} registered students).`,
+    `Open administrative & campus tickets logged: ${stats.open_complaints} pending.`,
+    `Active academic courses offered this semester: ${stats.active_courses} courses.`,
   ];
 
   const services = [
@@ -508,19 +571,19 @@ function AdminDashboard({ name }: DashboardProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Students</span>
-          <p className="text-3xl font-extrabold text-slate-900 mt-2">1,420</p>
+          <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total_students}</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Faculty Count</span>
-          <p className="text-3xl font-extrabold text-slate-900 mt-2">84</p>
+          <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total_faculty}</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AI Service Health</span>
           <p className="text-3xl font-extrabold text-emerald-600 mt-2">99.9%</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">System Alerts</span>
-          <p className="text-3xl font-extrabold text-indigo-600 mt-2">3 Pending</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Open Complaints</span>
+          <p className="text-3xl font-extrabold text-indigo-600 mt-2">{stats.open_complaints} Pending</p>
         </div>
       </div>
 
@@ -560,6 +623,20 @@ function AdminDashboard({ name }: DashboardProps) {
 // 4. HOSTEL WARDEN DASHBOARD
 // ----------------------------------------------------
 function HostelWardenDashboard({ name }: DashboardProps) {
+  const [stats, setStats] = useState({
+    total_rooms: 60,
+    occupied_beds: 84,
+    available_beds: 36,
+    pending_leaves: 0,
+    open_complaints: 0
+  });
+
+  useEffect(() => {
+    analyticsService.getWardenAnalytics()
+      .then(res => setStats(res))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <div className="space-y-6 animate-fade-in font-sans">
       <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-[#EEF2FF] via-[#F3E8FF] to-[#E0E7FF] border border-indigo-100/80 p-7 sm:p-8 shadow-sm shadow-indigo-100/50">
@@ -573,20 +650,20 @@ function HostelWardenDashboard({ name }: DashboardProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Occupancy</span>
-          <p className="text-3xl font-extrabold text-slate-900 mt-2">88.4%</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Rooms</span>
+          <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total_rooms}</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Open Tickets</span>
-          <p className="text-3xl font-extrabold text-rose-500 mt-2">4 Pending</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Hostel Complaints</span>
+          <p className="text-3xl font-extrabold text-rose-500 mt-2">{stats.open_complaints} Open</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Late Curfew Passes</span>
-          <p className="text-3xl font-extrabold text-indigo-600 mt-2">6 Issued</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Leave Passes</span>
+          <p className="text-3xl font-extrabold text-indigo-600 mt-2">{stats.pending_leaves} Pending</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Mess Food Waste</span>
-          <p className="text-3xl font-extrabold text-emerald-600 mt-2">-14% vs avg</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Available Beds</span>
+          <p className="text-3xl font-extrabold text-emerald-600 mt-2">{stats.available_beds} Beds</p>
         </div>
       </div>
     </div>
@@ -597,6 +674,19 @@ function HostelWardenDashboard({ name }: DashboardProps) {
 // 5. PLACEMENT OFFICER DASHBOARD
 // ----------------------------------------------------
 function PlacementOfficerDashboard({ name }: DashboardProps) {
+  const [stats, setStats] = useState({
+    recruiting_companies: 12,
+    active_drives: 4,
+    total_applications: 0,
+    placement_percentage: 88.5
+  });
+
+  useEffect(() => {
+    analyticsService.getPlacementOfficerAnalytics()
+      .then(res => setStats(res))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <div className="space-y-6 animate-fade-in font-sans">
       <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-[#EEF2FF] via-[#F3E8FF] to-[#E0E7FF] border border-indigo-100/80 p-7 sm:p-8 shadow-sm shadow-indigo-100/50">
@@ -604,26 +694,26 @@ function PlacementOfficerDashboard({ name }: DashboardProps) {
           Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">Placement Officer {name}</span> 👋
         </h1>
         <p className="text-slate-600 text-sm sm:text-base max-w-xl font-medium leading-relaxed">
-          Oversee company recruiter drives, monitor 100,000+ student dataset placement predictions, and analyze salary LPA ranges.
+          Oversee company recruiter drives, monitor student dataset placement predictions, and analyze salary LPA ranges.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Campus Placement Rate</span>
-          <p className="text-3xl font-extrabold text-emerald-600 mt-2">54.5%</p>
+          <p className="text-3xl font-extrabold text-emerald-600 mt-2">{stats.placement_percentage}%</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Recruiters</span>
-          <p className="text-3xl font-extrabold text-indigo-600 mt-2">18 Drives</p>
+          <p className="text-3xl font-extrabold text-indigo-600 mt-2">{stats.active_drives} Drives</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Avg Package (LPA)</span>
-          <p className="text-3xl font-extrabold text-slate-900 mt-2">13.3 LPA</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Applications</span>
+          <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total_applications}</p>
         </div>
         <div className="bg-white rounded-[20px] p-5 border border-slate-100 shadow-sm shadow-slate-200/50">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Top Package (LPA)</span>
-          <p className="text-3xl font-extrabold text-indigo-600 mt-2">24.5 LPA</p>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recruiting Companies</span>
+          <p className="text-3xl font-extrabold text-indigo-600 mt-2">{stats.recruiting_companies}</p>
         </div>
       </div>
     </div>
