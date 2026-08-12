@@ -92,15 +92,8 @@ class CampusRAGAssistant:
         self.api_key = gemini_api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         self.vector_stores: Dict[str, Any] = {}
 
-        if HuggingFaceEmbeddings:
-            print("[1/4] Initializing HuggingFace Embeddings model...")
-            try:
-                self.embeddings = HuggingFaceEmbeddings(model_name=embedding_model_name)
-            except Exception as e:
-                print(f"[!] Primary model load failed: {e}. Falling back to all-MiniLM-L6-v2...")
-                self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        else:
-            self.embeddings = None
+        self.embedding_model_name = embedding_model_name
+        self.embeddings = None
 
         if RecursiveCharacterTextSplitter:
             self.text_splitter = RecursiveCharacterTextSplitter(
@@ -191,7 +184,23 @@ class CampusRAGAssistant:
 
     def get_vector_store(self, category: str = "students"):
         """Retrieves or loads vector store collection for a specific category."""
-        if not Chroma or not self.embeddings:
+        if not Chroma:
+            return None
+
+        if self.embeddings is None:
+            import gc
+            gc.collect()
+            if HuggingFaceEmbeddings:
+                try:
+                    self.embeddings = HuggingFaceEmbeddings(model_name=self.embedding_model_name)
+                except Exception as e:
+                    print(f"[!] Primary model load failed: {e}. Falling back...")
+                    try:
+                        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+                    except Exception:
+                        self.embeddings = None
+
+        if not self.embeddings:
             return None
 
         if category not in self.vector_stores:

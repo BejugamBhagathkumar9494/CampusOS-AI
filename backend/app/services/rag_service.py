@@ -48,51 +48,45 @@ try:
 except ImportError:
     RecursiveCharacterTextSplitter = None
 
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-except ImportError:
-    HuggingFaceEmbeddings = None
-
-# Supabase Client & Config
-from app.core.config import settings
-from app.core.supabase import get_supabase_client, get_supabase_admin_client
-try:
-    from app.services.rag_langchain_assistant import CampusRAGAssistant
-except ImportError:
-    from rag_langchain_assistant import CampusRAGAssistant
-
-# Global Embeddings Singleton (all-mpnet-base-v2 -> 768 dimensions)
+# Global Embeddings & Assistant Singletons
 _embeddings_instance: Optional[Any] = None
-_rag_assistant_fallback: Optional[CampusRAGAssistant] = None
+_rag_assistant_fallback: Optional[Any] = None
 
 
 def get_embeddings_model():
-    """Initializes and returns 768-dim HuggingFace Embeddings model (all-mpnet-base-v2)."""
+    """Initializes and returns 768-dim HuggingFace Embeddings model lazily with gc.collect()."""
     global _embeddings_instance
     if _embeddings_instance is None:
         import gc
         gc.collect()
-        if HuggingFaceEmbeddings:
+        try:
+            from langchain_huggingface import HuggingFaceEmbeddings
+            _embeddings_instance = HuggingFaceEmbeddings(
+                model_name="sentence-transformers/all-mpnet-base-v2"
+            )
+        except Exception as e:
+            print(f"[!] Primary 768-dim embeddings model load failed: {e}")
             try:
+                from langchain_huggingface import HuggingFaceEmbeddings
                 _embeddings_instance = HuggingFaceEmbeddings(
-                    model_name="sentence-transformers/all-mpnet-base-v2"
+                    model_name="sentence-transformers/all-MiniLM-L6-v2"
                 )
-            except Exception as e:
-                print(f"[!] Embedding load fallback: {e}")
-                try:
-                    _embeddings_instance = HuggingFaceEmbeddings(
-                        model_name="sentence-transformers/all-MiniLM-L6-v2"
-                    )
-                except Exception as err:
-                    print(f"[!] Embeddings model fallback failed: {err}")
-                    _embeddings_instance = None
+            except Exception as err:
+                print(f"[!] Embeddings model fallback failed: {err}")
+                _embeddings_instance = None
     return _embeddings_instance
 
 
-def get_fallback_assistant() -> CampusRAGAssistant:
-    """Returns local Chroma RAG assistant fallback."""
+def get_fallback_assistant():
+    """Lazily loads local Chroma RAG assistant fallback to prevent container OOM on Render startup."""
     global _rag_assistant_fallback
     if _rag_assistant_fallback is None:
+        import gc
+        gc.collect()
+        try:
+            from app.services.rag_langchain_assistant import CampusRAGAssistant
+        except ImportError:
+            from rag_langchain_assistant import CampusRAGAssistant
         _rag_assistant_fallback = CampusRAGAssistant()
     return _rag_assistant_fallback
 
