@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
-from app.api.deps import get_current_user
-from app.models import User
+from sqlalchemy.orm import Session
+from app.api.deps import get_db, get_current_user
+from app.models import User, FeeStructure, Student
 
 router = APIRouter(prefix="/finance", tags=["Finance Management"])
 
@@ -8,19 +9,34 @@ router = APIRouter(prefix="/finance", tags=["Finance Management"])
 @router.get("/fees")
 def get_fees(
     student_id: str = "1",
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Get fee details (dues, structural breakdown, paid status)."""
+    try:
+        s_id = int(student_id)
+        fee = db.query(FeeStructure).filter(FeeStructure.student_id == s_id).first()
+    except (ValueError, TypeError):
+        fee = None
+
+    if fee:
+        dues = max(0.0, float(fee.total_amount - fee.paid_amount))
+        return {
+            "student_id": student_id,
+            "dues": dues,
+            "total_paid": float(fee.paid_amount),
+            "due_date": fee.due_date.isoformat() if fee.due_date else None,
+            "breakdown": [
+                {"category": "Tuition Fee & Charges", "amount": float(fee.total_amount), "status": "Pending" if dues > 0 else "Paid"}
+            ]
+        }
+
     return {
         "student_id": student_id,
-        "dues": 1250.0,
-        "total_paid": 5000.0,
-        "due_date": "2026-08-15",
-        "breakdown": [
-            {"category": "Tuition Fee", "amount": 4000.0, "status": "Paid"},
-            {"category": "Lab & Library Fee", "amount": 1000.0, "status": "Paid"},
-            {"category": "Semester Exam & Placement Cell Fee", "amount": 1250.0, "status": "Pending"}
-        ]
+        "dues": 0.0,
+        "total_paid": 0.0,
+        "due_date": None,
+        "breakdown": []
     }
 
 

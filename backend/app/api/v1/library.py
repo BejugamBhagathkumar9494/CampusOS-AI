@@ -18,18 +18,6 @@ def semantic_search_books(query: str = "", db: Session = Depends(get_db)):
     else:
         books = db.query(Book).all()
 
-    if not books:
-        # Initial default recommendations if DB search yields empty
-        return {
-            "query": query,
-            "results": [
-                {"id": 1, "title": "Introduction to Algorithms (4th Ed)", "author": "Cormen, Leiserson", "isbn": "978-0262033848", "category": "Computer Science", "copies_available": 3, "location": "Rack C-4"},
-                {"id": 2, "title": "Compilers: Principles, Techniques, & Tools", "author": "Aho, Sethi, Ullman", "isbn": "978-0321486813", "category": "Computer Science", "copies_available": 0, "location": "Rack E-1"},
-                {"id": 3, "title": "Computer Networking: A Top-Down Approach", "author": "Kurose, Ross", "isbn": "978-0133594140", "category": "Networks", "copies_available": 5, "location": "Rack B-2"},
-                {"id": 4, "title": "Pattern Recognition & Machine Learning", "author": "Christopher Bishop", "isbn": "978-0387310732", "category": "Artificial Intelligence", "copies_available": 4, "location": "Rack AI-1"}
-            ]
-        }
-
     return {
         "query": query,
         "results": [

@@ -8,44 +8,20 @@ router = APIRouter(prefix="/transport", tags=["Transport Management"])
 
 @router.get("/routes")
 def get_routes(db: Session = Depends(get_db)):
-    """Get optimized transit routes for university buses."""
+    """Get transit routes for university buses."""
     routes_in_db = db.query(BusRoute).all()
-    if routes_in_db:
-        return {
-            "routes": [
-                {
-                    "id": r.id,
-                    "route": r.route_name,
-                    "bus_number": r.bus.bus_number if r.bus else "TS-09-UA-1234",
-                    "driver_name": r.bus.driver_name if r.bus else "Ramesh Kumar",
-                    "eta": "8 mins" if r.id == 1 else "14 mins",
-                    "demand": "High" if r.id == 1 else "Low",
-                    "stops": r.stops.split(",") if r.stops else ["Central Station", "Campus"]
-                }
-                for r in routes_in_db
-            ]
-        }
-
     return {
         "routes": [
             {
-                "id": 1,
-                "route": "Route 10A (Central Station to Campus)",
-                "bus_number": "TS-09-UA-1234",
-                "driver_name": "Ramesh Kumar",
-                "eta": "8 mins",
-                "demand": "High",
-                "stops": ["Central Station", "Secunderabad", "Campus Gate 1"]
-            },
-            {
-                "id": 2,
-                "route": "Route 14B (Metro Link to North Gate)",
-                "bus_number": "TS-09-UA-5678",
-                "driver_name": "Suresh Singh",
-                "eta": "14 mins",
-                "demand": "Low",
-                "stops": ["Metro Link", "Campus Gate 2", "Library"]
+                "id": r.id,
+                "route": r.route_name,
+                "bus_number": r.bus.bus_number if r.bus else "Bus",
+                "driver_name": r.bus.driver_name if r.bus else None,
+                "eta": "Scheduled",
+                "demand": "Normal",
+                "stops": r.stops.split(",") if r.stops else []
             }
+            for r in routes_in_db
         ]
     }
 
