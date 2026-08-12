@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     SUPABASE_BUCKET_NAME: str = "campusos-media"
 
     # AI API Keys
+    GEMINI_API_KEY: str = ""
+    GOOGLE_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     LLAMA_API_BASE: str = ""
     LLAMA_API_KEY: str = ""
