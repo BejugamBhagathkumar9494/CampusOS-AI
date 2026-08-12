@@ -85,7 +85,7 @@ class CampusRAGAssistant:
     def __init__(
         self,
         persist_directory: Path = PERSIST_DIR,
-        embedding_model_name: str = "sentence-transformers/all-mpnet-base-v2",
+        embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         gemini_api_key: Optional[str] = None
     ):
         self.persist_dir = str(persist_directory)
