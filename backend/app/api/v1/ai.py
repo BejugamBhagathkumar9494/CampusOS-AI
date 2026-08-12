@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
@@ -21,7 +21,7 @@ from app.services.ai_agents import (
     finance as finance_agent,
     knowledge as knowledge_agent
 )
-from app.services.rag_service import execute_rag_query
+from app.services.rag_service import execute_pgvector_rag_query, process_and_ingest_document
 
 router = APIRouter(prefix="/ai", tags=["AI & Agents"])
 
@@ -32,7 +32,10 @@ def chat_with_agent(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Invoke the role-aware AI Assistant querying real user-authorized database context and RAG documents."""
+    """
+    Invoke the role-aware AI Assistant querying real database context and 
+    Supabase PostgreSQL pgvector knowledge base.
+    """
     query = payload.message.lower()
     chat_id = payload.chat_id or "session_1"
     
@@ -42,7 +45,7 @@ def chat_with_agent(
     student = db.query(Student).filter(Student.user_id == current_user.id).first() if current_user else None
     student_name = current_user.full_name if current_user else "Student"
 
-    # Specific database intent handling
+    # Specific database intent handling for standard transactional queries
     if "student" in role_names:
         if any(k in query for k in ["attendance", "present", "absent", "shortage"]):
             response_text = f"Hi {student_name}! Your current overall attendance is 87.5% (28 present out of 32 total classes). You are above the 75% threshold."
@@ -55,23 +58,68 @@ def chat_with_agent(
             prediction = predict_placement_readiness(cgpa=float(student.cgpa) if student and hasattr(student, "cgpa") else 8.4)
             response_text = f"Your Placement Readiness score is {prediction['readiness_score']:.1f}% ({prediction['readiness_rating']}). Top recruiters active: Google, Microsoft, TCS Digital."
         else:
-            # RAG Retrieval from Students PDF
-            rag_res = execute_rag_query(query=payload.message, role_or_category="students", k=2)
-            response_text = f"Hello {student_name}! Based on your Student Success RAG Documents:\n\n{rag_res['answer']}"
+            # Role-Aware Supabase pgvector RAG query
+            rag_res = execute_pgvector_rag_query(query=payload.message, user_role="student", match_threshold=0.25, k=3)
+            response_text = f"Hello {student_name}!\n\n{rag_res['answer']}"
 
     elif "faculty" in role_names:
-        rag_res = execute_rag_query(query=payload.message, role_or_category="faculty", k=2)
-        response_text = f"Welcome Dr. {student_name}! Based on Faculty RAG Documents:\n\n{rag_res['answer']}"
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="faculty", match_threshold=0.25, k=3)
+        response_text = f"Welcome Dr. {student_name}!\n\n{rag_res['answer']}"
 
     elif "placement_officer" in role_names or "placement" in role_names:
-        rag_res = execute_rag_query(query=payload.message, role_or_category="placements", k=2)
-        response_text = f"Welcome Placement Officer {student_name}! Based on Placements RAG Documents:\n\n{rag_res['answer']}"
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="placement_officer", match_threshold=0.25, k=3)
+        response_text = f"Welcome Placement Officer {student_name}!\n\n{rag_res['answer']}"
+
+    elif "hostel_warden" in role_names:
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="hostel_warden", match_threshold=0.25, k=3)
+        response_text = f"Welcome Warden {student_name}!\n\n{rag_res['answer']}"
 
     else:
-        rag_res = execute_rag_query(query=payload.message, role_or_category="students", k=2)
-        response_text = f"Greetings {student_name}! Based on CampusOS RAG Knowledge Base:\n\n{rag_res['answer']}"
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="admin", match_threshold=0.25, k=3)
+        response_text = f"Greetings Admin {student_name}!\n\n{rag_res['answer']}"
 
     return ChatResponse(chat_id=chat_id, response=response_text)
+
+
+@router.post("/knowledge/upload")
+async def upload_knowledge_document(
+    file: UploadFile = File(...),
+    category: str = Form("General"),
+    allowed_roles: Optional[str] = Form("student,faculty,admin,hostel_warden,placement_officer"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Document Ingestion Pipeline:
+    Uploads PDF or DOCX file into Supabase Storage 'campusos-media', extracts text,
+    splits into chunks, generates 768-dim embeddings, and stores in Supabase pgvector.
+    """
+    if not file.filename.endswith((".pdf", ".docx", ".doc")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported file format. Please upload a PDF or DOCX document."
+        )
+
+    contents = await file.read()
+    roles_list = [r.strip() for r in allowed_roles.split(",") if r.strip()] if allowed_roles else ["student", "faculty", "admin"]
+
+    try:
+        res = process_and_ingest_document(
+            file_name=file.filename,
+            file_bytes=contents,
+            category=category,
+            uploader_id=str(current_user.id) if current_user else None,
+            allowed_roles=roles_list
+        )
+        return {
+            "status": "success",
+            "message": f"Successfully processed and indexed '{file.filename}' into Supabase pgvector.",
+            "data": res
+        }
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Document ingestion failed: {str(err)}"
+        )
 
 
 @router.get("/chat/history")
@@ -86,19 +134,21 @@ def knowledge_rag_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """LangChain RAG search through Students, Placements, and Faculty PDF documents."""
-    role_or_cat = payload.category if payload.category else "students"
-    rag_results = knowledge_agent.perform_rag_query(query=payload.query, category=role_or_cat)
+    """
+    Role-aware semantic similarity search through Supabase PostgreSQL pgvector document chunks.
+    """
+    user_role = current_user.roles[0].name.lower() if hasattr(current_user, "roles") and current_user.roles else "student"
+    rag_res = execute_pgvector_rag_query(query=payload.query, user_role=user_role, match_threshold=0.20, k=5)
     
     results = []
-    for i, m in enumerate(rag_results, 1):
+    for i, doc in enumerate(rag_res.get("source_documents", []), 1):
         results.append(
             RAGSearchResultItem(
                 id=i,
-                title=m["document_title"],
-                category=role_or_cat.capitalize(),
-                content=m["snippet"],
-                score=m["relevance_score"]
+                title=f"{doc.get('file_name', 'CampusOS Document')} (Page {doc.get('page_number', 1)})",
+                category=user_role.capitalize(),
+                content=doc.get("content", ""),
+                score=round(doc.get("score", 0.9), 2)
             )
         )
             
