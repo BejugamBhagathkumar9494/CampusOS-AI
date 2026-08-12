@@ -43,6 +43,10 @@ pyvenv.cfg
 *.db
 *.sqlite
 backend/campusos Datasets/studentVle.csv
+chroma_langchain_db/
+backend/chroma_langchain_db/
+backend/test_embeddings.py
+backend/test_rag_paths.py
 
 # Environment Files
 .env
