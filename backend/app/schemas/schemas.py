@@ -165,6 +165,8 @@ class PlacementReadinessResponse(BaseModel):
 class ChatMessage(BaseModel):
     message: str
     chat_id: Optional[str] = None
+    category: Optional[str] = None
+    role: Optional[str] = None
 
 
 class ChatResponse(BaseModel):

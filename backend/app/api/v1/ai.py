@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, get_current_user
+from app.api.deps import get_db, get_current_user, get_current_user_optional
 from app.models import User, Student, HostelRoom, Subject, KnowledgeDocument
 from app.schemas import (
     ChatMessage, 
@@ -30,23 +30,31 @@ router = APIRouter(prefix="/ai", tags=["AI & Agents"])
 def chat_with_agent(
     payload: ChatMessage,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """
     Invoke the role-aware AI Assistant querying real database context and 
-    Supabase PostgreSQL pgvector knowledge base.
+    Supabase PostgreSQL pgvector knowledge base across Student, Faculty, and Placement dashboards.
     """
     query = payload.message.lower()
     chat_id = payload.chat_id or "session_1"
     
-    # Retrieve user's role and database profiles
-    role_names = [r.name.lower() for r in current_user.roles] if hasattr(current_user, "roles") and current_user.roles else ["student"]
+    # Determine active role/category from payload or current user profile
+    requested_role = (payload.role or payload.category or "").lower()
+    
+    if current_user and hasattr(current_user, "roles") and current_user.roles:
+        role_names = [r.name.lower() for r in current_user.roles]
+    elif requested_role:
+        role_names = [requested_role]
+    else:
+        role_names = ["student"]
+
     primary_role = role_names[0] if role_names else "student"
     student = db.query(Student).filter(Student.user_id == current_user.id).first() if current_user else None
-    student_name = current_user.full_name if current_user else "Student"
+    student_name = current_user.full_name if current_user else "User"
 
     # Specific database intent handling for standard transactional queries
-    if "student" in role_names:
+    if "student" in role_names or primary_role == "student":
         if any(k in query for k in ["attendance", "present", "absent", "shortage"]):
             response_text = f"Hi {student_name}! Your current overall attendance is 87.5% (28 present out of 32 total classes). You are above the 75% threshold."
         elif any(k in query for k in ["exam", "timetable", "schedule", "test"]):
@@ -58,24 +66,24 @@ def chat_with_agent(
             prediction = predict_placement_readiness(cgpa=float(student.cgpa) if student and hasattr(student, "cgpa") else 8.4)
             response_text = f"Your Placement Readiness score is {prediction['readiness_score']:.1f}% ({prediction['readiness_rating']}). Top recruiters active: Google, Microsoft, TCS Digital."
         else:
-            # Role-Aware Supabase pgvector RAG query
-            rag_res = execute_pgvector_rag_query(query=payload.message, user_role="student", match_threshold=0.25, k=3)
+            # Role-Aware Supabase pgvector RAG query for Students
+            rag_res = execute_pgvector_rag_query(query=payload.message, user_role="student", match_threshold=0.20, k=3)
             response_text = f"Hello {student_name}!\n\n{rag_res['answer']}"
 
-    elif "faculty" in role_names:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="faculty", match_threshold=0.25, k=3)
+    elif "faculty" in role_names or primary_role == "faculty":
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="faculty", match_threshold=0.20, k=3)
         response_text = f"Welcome Dr. {student_name}!\n\n{rag_res['answer']}"
 
-    elif "placement_officer" in role_names or "placement" in role_names:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="placement_officer", match_threshold=0.25, k=3)
+    elif "placement_officer" in role_names or "placement" in role_names or primary_role in ["placement_officer", "placements"]:
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="placement_officer", match_threshold=0.20, k=3)
         response_text = f"Welcome Placement Officer {student_name}!\n\n{rag_res['answer']}"
 
-    elif "hostel_warden" in role_names:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="hostel_warden", match_threshold=0.25, k=3)
+    elif "hostel_warden" in role_names or primary_role == "hostel_warden":
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="hostel_warden", match_threshold=0.20, k=3)
         response_text = f"Welcome Warden {student_name}!\n\n{rag_res['answer']}"
 
     else:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="admin", match_threshold=0.25, k=3)
+        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="admin", match_threshold=0.20, k=3)
         response_text = f"Greetings Admin {student_name}!\n\n{rag_res['answer']}"
 
     return ChatResponse(chat_id=chat_id, response=response_text)

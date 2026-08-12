@@ -1,4 +1,4 @@
-from typing import List, Generator
+from typing import List, Generator, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -13,6 +13,10 @@ from app.schemas import TokenPayload
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login"
 )
+optional_oauth2 = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/auth/login",
+    auto_error=False
+)
 
 def get_db() -> Generator:
     """Dependency for database sessions."""
@@ -21,6 +25,24 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+
+
+def get_current_user_optional(
+    db: Session = Depends(get_db), token: Optional[str] = Depends(optional_oauth2)
+) -> Optional[User]:
+    """Optional user dependency for public/unauthenticated fallback AI access."""
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
+        token_subject: str = payload.get("sub")
+        if not token_subject:
+            return None
+        return db.query(User).filter(User.email == token_subject).first()
+    except Exception:
+        return None
 
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
