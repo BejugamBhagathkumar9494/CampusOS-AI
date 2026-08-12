@@ -242,7 +242,11 @@ class CampusRAGAssistant:
 
     def docu_chat(self, user_query: str, category: str = "students", k: int = 3) -> Dict[str, Any]:
         """Main RAG pipeline entry point. Retrieves context and generates answer."""
-        context, source_docs = self.retrieve_context(user_query, category=category, k=k)
+        try:
+            context, source_docs = self.retrieve_context(user_query, category=category, k=k)
+        except Exception as err:
+            print(f"⚠️ Retrieve Context Exception: {err}")
+            context, source_docs = "", []
 
         system_message = (
             "You are a helpful CampusOS AI Assistant.\n"

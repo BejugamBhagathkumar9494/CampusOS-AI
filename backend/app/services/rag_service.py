@@ -67,22 +67,21 @@ _rag_assistant_fallback: Optional[CampusRAGAssistant] = None
 
 
 def get_embeddings_model():
-    """Initializes and returns low-memory HuggingFace Embeddings model."""
+    """Initializes and returns 768-dim HuggingFace Embeddings model (all-mpnet-base-v2)."""
     global _embeddings_instance
     if _embeddings_instance is None:
         import gc
         gc.collect()
         if HuggingFaceEmbeddings:
             try:
-                # Use lightweight all-MiniLM-L6-v2 (80MB RAM) for low memory deployment
                 _embeddings_instance = HuggingFaceEmbeddings(
-                    model_name="sentence-transformers/all-MiniLM-L6-v2"
+                    model_name="sentence-transformers/all-mpnet-base-v2"
                 )
             except Exception as e:
                 print(f"[!] Embedding load fallback: {e}")
                 try:
                     _embeddings_instance = HuggingFaceEmbeddings(
-                        model_name="sentence-transformers/all-mpnet-base-v2"
+                        model_name="sentence-transformers/all-MiniLM-L6-v2"
                     )
                 except Exception as err:
                     print(f"[!] Embeddings model fallback failed: {err}")
