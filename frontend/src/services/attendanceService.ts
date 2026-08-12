@@ -23,11 +23,8 @@ export const attendanceService = {
 
     if (!studentId) {
       return {
-        overall_rate: 85.0,
-        subjects: [
-          { subject_name: 'Automata Theory', subject_code: 'CS301', total_classes: 30, attended_classes: 26, attendance_rate: 86.6, status: 'Safe' },
-          { subject_name: 'Computer Networks', subject_code: 'CS302', total_classes: 32, attended_classes: 29, attendance_rate: 90.6, status: 'Safe' }
-        ]
+        overall_rate: 0,
+        subjects: []
       };
     }
 
@@ -37,19 +34,23 @@ export const attendanceService = {
       .eq('student_id', studentId);
 
     if (!records || records.length === 0) {
-      const { data: courses } = await supabase.from('courses').select('code, title');
-      const fallbackSubjects = (courses || []).map(c => ({
-        subject_name: c.title,
-        subject_code: c.code,
-        total_classes: 20,
-        attended_classes: 18,
-        attendance_rate: 90.0,
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('courses(code, title)')
+        .eq('student_id', studentId);
+
+      const subjects = (enrollments || []).map((e: any) => ({
+        subject_name: e.courses?.title || 'Subject',
+        subject_code: e.courses?.code || 'CS',
+        total_classes: 0,
+        attended_classes: 0,
+        attendance_rate: 100,
         status: 'Safe'
       }));
 
       return {
-        overall_rate: fallbackSubjects.length > 0 ? 90.0 : 0,
-        subjects: fallbackSubjects
+        overall_rate: 100.0,
+        subjects
       };
     }
 

@@ -14,23 +14,21 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './features/dashboard/Dashboard';
 import AIAssistant from './features/ai-assistant/AIAssistant';
 import UserManagementPage from './features/admin/UserManagementPage';
-import {
-  Academics,
-  Attendance,
-  Exams,
-  Assignments,
-  Library,
-  Hostel,
-  Transport,
-  Placements,
-  Finance,
-  Events,
-  Clubs,
-  Notices,
-  AIInsights,
-  Settings,
-  Profile,
-} from './features/placeholders';
+import Academics from './features/academics/AcademicsPage';
+import Attendance from './features/attendance/AttendancePage';
+import Exams from './features/exams/ExamsPage';
+import Assignments from './features/assignments/AssignmentsPage';
+import Library from './features/library/LibraryPage';
+import Hostel from './features/hostel/HostelPage';
+import Transport from './features/transport/TransportPage';
+import Placements from './features/placements/PlacementsPage';
+import Finance from './features/finance/FinancePage';
+import Events from './features/events/EventsPage';
+import Clubs from './features/clubs/ClubsPage';
+import Notices from './features/notices/NoticesPage';
+import AIInsights from './features/ai-insights/AIInsightsPage';
+import Settings from './features/settings/SettingsPage';
+import Profile from './features/profile/ProfilePage';
 
 // Automatically routes users to their trusted role-specific home dashboard
 const DashboardRedirect = () => {
