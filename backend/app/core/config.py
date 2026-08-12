@@ -30,8 +30,12 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "replace_this_with_a_super_secure_random_hex_key_for_production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    ALLOWED_ORIGINS: Union[str, List[str]] = ["*"]
+    ALLOWED_ORIGINS: Union[str, List[str]] = [
+        "https://campus-os-ai-jbth.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "*"
+    ]
 
     @property
     def cors_origins(self) -> List[str]:
