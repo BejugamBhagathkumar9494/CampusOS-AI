@@ -73,11 +73,32 @@ export async function chatWithAgent(message: string, chatId?: string): Promise<a
   });
 }
 
-export async function searchKnowledgeBase(query: string): Promise<any> {
+export async function searchKnowledgeBase(query: string, category?: string): Promise<any> {
   return fetchWithAuth('/ai/knowledge/search', {
     method: 'POST',
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, category }),
   });
+}
+
+export async function uploadKnowledgeDocument(file: File, category: string = 'General', allowedRoles: string = 'student,faculty,admin'): Promise<any> {
+  const token = await getAuthToken();
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('category', category);
+  formData.append('allowed_roles', allowedRoles);
+
+  const API_URL = getApiBaseUrl();
+  const response = await fetch(`${API_URL}/ai/knowledge/upload`, {
+    method: 'POST',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload Error ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
 }
 
 export interface PlacementReadinessInput {
