@@ -51,15 +51,16 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_BUCKET_NAME: str = "campusos-media"
 
-    # AI API Keys
+    # AI & Vector RAG Settings
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     LLAMA_API_BASE: str = ""
     LLAMA_API_KEY: str = ""
     MISTRAL_API_KEY: str = ""
-    DEFAULT_EMBEDDING_MODEL: str = "BAAI/bge-large-en-v1.5"
-
+    DEFAULT_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    VECTOR_MATCH_THRESHOLD: float = 0.20
+    VECTOR_MATCH_COUNT: int = 5
     # Environment
     ENV: str = "development"
 
