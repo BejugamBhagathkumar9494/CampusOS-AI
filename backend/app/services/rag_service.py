@@ -99,14 +99,20 @@ def get_fallback_assistant() -> CampusRAGAssistant:
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> List[Tuple[int, str]]:
-    """Extracts text page-by-page from binary PDF data."""
+    """Extracts text page-by-page from binary PDF data with text fallback."""
     pages = []
     if pypdf:
-        reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-        for page_idx, page in enumerate(reader.pages, 1):
-            text = page.extract_text() or ""
-            if text.strip():
-                pages.append((page_idx, text.strip()))
+        try:
+            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+            for page_idx, page in enumerate(reader.pages, 1):
+                text = page.extract_text() or ""
+                if text.strip():
+                    pages.append((page_idx, text.strip()))
+        except Exception as pdf_err:
+            print(f"⚠️ PDF Parser fallback: {pdf_err}")
+            fallback_text = file_bytes.decode("utf-8", errors="ignore").strip()
+            if fallback_text:
+                pages.append((1, fallback_text))
     return pages
 
 
