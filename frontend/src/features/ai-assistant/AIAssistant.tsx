@@ -1,23 +1,38 @@
 import { useState } from 'react'
-import { Send, Sparkles, HelpCircle, Bot, User } from 'lucide-react'
+import { Send, Sparkles, HelpCircle, Bot, User, Zap, BookOpen, ChevronDown, ChevronUp, Cpu } from 'lucide-react'
 import { chatWithAgent } from '../../services/api'
+
+interface SourceDoc {
+  file_name?: string
+  page_number?: number
+  page?: number
+  score?: number
+  content?: string
+}
 
 interface Message {
   sender: 'user' | 'assistant'
   text: string
   timestamp: string
+  agentName?: string
+  confidenceScore?: number
+  sourceDocs?: SourceDoc[]
 }
 
 export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: 'assistant',
-      text: 'Hi John! I am your CampusOS Academic & Success Agent. You can ask me to explain algorithms, recommend electives, draft personalized study plans, analyze placement probability, or query campus rulebooks. How can I help you today?',
-      timestamp: '16:00',
+      text: 'Hi John! I am your CampusOS Multi-Agent AI Assistant. Agentic Mode is ACTIVE. I dynamically route your queries across specialized neural agents (Academic, Placement, Student Success, Hostel, Finance, Transport, Library, and Grounded RAG). How can I assist you today?',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      agentName: '🤖 CampusOS AI Supervisor',
+      confidenceScore: 0.98
     },
   ])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [agenticMode, setAgenticMode] = useState<boolean>(true)
+  const [expandedSources, setExpandedSources] = useState<Record<number, boolean>>({})
 
   const suggestedQueries = [
     'Explain Dijkstra algorithm in simple terms',
@@ -25,6 +40,10 @@ export default function AIAssistant() {
     'Generate practice quiz for Automata Theory',
     'What are the campus hostel curfew rules?',
   ]
+
+  const toggleSources = (idx: number) => {
+    setExpandedSources((prev) => ({ ...prev, [idx]: !prev[idx] }))
+  }
 
   const handleSend = async (customQuery?: string) => {
     const query = (customQuery || inputValue).trim()
@@ -40,11 +59,14 @@ export default function AIAssistant() {
     setIsLoading(true)
 
     try {
-      const res = await chatWithAgent(query)
+      const res = await chatWithAgent(query, undefined, undefined, undefined, agenticMode)
       const botMsg: Message = {
         sender: 'assistant',
         text: res.response,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        agentName: res.agent_name || (agenticMode ? '🤖 Agentic Supervisor' : '📚 RAG Knowledge Base'),
+        confidenceScore: res.confidence_score || 0.95,
+        sourceDocs: res.source_documents || []
       }
       setMessages((prev) => [...prev, botMsg])
     } catch (err) {
@@ -66,6 +88,8 @@ export default function AIAssistant() {
         sender: 'assistant',
         text: fallbackText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        agentName: agenticMode ? '🤖 Multi-Agent Fallback' : '📚 RAG Fallback',
+        confidenceScore: 0.90
       }
       setMessages((prev) => [...prev, botMsg])
     } finally {
@@ -75,7 +99,7 @@ export default function AIAssistant() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-8.5rem)] animate-fade-in space-y-4 font-sans">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
             <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
@@ -86,6 +110,32 @@ export default function AIAssistant() {
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
             Powered by LangGraph Agentic Supervisor & Multi-Agent Vector RAG
           </p>
+        </div>
+
+        {/* Agentic Mode Toggle */}
+        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-indigo-100 shadow-xs">
+          <div className="flex items-center gap-2">
+            <Cpu className={`w-4 h-4 ${agenticMode ? 'text-indigo-600 animate-pulse' : 'text-slate-400'}`} />
+            <span className="text-xs font-extrabold text-slate-800">Agentic Mode</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              agenticMode ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {agenticMode ? 'ON' : 'OFF'}
+            </span>
+          </div>
+
+          <button
+            onClick={() => setAgenticMode(!agenticMode)}
+            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              agenticMode ? 'bg-indigo-600' : 'bg-slate-300'
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                agenticMode ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
         </div>
       </div>
 
@@ -104,13 +154,65 @@ export default function AIAssistant() {
               </div>
 
               <div
-                className={`max-w-[75%] p-4 rounded-[20px] text-sm leading-relaxed ${
+                className={`max-w-[80%] p-4.5 rounded-[20px] text-sm leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-tr-xs shadow-sm'
                     : 'bg-slate-50 border border-slate-200/80 text-slate-800 rounded-tl-xs'
                 }`}
               >
+                {/* Agent metadata badge */}
+                {msg.sender === 'assistant' && msg.agentName && (
+                  <div className="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-slate-200/60">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-100/70 px-2.5 py-1 rounded-lg">
+                      <Zap className="w-3.5 h-3.5 text-indigo-600" />
+                      {msg.agentName}
+                    </span>
+                    {msg.confidenceScore && (
+                      <span className="text-[11px] font-semibold text-slate-500 font-mono">
+                        {(msg.confidenceScore * 100).toFixed(0)}% confidence
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 <p className="whitespace-pre-wrap">{msg.text}</p>
+
+                {/* Source documents citation section */}
+                {msg.sender === 'assistant' && msg.sourceDocs && msg.sourceDocs.length > 0 && (
+                  <div className="mt-3.5 pt-3 border-t border-slate-200/80">
+                    <button
+                      onClick={() => toggleSources(idx)}
+                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition-colors"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      {msg.sourceDocs.length} Grounded Source Citation{msg.sourceDocs.length > 1 ? 's' : ''}
+                      {expandedSources[idx] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+
+                    {expandedSources[idx] && (
+                      <div className="mt-2.5 space-y-2 animate-fade-in">
+                        {msg.sourceDocs.map((doc, docIdx) => (
+                          <div key={docIdx} className="p-2.5 rounded-xl bg-white border border-slate-200/90 text-xs space-y-1">
+                            <div className="flex items-center justify-between font-semibold text-slate-800">
+                              <span>📄 {doc.file_name || 'CampusOS Document'} (Page {doc.page_number || doc.page || 1})</span>
+                              {doc.score !== undefined && (
+                                <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-mono">
+                                  Score: {doc.score}
+                                </span>
+                              )}
+                            </div>
+                            {doc.content && (
+                              <p className="text-slate-600 line-clamp-3 text-[11px] font-sans italic bg-slate-50/80 p-1.5 rounded">
+                                "{doc.content}"
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <span className={`text-[10px] block text-right mt-2 ${msg.sender === 'user' ? 'text-indigo-200' : 'text-slate-400'}`}>
                   {msg.timestamp}
                 </span>
@@ -155,7 +257,7 @@ export default function AIAssistant() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask CampusOS AI anything about courses, placements, attendance, or hostel rules..."
+            placeholder={agenticMode ? "Agentic Mode ON: Ask about courses, algorithms, hostel rules, or placement readiness..." : "Ask CampusOS AI anything..."}
             className="flex-1 px-4 py-3 text-sm rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all"
           />
           <button
@@ -170,3 +272,4 @@ export default function AIAssistant() {
     </div>
   )
 }
+

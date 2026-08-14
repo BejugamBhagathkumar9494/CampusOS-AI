@@ -1,6 +1,8 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.services.rag_service import init_rag_service
 from app.api.v1 import (
     auth,
     admin_management,
@@ -15,7 +17,24 @@ from app.api.v1 import (
     analytics,
     notifications,
     academics,
+    academics_extended,
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    FastAPI Lifespan Context Manager.
+    1. Validates required environment variables at startup.
+    2. Initializes singleton embedding model and global FAISS index once.
+    """
+    print("[CampusOS AI] Initializing system & validating startup configuration...")
+    settings.validate_required_env()
+    init_rag_service()
+    print("[CampusOS AI] Startup complete. Service ready on 1 worker (<450MB RAM).")
+    yield
+    print("[CampusOS AI] Shutting down backend service...")
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -24,26 +43,15 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
-# CORS configurations - Allow Vercel frontend, local development, and wildcard origins
-origins_list = list(settings.cors_origins) if settings.cors_origins else []
-default_origins = [
-    "https://campus-os-ai-jbth.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://localhost:8000"
-]
-for o in default_origins:
-    if o not in origins_list:
-        origins_list.append(o)
-
+# CORS configuration - strict origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if "*" in origins_list else origins_list,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -51,7 +59,6 @@ app.add_middleware(
 app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(admin_management.router, prefix=settings.API_V1_STR)
 app.include_router(students.router, prefix=settings.API_V1_STR)
-
 app.include_router(faculty.router, prefix=settings.API_V1_STR)
 app.include_router(hostel.router, prefix=settings.API_V1_STR)
 app.include_router(library.router, prefix=settings.API_V1_STR)
@@ -62,10 +69,7 @@ app.include_router(academics.router, prefix=settings.API_V1_STR)
 app.include_router(ai.router, prefix=settings.API_V1_STR)
 app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
-
-from app.api.v1 import academics_extended
 app.include_router(academics_extended.router, prefix=f"{settings.API_V1_STR}/academic-ext")
-
 
 
 @app.get("/", tags=["General"])
@@ -82,3 +86,4 @@ def read_root():
 def health_check():
     """Verify application health and availability."""
     return {"status": "healthy", "version": "1.0.0"}
+

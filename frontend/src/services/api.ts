@@ -66,10 +66,10 @@ export async function getStudentMarks(studentId: number = 1): Promise<any> {
   return fetchWithAuth(`/students/${studentId}/marks`);
 }
 
-export async function chatWithAgent(message: string, chatId?: string, category?: string, role?: string): Promise<any> {
+export async function chatWithAgent(message: string, chatId?: string, category?: string, role?: string, agenticMode: boolean = true): Promise<any> {
   return fetchWithAuth('/ai/chat', {
     method: 'POST',
-    body: JSON.stringify({ message, chat_id: chatId, category, role }),
+    body: JSON.stringify({ message, chat_id: chatId, category, role, agentic_mode: agenticMode }),
   });
 }
 

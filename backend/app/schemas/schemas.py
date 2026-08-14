@@ -167,11 +167,17 @@ class ChatMessage(BaseModel):
     chat_id: Optional[str] = None
     category: Optional[str] = None
     role: Optional[str] = None
+    agentic_mode: Optional[bool] = True
 
 
 class ChatResponse(BaseModel):
     chat_id: str
     response: str
+    agent_name: Optional[str] = None
+    confidence_score: Optional[float] = None
+    reasoning_chain: Optional[List[str]] = None
+    source_documents: Optional[List[dict]] = None
+
 
 
 # Knowledge Search Schemas

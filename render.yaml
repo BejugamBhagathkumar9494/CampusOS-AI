@@ -20,8 +20,15 @@ services:
       - key: ENV
         value: production
       - key: ALLOWED_ORIGINS
-        value: "https://campus-os-ai-jbth.vercel.app,http://localhost:5173,http://localhost:3000,*"
+        value: "https://campus-os-ai-jbth.vercel.app,http://localhost:5173"
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET_KEY
         generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+

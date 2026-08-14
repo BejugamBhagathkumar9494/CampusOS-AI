@@ -1,6 +1,7 @@
 import os
+import sys
 from typing import List, Union
-from pydantic import BaseModel, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,7 +11,7 @@ class Settings(BaseSettings):
     )
 
     PROJECT_NAME: str = "CampusOS AI"
-    DEBUG: bool = True
+    DEBUG: bool = False
     API_V1_STR: str = "/api/v1"
 
     # Database
@@ -23,9 +24,6 @@ class Settings(BaseSettings):
             return v.replace("postgres://", "postgresql://", 1)
         return v
 
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
-
     # Security & CORS
     JWT_SECRET_KEY: str = "replace_this_with_a_super_secure_random_hex_key_for_production"
     JWT_ALGORITHM: str = "HS256"
@@ -33,21 +31,24 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: Union[str, List[str]] = [
         "https://campus-os-ai-jbth.vercel.app",
         "http://localhost:5173",
-        "http://localhost:3000",
-        "*"
     ]
 
     @property
     def cors_origins(self) -> List[str]:
         if isinstance(self.ALLOWED_ORIGINS, str):
-            return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
-        return self.ALLOWED_ORIGINS
-
-    # OAuth
-    GOOGLE_CLIENT_ID: str = ""
-    GOOGLE_CLIENT_SECRET: str = ""
-    MICROSOFT_CLIENT_ID: str = ""
-    MICROSOFT_CLIENT_SECRET: str = ""
+            origins = [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
+        else:
+            origins = list(self.ALLOWED_ORIGINS)
+        
+        default_allowed = [
+            "https://campus-os-ai-jbth.vercel.app",
+            "http://localhost:5173",
+        ]
+        cleaned = [o for o in origins if o != "*"]
+        for d in default_allowed:
+            if d not in cleaned:
+                cleaned.append(d)
+        return cleaned
 
     # Storage & Supabase
     SUPABASE_URL: str = ""
@@ -59,14 +60,31 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
-    LLAMA_API_BASE: str = ""
-    LLAMA_API_KEY: str = ""
-    MISTRAL_API_KEY: str = ""
     DEFAULT_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     VECTOR_MATCH_THRESHOLD: float = 0.20
     VECTOR_MATCH_COUNT: int = 5
-    # Environment
-    ENV: str = "development"
+    ENV: str = "production"
+
+    def validate_required_env(self) -> None:
+        """Validates critical environment variables required for backend execution."""
+        required_vars = {
+            "SUPABASE_URL": self.SUPABASE_URL or os.getenv("SUPABASE_URL", ""),
+            "SUPABASE_SERVICE_ROLE_KEY": self.SUPABASE_SERVICE_ROLE_KEY or os.getenv("SUPABASE_SERVICE_ROLE_KEY", ""),
+            "OPENAI_API_KEY": self.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY", ""),
+        }
+        missing = [var for var, val in required_vars.items() if not val or not str(val).strip()]
+        if missing:
+            msg = (
+                f"\n========================================================================\n"
+                f"CRITICAL STARTUP ERROR: Missing required environment variable(s):\n"
+                f"  -> {', '.join(missing)}\n"
+                f"Please ensure SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and OPENAI_API_KEY\n"
+                f"are properly set in environment variables or .env file before running.\n"
+                f"========================================================================\n"
+            )
+            print(msg, file=sys.stderr)
+            raise RuntimeError(msg)
 
 
 settings = Settings()
+

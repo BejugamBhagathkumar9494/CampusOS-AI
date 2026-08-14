@@ -21,72 +21,94 @@ from app.services.ai_agents import (
     finance as finance_agent,
     knowledge as knowledge_agent
 )
+from app.services.ai_agents.agentic_supervisor import AgenticSupervisor
 from app.services.rag_service import execute_pgvector_rag_query, process_and_ingest_document
 
 router = APIRouter(prefix="/ai", tags=["AI & Agents"])
 
 
-@router.post("/chat", response_model=ChatResponse)
-def chat_with_agent(
-    payload: ChatMessage,
+class ChatMessagePayload(BaseModel):
+    message: Optional[str] = None
+    question: Optional[str] = None
+    chat_id: Optional[str] = "session_1"
+    category: Optional[str] = None
+    role: Optional[str] = None
+    agentic_mode: Optional[bool] = True
+
+
+@router.post("/chat")
+async def chat_with_agent(
+    payload: ChatMessagePayload,
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """
-    Invoke the role-aware AI Assistant querying real database context and 
-    Supabase PostgreSQL pgvector knowledge base across Student, Faculty, and Placement dashboards.
+    AI Chat Endpoint.
+    Accepts POST JSON payload, queries RAG knowledge base & agents with timeout protection (10s),
+    and returns { answer, sources, confidence } without stack traces.
     """
-    query = payload.message.lower()
+    query_text = (payload.message or payload.question or "").strip()
+    if not query_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request JSON payload must contain 'message' or 'question' field."
+        )
+
     chat_id = payload.chat_id or "session_1"
-    
-    # Determine active role/category from payload or current user profile
-    requested_role = (payload.role or payload.category or "").lower()
-    
+    requested_role = (payload.role or payload.category or "students").lower()
+
     if current_user and hasattr(current_user, "roles") and current_user.roles:
-        role_names = [r.name.lower() for r in current_user.roles]
-    elif requested_role:
-        role_names = [requested_role]
+        primary_role = current_user.roles[0].name.lower()
     else:
-        role_names = ["student"]
+        primary_role = requested_role
 
-    primary_role = role_names[0] if role_names else "student"
-    student = db.query(Student).filter(Student.user_id == current_user.id).first() if current_user else None
-    student_name = current_user.full_name if current_user else "User"
+    try:
+        # Wrap execution in asyncio.wait_for with 10s timeout protection
+        loop = asyncio.get_event_loop()
+        rag_res = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=3)
+            ),
+            timeout=10.0
+        )
 
-    # Specific database intent handling for standard transactional queries
-    if "student" in role_names or primary_role == "student":
-        if any(k in query for k in ["attendance", "present", "absent", "shortage"]):
-            response_text = f"Hi {student_name}! Your current overall attendance is 87.5% (28 present out of 32 total classes). You are above the 75% threshold."
-        elif any(k in query for k in ["exam", "timetable", "schedule", "test"]):
-            response_text = f"Hi {student_name}! Your upcoming End-Semester exams begin on May 15, 2026. CS301 (Automata Theory) is scheduled for May 15 in Hall 302."
-        elif any(k in query for k in ["hostel", "room", "leave", "complaint"]):
-            room_info = f"Room {student.occupancy.room.room_number}" if (student and hasattr(student, "occupancy") and student.occupancy) else "Room 302-B"
-            response_text = f"Hi {student_name}! You are currently allotted to {room_info}. Submit maintenance requests via your Hostel Portal."
-        elif any(k in query for k in ["placement", "readiness"]):
-            prediction = predict_placement_readiness(cgpa=float(student.cgpa) if student and hasattr(student, "cgpa") else 8.4)
-            response_text = f"Your Placement Readiness score is {prediction['readiness_score']:.1f}% ({prediction['readiness_rating']}). Top recruiters active: Google, Microsoft, TCS Digital."
-        else:
-            # Role-Aware Supabase pgvector RAG query for Students
-            rag_res = execute_pgvector_rag_query(query=payload.message, user_role="student", match_threshold=0.20, k=3)
-            response_text = f"Hello {student_name}!\n\n{rag_res['answer']}"
+        answer_text = rag_res.get("answer", "No response generated.")
+        sources_list = rag_res.get("source_documents", [])
+        confidence_score = float(rag_res.get("confidence", 0.95))
 
-    elif "faculty" in role_names or primary_role == "faculty":
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="faculty", match_threshold=0.20, k=3)
-        response_text = f"Welcome Dr. {student_name}!\n\n{rag_res['answer']}"
+        return {
+            "answer": answer_text,
+            "sources": sources_list,
+            "confidence": confidence_score,
+            "response": answer_text,
+            "chat_id": chat_id,
+            "agent_name": "🤖 CampusOS AI Assistant",
+            "confidence_score": confidence_score,
+            "source_documents": sources_list,
+        }
 
-    elif "placement_officer" in role_names or "placement" in role_names or primary_role in ["placement_officer", "placements"]:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="placement_officer", match_threshold=0.20, k=3)
-        response_text = f"Welcome Placement Officer {student_name}!\n\n{rag_res['answer']}"
+    except asyncio.TimeoutError:
+        return {
+            "answer": "The request timed out while generating an AI response. Please try again.",
+            "sources": [],
+            "confidence": 0.0,
+            "response": "The request timed out while generating an AI response. Please try again.",
+            "chat_id": chat_id,
+            "agent_name": "🤖 CampusOS AI Assistant",
+            "confidence_score": 0.0,
+            "source_documents": [],
+        }
+    except HTTPException:
+        raise
+    except Exception as err:
+        print(f"[AI Chat Router Error]: {err}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while processing your AI chat request."
+        )
 
-    elif "hostel_warden" in role_names or primary_role == "hostel_warden":
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="hostel_warden", match_threshold=0.20, k=3)
-        response_text = f"Welcome Warden {student_name}!\n\n{rag_res['answer']}"
 
-    else:
-        rag_res = execute_pgvector_rag_query(query=payload.message, user_role="admin", match_threshold=0.20, k=3)
-        response_text = f"Greetings Admin {student_name}!\n\n{rag_res['answer']}"
-
-    return ChatResponse(chat_id=chat_id, response=response_text)
 
 
 @router.post("/knowledge/upload")
