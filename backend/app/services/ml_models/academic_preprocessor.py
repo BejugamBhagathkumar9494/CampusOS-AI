@@ -8,9 +8,8 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple, Any
-
-import numpy as np
 import pandas as pd
+
 
 DATASET_DIR = Path(__file__).resolve().parents[3] / "campusos Datasets"
 
@@ -45,8 +44,9 @@ class AcademicDataPreprocessor:
     def __init__(self, data_dir: Path | str = DATASET_DIR):
         self.data_dir = Path(data_dir)
 
-    def load_raw_datasets(self) -> Dict[str, pd.DataFrame]:
+    def load_raw_datasets(self) -> Dict[str, Any]:
         """Loads raw CSV files from dataset directory."""
+        import pandas as pd
         files = {
             "student_info": "studentInfo.csv",
             "courses": "courses.csv",
@@ -64,8 +64,10 @@ class AcademicDataPreprocessor:
                 dfs[key] = pd.DataFrame()
         return dfs
 
-    def preprocess_and_merge(self) -> pd.DataFrame:
+    def preprocess_and_merge(self) -> Any:
         """Merges datasets and engineers academic performance features."""
+        import numpy as np
+        import pandas as pd
         dfs = self.load_raw_datasets()
         if dfs["student_info"].empty:
             raise FileNotFoundError(f"studentInfo.csv not found in {self.data_dir}")

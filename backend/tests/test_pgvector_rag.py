@@ -22,13 +22,15 @@ class TestRAGService(unittest.TestCase):
 
     def test_pdf_extraction_empty_bytes(self):
         """Test graceful extraction handling on empty PDF bytes."""
-        pages = extract_text_from_pdf(b"")
+        empty_data: bytes = b""
+        pages = extract_text_from_pdf(empty_data)
         self.assertIsInstance(pages, list)
         self.assertEqual(len(pages), 0)
 
     def test_docx_extraction_empty_bytes(self):
         """Test graceful extraction handling on empty DOCX bytes."""
-        pages = extract_text_from_docx(b"")
+        empty_data: bytes = b""
+        pages = extract_text_from_docx(empty_data)
         self.assertIsInstance(pages, list)
 
     def test_pgvector_query_fallback(self):

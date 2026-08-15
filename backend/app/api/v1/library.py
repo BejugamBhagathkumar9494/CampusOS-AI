@@ -28,7 +28,7 @@ def semantic_search_books(query: str = "", db: Session = Depends(get_db)):
                 "isbn": b.isbn,
                 "category": b.category or "General",
                 "copies_available": b.copies_available,
-                "location": f"Rack {b.category[0].upper() if b.category else 'A'}-{(b.id % 5) + 1}"
+                "location": f"Rack {(str(b.category)[0].upper() if b.category is not None else 'A')}-{(b.id % 5) + 1}"
             }
             for b in books
         ]

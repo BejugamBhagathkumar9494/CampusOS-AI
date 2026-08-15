@@ -6,11 +6,11 @@ VLE engagement, and classroom participation rates.
 from __future__ import annotations
 
 from typing import Dict, List, Any
-import numpy as np
 
 
 def predict_attendance_trend(past_attendance_rates: List[float]) -> Dict[str, Any]:
     """Predicts next month's attendance percentage using weighted linear trend extrapolation."""
+    import numpy as np
     if not past_attendance_rates:
         return {
             "predicted_attendance": 75.0,

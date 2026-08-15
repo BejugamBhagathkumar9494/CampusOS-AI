@@ -6,6 +6,7 @@ from app.models import (
     Permission,
     Role,
     User,
+    Profile,
     Student,
     Subject,
     Attendance,

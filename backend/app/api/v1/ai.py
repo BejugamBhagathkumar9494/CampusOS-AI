@@ -65,41 +65,68 @@ async def chat_with_agent(
         primary_role = requested_role
 
     try:
-        # Wrap execution in asyncio.wait_for with 10s timeout protection
-        loop = asyncio.get_event_loop()
-        rag_res = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=3)
-            ),
-            timeout=10.0
-        )
+        user_name = "Student"
+        if current_user and hasattr(current_user, "full_name") and current_user.full_name:
+            user_name = current_user.full_name
+        elif current_user and hasattr(current_user, "username") and current_user.username:
+            user_name = current_user.username.split("@")[0].capitalize()
 
-        answer_text = rag_res.get("answer", "No response generated.")
-        sources_list = rag_res.get("source_documents", [])
-        confidence_score = float(rag_res.get("confidence", 0.95))
+        is_agentic = payload.agentic_mode if payload.agentic_mode is not None else True
+
+        loop = asyncio.get_event_loop()
+        if is_agentic:
+            agent_res = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: AgenticSupervisor.process_query(
+                        query=query_text,
+                        user_role=primary_role,
+                        user_name=user_name,
+                        student_data=current_user,
+                        db=db,
+                        agentic_mode=True
+                    )
+                ),
+                timeout=12.0
+            )
+            answer_text = agent_res.get("answer", "No response generated.")
+            sources_list = agent_res.get("source_documents", [])
+            confidence_score = float(agent_res.get("confidence_score", 0.95))
+            agent_name = agent_res.get("agent_name", "🤖 CampusOS AI Supervisor")
+        else:
+            rag_res = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=3)
+                ),
+                timeout=12.0
+            )
+            answer_text = rag_res.get("answer", "No response generated.")
+            sources_list = rag_res.get("source_documents", [])
+            confidence_score = float(rag_res.get("confidence", 0.95))
+            agent_name = "📚 Grounded RAG Agent"
 
         return {
             "answer": answer_text,
-            "sources": sources_list,
-            "confidence": confidence_score,
             "response": answer_text,
-            "chat_id": chat_id,
-            "agent_name": "🤖 CampusOS AI Assistant",
-            "confidence_score": confidence_score,
+            "sources": sources_list,
             "source_documents": sources_list,
+            "confidence": confidence_score,
+            "confidence_score": confidence_score,
+            "chat_id": chat_id,
+            "agent_name": agent_name,
         }
 
     except asyncio.TimeoutError:
         return {
             "answer": "The request timed out while generating an AI response. Please try again.",
-            "sources": [],
-            "confidence": 0.0,
             "response": "The request timed out while generating an AI response. Please try again.",
+            "sources": [],
+            "source_documents": [],
+            "confidence": 0.0,
+            "confidence_score": 0.0,
             "chat_id": chat_id,
             "agent_name": "🤖 CampusOS AI Assistant",
-            "confidence_score": 0.0,
-            "source_documents": [],
         }
     except HTTPException:
         raise

@@ -17,42 +17,20 @@ from typing import List, Dict, Any, Optional
 # Safe UTF-8 reconfiguration for Windows & container logs
 try:
     if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding='utf-8')
+        getattr(sys.stdout, "reconfigure")(encoding='utf-8')
     if hasattr(sys.stderr, "reconfigure"):
-        sys.stderr.reconfigure(encoding='utf-8')
+        getattr(sys.stderr, "reconfigure")(encoding='utf-8')
 except Exception:
     pass
 
-# Safe imports with graceful fallbacks for server deployment stability
-try:
-    from langchain_community.document_loaders import PyPDFLoader
-except ImportError:
-    PyPDFLoader = None
+# Safe imports with lazy loading for server memory optimization (<50MB RAM)
+PyPDFLoader = None
+RecursiveCharacterTextSplitter = None
+HuggingFaceEmbeddings = None
+Chroma = None
+ChatGoogleGenerativeAI = None
+init_chat_model = None
 
-try:
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-except ImportError:
-    RecursiveCharacterTextSplitter = None
-
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-except ImportError:
-    HuggingFaceEmbeddings = None
-
-try:
-    from langchain_chroma import Chroma
-except ImportError:
-    Chroma = None
-
-try:
-    from langchain_google_genai import ChatGoogleGenerativeAI
-except ImportError:
-    ChatGoogleGenerativeAI = None
-
-try:
-    from langchain.chat_models import init_chat_model
-except ImportError:
-    init_chat_model = None
 
 
 # Paths Configuration

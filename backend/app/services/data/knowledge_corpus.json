@@ -1,5 +1,69 @@
 [
   {
+    "id": "campusos_policy_01",
+    "category": "students",
+    "file_name": "CampusOS Attendance & Examination Regulations 2026.pdf",
+    "page": 1,
+    "content": "CampusOS Official Attendance Regulation: All registered undergraduate and postgraduate students must maintain a minimum of 75% overall attendance across all enrolled courses to be eligible to sit for end-semester university examinations. Students with attendance between 65% and 74% can request attendance condonation up to 10% by submitting valid official medical leave documentation or sports/event participation certificates signed by the Hostel Warden or Department Head within 3 business days of return.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_02",
+    "category": "hostel_warden",
+    "file_name": "CampusOS Hostel & Residential Rules 2026.pdf",
+    "page": 1,
+    "content": "CampusOS Hostel Curfew & Maintenance Policy: Hostel night entry cutoff is strictly 10:00 PM on weekdays (Monday through Friday) and 10:30 PM on weekends (Saturday and Sunday). Late entries require prior written out-pass approval from the Senior Hostel Warden. Facility complaints regarding plumbing, Wi-Fi connectivity, air conditioning, or electrical maintenance must be submitted through the Hostel Ticket Portal for 24-hour resolution.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_03",
+    "category": "placements",
+    "file_name": "CampusOS Career & Placement Guidelines 2026.pdf",
+    "page": 1,
+    "content": "CampusOS Placement Eligibility & Recruiter Guidelines: To participate in campus recruitment drives, students must maintain a minimum cumulative CGPA of 6.0 with zero active backlogs. Top tier recruiters including Google, Microsoft, Amazon, TCS Digital, and Infosys conduct campus interviews during Semester 7 and 8. Students are recommended to complete 2 core projects, maintain CGPA above 8.0, and complete mock interview evaluations.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_04",
+    "category": "students",
+    "file_name": "CampusOS Data Structures & Algorithms Handbook.pdf",
+    "page": 1,
+    "content": "Dijkstra's Algorithm Overview: Dijkstra's Algorithm is a greedy graph traversal algorithm that computes the single-source shortest paths for a weighted directed or undirected graph with non-negative edge weights. Time complexity is O((V + E) log V) using a binary min-heap priority queue, where V is vertices and E is edges.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_05",
+    "category": "students",
+    "file_name": "CampusOS Automata & Computation Guide.pdf",
+    "page": 1,
+    "content": "Automata Theory & Formal Languages: Deterministic Finite Automata (DFA) and Nondeterministic Finite Automata (NFA) are foundational state machines used to recognize regular languages. Every NFA can be converted into an equivalent DFA using Subset Construction algorithm.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_06",
+    "category": "students",
+    "file_name": "CampusOS Shuttle & Transport Schedule.pdf",
+    "page": 1,
+    "content": "CampusOS Transport & Shuttle Schedule: Campus shuttles operate continuous loop routes. Route 1 connects North Campus Residences to Tech Park every 15 minutes. Route 2 connects Main Hostel Complex to Main Gate from 7:00 AM to 10:00 PM daily with real-time GPS tracking enabled on the CampusOS Transport Portal.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_07",
+    "category": "students",
+    "file_name": "CampusOS Central Library Regulations.pdf",
+    "page": 1,
+    "content": "CampusOS Library Services: The University Central Library is open daily from 8:00 AM to 11:00 PM. Students can borrow up to 4 physical books for 14 days and access 50,000+ digital textbooks, IEEE Xplore, SpringerLink, and ACM Digital Library papers via the Library Portal tab.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
+    "id": "campusos_policy_08",
+    "category": "students",
+    "file_name": "CampusOS Fee & Scholarship Regulations.pdf",
+    "page": 1,
+    "content": "CampusOS Tuition Fees & Merit Scholarships: Semester tuition fees are due before the commencement of classes. Eligible students can apply for Merit-Based Academic Scholarships (GPA >= 8.5), Need-Based Tuition Grants, and STEM Leadership Awards directly on the Finance Portal tab.",
+    "allowed_roles": ["student", "faculty", "admin", "placement_officer", "hostel_warden"]
+  },
+  {
     "id": "students_3_1",
     "category": "students",
     "file_name": "preparing-for-college-success_-_WEB.pdf",

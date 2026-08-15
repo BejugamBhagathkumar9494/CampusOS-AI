@@ -14,17 +14,8 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any, Dict, List, Tuple
-
-import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
 
 from app.services.ml_models.academic_preprocessor import (
     CATEGORICAL_FEATURES,
@@ -77,6 +68,17 @@ class ModelTrainer:
 
     def train_models(self) -> Dict[str, Any]:
         """Trains anti-overfitting models on academic dataset and computes metrics."""
+        import numpy as np
+        import pandas as pd
+        from sklearn.compose import ColumnTransformer
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.impute import SimpleImputer
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+        from sklearn.model_selection import train_test_split
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
         preprocessor_tool = AcademicDataPreprocessor()
         try:
             X, y_risk, y_multiclass = preprocessor_tool.get_feature_matrix()

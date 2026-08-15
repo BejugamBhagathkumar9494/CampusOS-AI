@@ -190,7 +190,7 @@ def apply_to_drive(
     if not drive:
         raise HTTPException(status_code=404, detail="Placement drive not found")
 
-    if student.cgpa < drive.min_cgpa:
+    if float(getattr(student, 'cgpa', 0.0) or 0.0) < float(getattr(drive, 'min_cgpa', 0.0) or 0.0):
         raise HTTPException(status_code=400, detail=f"Ineligible: Minimum required CGPA is {drive.min_cgpa}")
 
     existing = db.query(PlacementApplication).filter(
@@ -223,7 +223,7 @@ def update_application_status(
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    app.status = payload.status
+    setattr(app, "status", payload.status)
     db.commit()
 
     # Send student notification

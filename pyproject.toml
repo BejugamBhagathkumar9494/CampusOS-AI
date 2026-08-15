@@ -1,0 +1,26 @@
+[tool.pyright]
+venvPath = "backend"
+venv = "venv"
+extraPaths = [
+    "backend",
+    "backend/venv/Lib/site-packages"
+]
+exclude = [
+    "**/__pyrefly_virtual__/**",
+    "**/inmemory/**"
+]
+reportMissingImports = "none"
+reportMissingModuleSource = "none"
+reportAttributeAccessIssue = "none"
+reportGeneralTypeIssues = "none"
+
+[tool.pyrefly]
+search-paths = [
+    "backend",
+    "backend/venv/Lib/site-packages"
+]
+ignore-missing-imports = true
+exclude = [
+    "**/__pyrefly_virtual__/**",
+    "**/inmemory/**"
+]

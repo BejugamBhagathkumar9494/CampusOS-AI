@@ -5,6 +5,8 @@ import csv
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List
+import pandas as pd
+import numpy as np
 
 DATASET_DIR = Path(__file__).resolve().parents[3] / "campusos Datasets"
 PRIMARY_DATASET_PATH = DATASET_DIR / "student_placement_prediction_dataset_2026.csv"
@@ -80,7 +82,7 @@ def predict_placement_readiness(
                 ("scaler", StandardScaler()),
                 ("regressor", Ridge(alpha=1.0))
             ])
-            reg.fit(placed_df[FEATURE_COLUMNS].apply(pd.to_numeric, errors="coerce").fillna(DEFAULTS), placed_df["salary_package_lpa"])
+            reg.fit(pd.DataFrame(placed_df[FEATURE_COLUMNS]).apply(pd.to_numeric, errors="coerce").fillna(DEFAULTS), placed_df["salary_package_lpa"])
 
             test_row = pd.DataFrame([{col: row.get(col, DEFAULTS.get(col, 0)) for col in FEATURE_COLUMNS}])
             score = round(float(clf.predict_proba(test_row)[0, 1]) * 100, 1)

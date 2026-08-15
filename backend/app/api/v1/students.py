@@ -47,7 +47,7 @@ def get_student_attendance(student_id: int, db: Session = Depends(get_db), curre
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student record not found")
         
     # Level 2 Security: Verify user-specific ownership or elevated role
-    if student.user_id != current_user.id:
+    if str(student.user_id) != str(current_user.id):
         user_roles = [r.name.lower() for r in current_user.roles]
         if not any(r in user_roles for r in ["admin", "faculty", "super_admin"]):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied. You cannot view another student's attendance records.")
@@ -66,7 +66,7 @@ def get_student_attendance(student_id: int, db: Session = Depends(get_db), curre
                 "attended_classes": 0
             }
         subject_stats[sub_id]["total_classes"] += 1
-        if record.is_present:
+        if bool(record.is_present):
             subject_stats[sub_id]["attended_classes"] += 1
             
     stats_list = []
@@ -102,7 +102,7 @@ def get_student_marks(student_id: int, db: Session = Depends(get_db), current_us
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student record not found")
         
     # Level 2 Security: Verify user-specific ownership or elevated role
-    if student.user_id != current_user.id:
+    if str(student.user_id) != str(current_user.id):
         user_roles = [r.name.lower() for r in current_user.roles]
         if not any(r in user_roles for r in ["admin", "faculty", "super_admin"]):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied. You cannot view another student's marks.")

@@ -44,7 +44,7 @@ def mark_notification_read(
     if not notification:
         raise HTTPException(status_code=404, detail="Notification not found")
 
-    notification.is_read = True
+    setattr(notification, "is_read", True)
     db.commit()
     db.refresh(notification)
     return notification

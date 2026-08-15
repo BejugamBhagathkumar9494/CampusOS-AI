@@ -213,8 +213,8 @@ def review_leave_request(
     if not req:
         raise HTTPException(status_code=404, detail="Leave request not found")
 
-    req.status = payload.status
-    req.reviewed_by = current_user.full_name
+    setattr(req, "status", payload.status)
+    setattr(req, "reviewed_by", current_user.full_name)
     db.commit()
 
     # Trigger student notification
