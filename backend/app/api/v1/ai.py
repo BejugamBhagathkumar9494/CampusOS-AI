@@ -73,6 +73,17 @@ async def chat_with_agent(
 
         is_agentic = payload.agentic_mode if payload.agentic_mode is not None else True
 
+        role_assistant_names = {
+            "student": "🤖 CampusOS Student Assistant",
+            "faculty": "🤖 CampusOS Faculty Assistant",
+            "warden": "🤖 CampusOS Warden Assistant",
+            "hostel_warden": "🤖 CampusOS Warden Assistant",
+            "librarian": "🤖 CampusOS Library Assistant",
+            "library": "🤖 CampusOS Library Assistant",
+            "admin": "🤖 CampusOS Admin Assistant"
+        }
+        assistant_name = role_assistant_names.get(primary_role.lower(), "🤖 CampusOS AI Assistant")
+
         loop = asyncio.get_event_loop()
         if is_agentic:
             agent_res = await asyncio.wait_for(
@@ -92,19 +103,19 @@ async def chat_with_agent(
             answer_text = agent_res.get("answer", "No response generated.")
             sources_list = agent_res.get("source_documents", [])
             confidence_score = float(agent_res.get("confidence_score", 0.95))
-            agent_name = agent_res.get("agent_name", "🤖 CampusOS AI Supervisor")
+            agent_name = assistant_name
         else:
             rag_res = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
-                    lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=3)
+                    lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=5, match_threshold=0.20)
                 ),
                 timeout=12.0
             )
             answer_text = rag_res.get("answer", "No response generated.")
             sources_list = rag_res.get("source_documents", [])
             confidence_score = float(rag_res.get("confidence", 0.95))
-            agent_name = "📚 Grounded RAG Agent"
+            agent_name = assistant_name
 
         return {
             "answer": answer_text,
@@ -114,7 +125,7 @@ async def chat_with_agent(
             "confidence": confidence_score,
             "confidence_score": confidence_score,
             "chat_id": chat_id,
-            "agent_name": agent_name,
+            "agent_name": assistant_name,
         }
 
     except asyncio.TimeoutError:
