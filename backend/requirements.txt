@@ -17,8 +17,6 @@ pandas>=2.0.0
 scikit-learn>=1.4.0
 python-dotenv>=1.0.1
 supabase>=2.4.0
-sentence-transformers>=2.5.0
-faiss-cpu>=1.7.4
 pypdf>=4.0.0
 python-docx>=1.1.0
 

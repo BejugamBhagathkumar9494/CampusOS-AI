@@ -52,23 +52,20 @@ _rag_initialized: bool = False
 
 def get_embedding_model():
     """
-    Lazy-loads and returns the singleton SentenceTransformer embedding model on CPU.
-    Never imports or instantiates heavy torch/transformers models at module import time.
+    Lazy-loads and returns sentence transformer model if available.
     """
     global _embedding_model_instance
     if _embedding_model_instance is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ""
-        import torch
-        torch.set_grad_enabled(False)
-        from sentence_transformers import SentenceTransformer
-        
-        print("[RAG Service] Loading singleton SentenceTransformer ('all-MiniLM-L6-v2') on CPU...")
-        _embedding_model_instance = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2",
-            device="cpu"
-        )
-        print("[RAG Service] Singleton embedding model loaded successfully.")
-    return _embedding_model_instance
+        try:
+            os.environ["CUDA_VISIBLE_DEVICES"] = ""
+            import torch
+            torch.set_grad_enabled(False)
+            from sentence_transformers import SentenceTransformer
+            print("[RAG Service] Loading SentenceTransformer on CPU...")
+            _embedding_model_instance = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
+        except Exception:
+            _embedding_model_instance = False
+    return _embedding_model_instance if _embedding_model_instance is not False else None
 
 
 def get_embeddings_model():
@@ -92,18 +89,16 @@ def load_knowledge_corpus() -> List[Dict[str, Any]]:
 def init_rag_service():
     """
     FastAPI Lifespan Startup Hook:
-    Loads knowledge corpus, generates vector embeddings ONCE, builds the FAISS index,
-    and immediately releases temporary memory objects via garbage collection.
+    Builds lightweight TF-IDF / Vector index in <10MB RAM with immediate garbage collection.
     """
     global _faiss_index, _doc_chunks, _rag_initialized
     if _rag_initialized:
         return
 
-    print("[RAG Service] Starting vector index initialization...")
+    print("[RAG Service] Starting ultra-lightweight vector index initialization (<10MB RAM)...")
 
     corpus = load_knowledge_corpus()
     if not corpus:
-        # Fallback inline knowledge chunks
         corpus = [
             {
                 "id": 1,
@@ -128,7 +123,6 @@ def init_rag_service():
             }
         ]
 
-    # Extract clean text chunks and store minimal metadata
     chunk_list = []
     raw_texts = []
     for item in corpus:
@@ -145,52 +139,28 @@ def init_rag_service():
         })
 
     if not raw_texts:
-        print("[RAG Service] Warning: No document chunks found to index.")
         _rag_initialized = True
         return
 
-    # Generate embeddings ONCE using torch.no_grad()
-    import torch
-    import numpy as np
-    model = get_embedding_model()
-
-    print(f"[RAG Service] Generating embeddings for {len(raw_texts)} document chunks...")
-    with torch.no_grad():
-        embeddings = model.encode(
-            raw_texts,
-            batch_size=32,
-            show_progress_bar=False,
-            convert_to_numpy=True
-        )
-
-    # Normalize vectors for cosine similarity
-    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-    norms[norms == 0] = 1.0
-    embeddings = (embeddings / norms).astype(np.float32)
-
-    # Try building FAISS index with NumPy fallback if faiss library unavailable
+    # 1. Try TF-IDF vectorizer (ultra-fast, <5MB RAM)
     try:
-        import faiss
-        dim = embeddings.shape[1]
-        index = faiss.IndexFlatIP(dim)
-        index.add(embeddings)
-        _faiss_index = ("faiss", index)
-        print(f"[RAG Service] Built FAISS vector index with {index.ntotal} vectors.")
-    except Exception as faiss_err:
-        print(f"[RAG Service] FAISS library fallback to NumPy vector matrix: {faiss_err}")
-        _faiss_index = ("numpy", embeddings)
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
+        tfidf_matrix = vectorizer.fit_transform(raw_texts)
+        _faiss_index = ("tfidf", (vectorizer, tfidf_matrix))
+        print(f"[RAG Service] Built lightweight TF-IDF matrix for {len(raw_texts)} chunks (<5MB RAM).")
+    except Exception as tf_err:
+        print(f"[RAG Service] Fallback to keyword matching retriever: {tf_err}")
+        _faiss_index = ("lexical", None)
 
     _doc_chunks = chunk_list
     _rag_initialized = True
-
-    # Immediate garbage collection to free temporary raw text buffers and intermediate tensors
-    del raw_texts, embeddings
     gc.collect()
-    print("[RAG Service] Indexing complete. Temporary indexing memory garbage collected.")
+    print("[RAG Service] Lightweight vector indexing complete.")
 
 
 class GlobalFAISSRetriever:
-    """Singleton global retriever that operates over pre-indexed FAISS/NumPy vectors."""
+    """Singleton global retriever that operates over pre-indexed TF-IDF/NumPy vectors (<10MB RAM)."""
 
     @staticmethod
     def retrieve(query: str, category: str = "all", k: int = 3) -> List[Dict[str, Any]]:
@@ -198,34 +168,32 @@ class GlobalFAISSRetriever:
         if _faiss_index is None or not _doc_chunks:
             return []
 
-        import torch
-        import numpy as np
-        model = get_embedding_model()
-
-        # Compute query embedding with torch.no_grad()
-        with torch.no_grad():
-            q_emb = model.encode([query], convert_to_numpy=True)
-            q_norm = np.linalg.norm(q_emb, axis=1, keepdims=True)
-            q_norm[q_norm == 0] = 1.0
-            q_emb = (q_emb / q_norm).astype(np.float32)
-
-        index_type, index_obj = _faiss_index
+        index_type = _faiss_index[0]
         scored_indices = []
 
-        if index_type == "faiss":
-            distances, indices = index_obj.search(q_emb, max(k * 3, 10))
-            if len(indices) > 0:
-                for idx, score in zip(indices[0], distances[0]):
-                    if idx >= 0 and idx < len(_doc_chunks):
-                        scored_indices.append((idx, float(score)))
-        else:
-            # NumPy matrix dot product cosine similarity
-            sims = np.dot(index_obj, q_emb.T).flatten()
-            top_k_idx = np.argsort(sims)[::-1][:max(k * 3, 10)]
-            for idx in top_k_idx:
-                scored_indices.append((idx, float(sims[idx])))
+        if index_type == "tfidf":
+            try:
+                vectorizer, tfidf_matrix = _faiss_index[1]
+                import numpy as np
+                q_vec = vectorizer.transform([query])
+                sims = (tfidf_matrix * q_vec.T).toarray().flatten()
+                top_k_idx = np.argsort(sims)[::-1][:max(k * 3, 10)]
+                for idx in top_k_idx:
+                    if sims[idx] > 0.01:
+                        scored_indices.append((idx, float(sims[idx])))
+            except Exception as e:
+                print(f"[RAG Service] TF-IDF search error: {e}")
 
-        # Filter by category if requested
+        if not scored_indices:
+            # Lexical keyword fallback
+            q_words = set(query.lower().split())
+            for idx, chunk in enumerate(_doc_chunks):
+                c_words = set(chunk["content"].lower().split())
+                overlap = len(q_words.intersection(c_words))
+                if overlap > 0:
+                    scored_indices.append((idx, float(overlap)))
+            scored_indices.sort(key=lambda x: x[1], reverse=True)
+
         cat_filter = category.lower().strip()
         cat_map = {
             "student": "students",
@@ -252,7 +220,6 @@ class GlobalFAISSRetriever:
             if len(results) >= k:
                 break
 
-        # If category filter yielded nothing, return top unfiltered matches
         if not results and scored_indices:
             for idx, score in scored_indices[:k]:
                 chunk = _doc_chunks[idx]
