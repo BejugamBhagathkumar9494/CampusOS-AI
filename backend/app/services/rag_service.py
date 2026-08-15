@@ -212,6 +212,34 @@ ROLE_ACCESS_MAP = {
 }
 
 
+TYPO_CORRECTIONS = {
+    "caluclated": "calculated",
+    "calulated": "calculated",
+    "claculated": "calculated",
+    "calcualted": "calculated",
+    "calcuated": "calculated",
+    "calculat": "calculated",
+    "attendence": "attendance",
+    "atendance": "attendance",
+    "hostle": "hostel",
+    "placment": "placement",
+    "eligiblity": "eligibility",
+    "rqeuired": "required",
+    "requried": "required"
+}
+
+
+def clean_and_normalize_query(query: str) -> str:
+    """Corrects common user spelling typos and normalizes query text."""
+    words = query.split()
+    corrected = []
+    for w in words:
+        clean = w.lower().strip("?,.!")
+        fixed = TYPO_CORRECTIONS.get(clean, clean)
+        corrected.append(fixed)
+    return " ".join(corrected)
+
+
 def init_rag_service():
     """
     FastAPI Lifespan Startup Hook:
@@ -259,6 +287,13 @@ def init_rag_service():
             "file_name": "CampusOS Central Library Regulations.pdf",
             "page": 1,
             "content": "CampusOS Library Regulations: Students can borrow up to 4 physical books for 14 days and access digital textbooks on the Library Portal."
+        },
+        {
+            "id": 9006,
+            "category": "students",
+            "file_name": "CampusOS Student Handbook.pdf",
+            "page": 1,
+            "content": "CampusOS CGPA & Grading Policy: Cumulative Grade Point Average (CGPA) is calculated on a 10.0 scale as total grade points earned divided by total course credits attempted across all semesters. Letter grades: O=10.0, A+=9.0, A=8.0, B+=7.0, B=6.0, C=5.0, P=4.0, F=0.0."
         }
     ]
 
@@ -323,6 +358,8 @@ class GlobalFAISSRetriever:
         global _faiss_index, _doc_chunks
         if _faiss_index is None or not _doc_chunks:
             return []
+
+        query = clean_and_normalize_query(query)
 
         user_role = category.lower().strip()
         allowed_tags = ROLE_ACCESS_MAP.get(user_role, [user_role, "all", "general"])
@@ -420,6 +457,8 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
     """Generates grounded answer using OpenAI/Gemini REST API or strict context synthesis (Steps 4 & 5)."""
     
     NOT_FOUND_MSG = "I couldn't find this information in the CampusOS knowledge base."
+
+    query = clean_and_normalize_query(query)
 
     if not retrieved_chunks:
         return NOT_FOUND_MSG

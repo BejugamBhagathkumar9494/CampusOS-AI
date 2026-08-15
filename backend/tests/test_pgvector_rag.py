@@ -65,6 +65,12 @@ class TestRoleBasedRAGService(unittest.TestCase):
         self.assertIn("answer", res)
         self.assertTrue("curfew" in res["answer"].lower() or "hostel" in res["answer"].lower())
 
+    def test_cgpa_calculation_with_typo(self):
+        """Student asks: how cgpa is caluclated (with spelling typo)."""
+        res = execute_pgvector_rag_query("how cgpa is caluclated", user_role="student", match_threshold=0.15)
+        self.assertIn("answer", res)
+        self.assertTrue("cgpa" in res["answer"].lower() or "scale" in res["answer"].lower() or "credits" in res["answer"].lower())
+
     def test_absent_info_drone_refusal(self):
         """Absent info: Does CampusOS allow drones in hostel rooms?"""
         res = execute_pgvector_rag_query("Does CampusOS allow drones in hostel rooms?", user_role="student", match_threshold=0.20)
