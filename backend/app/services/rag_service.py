@@ -563,9 +563,27 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
         except Exception as e:
             print(f"[RAG Service] Gemini REST call error: {e}")
 
-    # Grounded offline synthesis directly from retrieved snippets
-    direct_answer = "\n".join([f"- {s}" for s in clean_snippets[:3]])
-    return f"{direct_answer}{sources_text}"
+    # Grounded synthesis directly from retrieved snippets with neat query summary and relevant filtering
+    summary_header = f"### 📌 Query Summary\nYou are inquiring about **{query.title()}** as governed by official CampusOS University regulations.\n\n### 💡 Relevant Official Policy\n"
+
+    relevant_snippets = []
+    for snippet in clean_snippets:
+        for line in snippet.split("\n"):
+            line_clean = line.strip()
+            if not line_clean:
+                continue
+            if any(line_clean.startswith(prefix) for prefix in ["Q1.", "Q2.", "Q3.", "Q4.", "Q5.", "Q6.", "Q7.", "Q8.", "Q9.", "Q10.", "Q11.", "Q12.", "Q13.", "Q14.", "Q15.", "Q16.", "Q17.", "Q18.", "Q19.", "Q20.", "Sample question"]):
+                continue
+            if "procedure for" in line_clean.lower() and "guideline" in line_clean.lower():
+                continue
+            if line_clean not in relevant_snippets:
+                relevant_snippets.append(line_clean)
+
+    if not relevant_snippets:
+        relevant_snippets = [clean_snippets[0].strip()]
+
+    formatted_policy = "\n".join([f"- {s}" for s in relevant_snippets[:4]])
+    return f"{summary_header}{formatted_policy}{sources_text}"
 
 
 def execute_pgvector_rag_query(
