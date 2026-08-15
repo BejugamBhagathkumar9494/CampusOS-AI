@@ -14,7 +14,6 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any, Dict, List, Tuple
-import pandas as pd
 
 
 from app.services.ml_models.academic_preprocessor import (
@@ -173,13 +172,17 @@ class ModelTrainer:
             self.train_models()
 
         row = {**DEFAULTS, **sample_dict}
-        df_row = pd.DataFrame([row])
-
-        if self.rf_pipeline:
-            risk_proba = float(self.rf_pipeline.predict_proba(df_row)[0, 1])
-            is_risk = int(self.rf_pipeline.predict(df_row)[0])
-        else:
-            # Fallback heuristic
+        try:
+            import pandas as pd
+            df_row = pd.DataFrame([row])
+            if self.rf_pipeline:
+                risk_proba = float(self.rf_pipeline.predict_proba(df_row)[0, 1])
+                is_risk = int(self.rf_pipeline.predict(df_row)[0])
+            else:
+                score = (row.get("mean_assessment_score", 70) * 0.5) + (row.get("total_weighted_score", 65) * 0.5)
+                risk_proba = max(0.0, min(1.0, (100.0 - score) / 100.0))
+                is_risk = 1 if risk_proba > 0.5 else 0
+        except Exception:
             score = (row.get("mean_assessment_score", 70) * 0.5) + (row.get("total_weighted_score", 65) * 0.5)
             risk_proba = max(0.0, min(1.0, (100.0 - score) / 100.0))
             is_risk = 1 if risk_proba > 0.5 else 0

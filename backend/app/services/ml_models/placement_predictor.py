@@ -5,8 +5,6 @@ import csv
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List
-import pandas as pd
-import numpy as np
 
 DATASET_DIR = Path(__file__).resolve().parents[3] / "campusos Datasets"
 PRIMARY_DATASET_PATH = DATASET_DIR / "student_placement_prediction_dataset_2026.csv"

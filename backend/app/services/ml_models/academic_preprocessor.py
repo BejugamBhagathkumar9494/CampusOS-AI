@@ -8,7 +8,6 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple, Any
-import pandas as pd
 
 
 DATASET_DIR = Path(__file__).resolve().parents[3] / "campusos Datasets"
@@ -135,7 +134,7 @@ class AcademicDataPreprocessor:
 
         return merged
 
-    def get_feature_matrix(self) -> Tuple[pd.DataFrame, pd.Series, pd.Series]:
+    def get_feature_matrix(self) -> Tuple[Any, Any, Any]:
         """Returns feature matrix X, binary target y_risk, and multi-class target y_multiclass."""
         df = self.preprocess_and_merge()
         X = df[NUMERICAL_FEATURES + CATEGORICAL_FEATURES].copy()
@@ -145,7 +144,7 @@ class AcademicDataPreprocessor:
 
 
 @lru_cache(maxsize=1)
-def get_preprocessed_academic_data() -> pd.DataFrame:
+def get_preprocessed_academic_data() -> Any:
     """Cached accessor for preprocessed academic dataframe."""
     processor = AcademicDataPreprocessor()
     return processor.preprocess_and_merge()
