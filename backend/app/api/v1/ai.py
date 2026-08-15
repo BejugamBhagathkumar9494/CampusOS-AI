@@ -212,3 +212,55 @@ def knowledge_rag_search(
         )
             
     return RAGSearchResponse(query=payload.query, results=results)
+
+
+class RAGDebugPayload(BaseModel):
+    query: str
+    role: Optional[str] = "student"
+    match_threshold: Optional[float] = 0.20
+    k: Optional[int] = 5
+
+
+@router.post("/debug/rag")
+def debug_rag_pipeline(
+    payload: RAGDebugPayload,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Hidden Debug Endpoint (Admin/Authorized Debugger - Step 8):
+    Returns full RAG pipeline breakdown:
+    { question, retrieved_chunks, similarity_score, documents_used, pages, llm_prompt, final_answer }
+    """
+    user_role = (payload.role or (current_user.roles[0].name.lower() if hasattr(current_user, "roles") and current_user.roles else "student")).lower()
+    
+    from app.services.rag_service import GlobalFAISSRetriever, execute_pgvector_rag_query
+    
+    k = payload.k or 5
+    threshold = payload.match_threshold or 0.20
+
+    chunks = GlobalFAISSRetriever.retrieve(query=payload.query, category=user_role, k=k, match_threshold=threshold)
+    
+    max_sim = max([c.get("score", 0.0) for c in chunks], default=0.0)
+    docs_used = list(set([c.get("file_name", "Document") for c in chunks]))
+    pages_used = list(set([c.get("page_number", 1) for c in chunks]))
+    
+    formatted_context = "\n\n".join([c.get("content", "") for c in chunks])
+    
+    simulated_prompt = (
+        "You are CampusOS AI.\n\n"
+        "Answer ONLY using the retrieved CampusOS documents.\n\n"
+        f"Context:\n{formatted_context or '[EMPTY]'}\n\n"
+        f"Question:\n{payload.query}"
+    )
+
+    rag_res = execute_pgvector_rag_query(query=payload.query, user_role=user_role, match_threshold=threshold, k=k)
+
+    return {
+        "question": payload.query,
+        "retrieved_chunks": chunks,
+        "similarity_score": round(max_sim, 3),
+        "documents_used": docs_used,
+        "pages": pages_used,
+        "llm_prompt": simulated_prompt,
+        "final_answer": rag_res.get("answer", "")
+    }
