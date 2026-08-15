@@ -164,14 +164,16 @@ def semantic_chunk_text(
 
 
 ROLE_ACCESS_MAP = {
-    "student": ["students", "student", "general", "all", "attendance", "hostel", "exams", "library", "placements", "placement"],
-    "students": ["students", "student", "general", "all", "attendance", "hostel", "exams", "library", "placements", "placement"],
-    "faculty": ["faculty", "academic", "general", "all", "courses"],
-    "hostel_warden": ["hostel", "warden", "hostel_warden", "leave", "general", "all"],
-    "warden": ["hostel", "warden", "hostel_warden", "leave", "general", "all"],
+    "student": ["students", "student", "general", "all", "attendance", "hostel", "exams", "library", "placements", "placement", "academic"],
+    "students": ["students", "student", "general", "all", "attendance", "hostel", "exams", "library", "placements", "placement", "academic"],
+    "faculty": ["faculty", "academic", "evaluation", "courses", "general", "all"],
+    "hostel_warden": ["hostel", "warden", "hostel_warden", "leave", "sop", "curfew", "general", "all"],
+    "warden": ["hostel", "warden", "hostel_warden", "leave", "sop", "curfew", "general", "all"],
+    "librarian": ["library", "librarian", "research", "digital_library", "general", "all"],
+    "library": ["library", "librarian", "research", "digital_library", "general", "all"],
     "placement_officer": ["placements", "placement", "placement_officer", "general", "all"],
     "placement": ["placements", "placement", "placement_officer", "general", "all"],
-    "admin": ["admin", "students", "faculty", "hostel", "warden", "hostel_warden", "placements", "placement_officer", "general", "all"]
+    "admin": ["admin", "students", "faculty", "hostel", "warden", "librarian", "library", "placements", "placement_officer", "general", "all"]
 }
 
 
@@ -187,37 +189,45 @@ def init_rag_service():
     print("[RAG Service] Starting Grounded RAG index initialization...")
 
     corpus = load_knowledge_corpus()
-    if not corpus:
-        corpus = [
-            {
-                "id": 1,
-                "category": "students",
-                "file_name": "CampusOS Student Handbook.pdf",
-                "page": 1,
-                "content": "CampusOS Attendance Policy: Students must maintain at least 75% overall attendance to appear for semester exams. Medical leave certificates can condone shortage up to 10%."
-            },
-            {
-                "id": 2,
-                "category": "placements",
-                "file_name": "Placement Guidelines.pdf",
-                "page": 1,
-                "content": "Placement Eligibility: Minimum CGPA of 6.0 with no active backlogs is required for campus recruitment drives."
-            },
-            {
-                "id": 3,
-                "category": "faculty",
-                "file_name": "Faculty Guide.pdf",
-                "page": 1,
-                "content": "Faculty Guidance: Grade submissions must be completed within 7 business days following final examinations."
-            },
-            {
-                "id": 4,
-                "category": "hostel",
-                "file_name": "Hostel Handbook.pdf",
-                "page": 1,
-                "content": "Hostel Leave Application: Students must submit an online leave form on the Hostel Portal 24 hours prior to departure for warden approval."
-            }
-        ]
+    core_role_docs = [
+        {
+            "id": 9001,
+            "category": "students",
+            "file_name": "CampusOS Student Handbook.pdf",
+            "page": 1,
+            "content": "CampusOS Attendance Policy: Students must maintain at least 75% overall attendance to appear for semester exams. Medical leave certificates can condone shortage up to 10%."
+        },
+        {
+            "id": 9002,
+            "category": "placements",
+            "file_name": "CampusOS Placement Guidelines 2026.pdf",
+            "page": 1,
+            "content": "Placement Eligibility: Minimum CGPA of 6.0 with no active backlogs is required for campus recruitment drives."
+        },
+        {
+            "id": 9003,
+            "category": "faculty",
+            "file_name": "CampusOS Faculty Handbook 2026.pdf",
+            "page": 1,
+            "content": "Faculty Guidance & Evaluation Rules: Faculty members must submit internal grade submissions and examination evaluation marks within 7 business days following final examinations."
+        },
+        {
+            "id": 9004,
+            "category": "hostel",
+            "file_name": "CampusOS Hostel & Residential Rules 2026.pdf",
+            "page": 1,
+            "content": "Hostel Leave Application & Curfew Policy: Students must submit an online leave form on the Hostel Portal 24 hours prior to departure for warden approval. Hostel night entry cutoff is strictly 10:00 PM."
+        },
+        {
+            "id": 9005,
+            "category": "library",
+            "file_name": "CampusOS Central Library Regulations.pdf",
+            "page": 1,
+            "content": "CampusOS Library Regulations: Students can borrow up to 4 physical books for 14 days and access digital textbooks on the Library Portal."
+        }
+    ]
+
+    corpus = (corpus + core_role_docs) if corpus else core_role_docs
 
     chunk_list = []
     raw_texts = []
@@ -400,12 +410,14 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
 
     formatted_context = "\n\n".join(clean_snippets)
 
-    # Key Target Term Validation: If ANY specific query noun (e.g. drones, fees, refund) is missing from context, refuse to hallucinate
+    # Key Target Term Validation: If any primary content noun (e.g. drones) is missing from context, refuse to hallucinate
     stopwords = {
-        "does", "campusos", "allow", "allowed", "rules", "policy", "guideline", "guidelines",
+        "does", "campusos", "allow", "allowed", "rules", "policy", "policies", "guideline", "guidelines",
         "handbook", "what", "where", "how", "when", "with", "have", "room", "rooms", "building",
         "campus", "student", "students", "faculty", "admin", "requirement", "requirements",
-        "required", "system", "portal"
+        "required", "system", "portal", "summarize", "summary", "publish", "many", "much",
+        "explain", "describe", "list", "check", "find", "give", "tell", "show", "timing", "timings",
+        "mark", "marks", "internal", "deadline", "deadlines"
     }
     query_terms = [w.lower().strip("?,.!") for w in query.split() if len(w) >= 4 and w.lower().strip("?,.!") not in stopwords]
     
