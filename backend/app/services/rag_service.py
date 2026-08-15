@@ -38,10 +38,45 @@ try:
 except ImportError:
     pypdf = None
 
-try:
-    import docx
-except ImportError:
-    docx = None
+import zipfile
+import xml.etree.ElementTree as ET
+
+
+def extract_text_from_docx(file_bytes: bytes) -> List[Tuple[int, str]]:
+    """Extracts text paragraphs from docx file bytes using XML parsing."""
+    if not file_bytes:
+        return []
+    try:
+        with zipfile.ZipFile(io.BytesIO(file_bytes)) as z:
+            xml_content = z.read('word/document.xml')
+            tree = ET.fromstring(xml_content)
+            paragraphs = []
+            for p in tree.iter('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p'):
+                texts = [node.text for node in p.iter('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t') if node.text]
+                if texts:
+                    paragraphs.append(''.join(texts))
+            full_text = "\n".join(paragraphs)
+            return [(1, full_text)] if full_text.strip() else []
+    except Exception as e:
+        print(f"[RAG Service] DOCX extraction error: {e}")
+        return []
+
+
+def extract_text_from_pdf(file_bytes: bytes) -> List[Tuple[int, str]]:
+    """Extracts text pages from PDF file bytes."""
+    pages = []
+    if not file_bytes:
+        return pages
+    try:
+        if pypdf:
+            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+            for i, page in enumerate(reader.pages, 1):
+                text = page.extract_text() or ""
+                if text.strip():
+                    pages.append((i, text.strip()))
+    except Exception as e:
+        print(f"[RAG Service] PDF extraction error: {e}")
+    return pages
 
 # Global Singletons
 _embedding_model_instance: Optional[Any] = None
@@ -410,14 +445,14 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
 
     formatted_context = "\n\n".join(clean_snippets)
 
-    # Key Target Term Validation: If any primary content noun (e.g. drones) is missing from context, refuse to hallucinate
+    # Key Target Term Validation: If any primary target subject term (e.g. drones) is missing from context, refuse to hallucinate
     stopwords = {
         "does", "campusos", "allow", "allowed", "rules", "policy", "policies", "guideline", "guidelines",
         "handbook", "what", "where", "how", "when", "with", "have", "room", "rooms", "building",
-        "campus", "student", "students", "faculty", "admin", "requirement", "requirements",
-        "required", "system", "portal", "summarize", "summary", "publish", "many", "much",
-        "explain", "describe", "list", "check", "find", "give", "tell", "show", "timing", "timings",
-        "mark", "marks", "internal", "deadline", "deadlines"
+        "campus", "student", "students", "faculty", "admin", "university", "college", "hostel",
+        "requirement", "requirements", "required", "system", "portal", "summarize", "summary",
+        "publish", "many", "much", "explain", "describe", "list", "check", "find", "give", "tell",
+        "show", "timing", "timings", "mark", "marks", "internal", "deadline", "deadlines"
     }
     query_terms = [w.lower().strip("?,.!") for w in query.split() if len(w) >= 4 and w.lower().strip("?,.!") not in stopwords]
     
@@ -533,37 +568,7 @@ def execute_rag_query(query: str, role_or_category: str = "students", k: int = 3
     return execute_pgvector_rag_query(query=query, user_role=role_or_category, k=k)
 
 
-def extract_text_from_pdf(file_bytes: bytes) -> List[Tuple[int, str]]:
-    """Extracts text page-by-page from PDF binary data."""
-    pages = []
-    if pypdf:
-        try:
-            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-            for idx, page in enumerate(reader.pages, 1):
-                t = page.extract_text() or ""
-                if t.strip():
-                    pages.append((idx, t.strip()))
-        except Exception:
-            pass
-    if not pages:
-        fallback = file_bytes.decode("utf-8", errors="ignore").strip()
-        if fallback:
-            pages.append((1, fallback))
-    return pages
 
-
-def extract_text_from_docx(file_bytes: bytes) -> List[Tuple[int, str]]:
-    """Extracts text from DOCX binary data."""
-    pages = []
-    if docx:
-        try:
-            doc = docx.Document(io.BytesIO(file_bytes))
-            full_t = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
-            if full_t.strip():
-                pages.append((1, full_t.strip()))
-        except Exception:
-            pass
-    return pages
 
 
 def process_and_ingest_document(
