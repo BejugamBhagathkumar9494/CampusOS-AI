@@ -2,13 +2,13 @@ services:
   - type: web
     name: campusos-ai-backend
     env: python
-    buildCommand: (cd backend 2>/dev/null || true) && pip install --prefer-binary --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
-    startCommand: (cd backend 2>/dev/null || true) && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    buildCommand: pip install --prefer-binary --extra-index-url https://download.pytorch.org/whl/cpu -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.8
       - key: PYTHONPATH
-        value: .
+        value: backend:.
       - key: MALLOC_ARENA_MAX
         value: "2"
       - key: WEB_CONCURRENCY

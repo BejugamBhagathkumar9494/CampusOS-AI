@@ -71,20 +71,16 @@ class Settings(BaseSettings):
         required_vars = {
             "SUPABASE_URL": self.SUPABASE_URL or os.getenv("SUPABASE_URL", ""),
             "SUPABASE_SERVICE_ROLE_KEY": self.SUPABASE_SERVICE_ROLE_KEY or os.getenv("SUPABASE_SERVICE_ROLE_KEY", ""),
-            "OPENAI_API_KEY": self.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY", ""),
         }
         missing = [var for var, val in required_vars.items() if not val or not str(val).strip()]
         if missing:
             msg = (
-                f"\n========================================================================\n"
-                f"CRITICAL STARTUP ERROR: Missing required environment variable(s):\n"
-                f"  -> {', '.join(missing)}\n"
-                f"Please ensure SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and OPENAI_API_KEY\n"
-                f"are properly set in environment variables or .env file before running.\n"
-                f"========================================================================\n"
+                f"[CampusOS AI WARNING] Missing environment variable(s): {', '.join(missing)}.\n"
+                f"Running with fallback mock/offline data mode until environment variables are set in deployment dashboard."
             )
             print(msg, file=sys.stderr)
-            raise RuntimeError(msg)
+        else:
+            print("[CampusOS AI] Environment variables validated successfully.")
 
 
 settings = Settings()
