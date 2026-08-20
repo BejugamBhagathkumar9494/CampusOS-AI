@@ -10,18 +10,37 @@ from typing import Dict, Any
 
 
 def run_student_success_agent(student_id: str, context: Dict[str, Any]) -> Dict[str, Any]:
-    """Runs the LangGraph orchestration flow to analyze student data and return insights."""
-    # Stub implementation representing the agent logic
+    """Runs the Student Success AI agent orchestration flow to analyze student data and return dynamic insights."""
+    from app.services.ml_models.attendance_predictor import calculate_attendance_buffer, predict_attendance_trend
+
+    total_cls = context.get("total_classes", 20)
+    attended_cls = context.get("attended_classes", 17)
+    past_rates = context.get("past_attendance_rates", [85.0])
+
+    buffer_info = calculate_attendance_buffer(total_cls, attended_cls, target_pct=75.0)
+    trend_prediction = predict_attendance_trend(past_rates, total_cls, attended_cls)
+
+    overall_rate = buffer_info["current_rate"]
+    risk_status = "High Risk" if overall_rate < 65.0 else "Warning" if overall_rate < 75.0 else "Safe"
+
+    recommendations = []
+    if buffer_info["status"] == "Warning":
+        recommendations.append(f"CRITICAL: Attendance is currently {overall_rate}%. Attend the next {buffer_info['required_future_classes']} consecutive classes to regain 75% exam eligibility.")
+        recommendations.append("Meet with your academic advisor regarding attendance condonation guidelines.")
+    else:
+        recommendations.append(f"Attendance is safe at {overall_rate}%. You can miss up to {buffer_info['margin_absences_allowed']} classes while maintaining 75%.")
+        recommendations.append("Continue participating in upcoming lab sessions and internal quizzes.")
+
     return {
         "student_id": student_id,
-        "academic_risk_status": "Low",
-        "predicted_attendance_trends": "Stabilizing at 88%",
+        "academic_risk_status": risk_status,
+        "current_attendance_rate": overall_rate,
+        "predicted_attendance_trends": f"Projected at {trend_prediction['predicted_attendance']}% ({trend_prediction['trend']})",
+        "buffer_analysis": buffer_info,
         "study_plan": {
-            "focus_subjects": ["Mathematics IV", "Automata Theory"],
-            "hours_per_week": 10,
+            "focus_subjects": context.get("focus_subjects", ["Automata Theory", "Computer Networks"]),
+            "hours_per_week": 12,
         },
-        "weekly_recommendations": [
-            "Review discrete math lecture notes from week 4",
-            "Attempt mock test for Automata before Friday",
-        ],
+        "weekly_recommendations": recommendations,
     }
+

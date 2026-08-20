@@ -86,11 +86,20 @@ def get_student_attendance(student_id: int, db: Session = Depends(get_db), curre
         total_classes += stat["total_classes"]
         
     overall_rate = (total_attended / total_classes * 100.0) if total_classes > 0 else 0.0
+    
+    from app.services.ml_models.attendance_predictor import predict_attendance_trend
+    ml_prediction = predict_attendance_trend(
+        past_attendance_rates=[s["attendance_rate"] for s in stats_list] if stats_list else [overall_rate],
+        total_classes=total_classes,
+        attended_classes=total_attended
+    )
+
     return {
         "student_id": student_id,
         "roll_number": student.roll_number,
         "overall_rate": round(overall_rate, 1),
-        "subjects": stats_list
+        "subjects": stats_list,
+        "ml_prediction": ml_prediction
     }
 
 
