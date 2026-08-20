@@ -4,7 +4,7 @@ export const attendanceService = {
   async getStudentAttendance(studentProfileId) {
     const { data: student } = await supabase
       .from('students')
-      .select('id')
+      .select('id, current_semester')
       .eq('profile_id', studentProfileId)
       .single();
 
@@ -31,13 +31,22 @@ export const attendanceService = {
 
     const { data: records } = await supabase
       .from('attendance')
-      .select('*, courses(id, code, title)')
+      .select('*, courses(id, code, title, semester)')
       .eq('student_id', studentId);
 
     const { data: enrollments } = await supabase
       .from('course_enrollments')
-      .select('course_id, courses(id, code, title)')
+      .select('course_id, courses(id, code, title, semester)')
       .eq('student_id', studentId);
+
+    let semCourses = [];
+    if (student?.current_semester) {
+      const { data: matched } = await supabase
+        .from('courses')
+        .select('id, code, title, semester')
+        .eq('semester', student.current_semester);
+      semCourses = matched || [];
+    }
 
     const subjectMap = {};
 
@@ -48,6 +57,20 @@ export const attendanceService = {
           id: cId,
           code: e.courses?.code || 'SUB',
           title: e.courses?.title || 'Course Subject',
+          semester: e.courses?.semester || 1,
+          total: 0,
+          attended: 0
+        };
+      }
+    });
+
+    (semCourses || []).forEach((c) => {
+      if (c.id && !subjectMap[c.id]) {
+        subjectMap[c.id] = {
+          id: c.id,
+          code: c.code || 'SUB',
+          title: c.title || 'Course Subject',
+          semester: c.semester || 1,
           total: 0,
           attended: 0
         };
@@ -60,7 +83,7 @@ export const attendanceService = {
       const title = rec.courses?.title || subjectMap[courseId]?.title || 'Course Subject';
 
       if (!subjectMap[courseId]) {
-        subjectMap[courseId] = { id: courseId, code, title, total: 0, attended: 0 };
+        subjectMap[courseId] = { id: courseId, code, title, semester: rec.courses?.semester || 1, total: 0, attended: 0 };
       }
       subjectMap[courseId].total += 1;
       if (rec.status === 'present' || rec.status === 'late') {
@@ -74,7 +97,7 @@ export const attendanceService = {
     const subjects = Object.values(subjectMap).map(sub => {
       totalClassesAll += sub.total;
       totalAttendedAll += sub.attended;
-      const rate = sub.total > 0 ? parseFloat(((sub.attended / sub.total) * 100).toFixed(1)) : 100;
+      const rate = sub.total > 0 ? parseFloat(((sub.attended / sub.total) * 100).toFixed(1)) : 100.0;
 
       let reqFuture = 0;
       let marginAbs = 0;
@@ -90,6 +113,7 @@ export const attendanceService = {
         course_id: sub.id,
         subject_name: sub.title,
         subject_code: sub.code,
+        semester: sub.semester,
         total_classes: sub.total,
         attended_classes: sub.attended,
         attendance_rate: rate,
@@ -143,41 +167,25 @@ export const attendanceService = {
 
     const facultyId = faculty?.id;
 
-    let coursesQuery = supabase.from('courses').select('id, code, title');
+    let coursesQuery = supabase.from('courses').select('id, code, title, semester');
     if (facultyId) {
       coursesQuery = coursesQuery.eq('faculty_id', facultyId);
     }
     const { data: courses } = await coursesQuery;
-    const activeCourses = (courses && courses.length > 0) ? courses : (await supabase.from('courses').select('id, code, title')).data || [];
+    const activeCourses = (courses && courses.length > 0) ? courses : (await supabase.from('courses').select('id, code, title, semester')).data || [];
+
+    const { data: allStudents } = await supabase
+      .from('students')
+      .select('id, profile_id, roll_number, cgpa, batch_year, current_semester, profiles(full_name, email, department)');
+
+    const registeredStudents = allStudents || [];
 
     const rosterList = [];
 
     for (const course of activeCourses) {
-      const { data: enrollments } = await supabase
-        .from('course_enrollments')
-        .select(`
-          student_id,
-          students (
-            id, profile_id, roll_number, cgpa, batch_year,
-            profiles ( full_name, email, department )
-          )
-        `)
-        .eq('course_id', course.id);
-
       const studentDetails = [];
 
-      const enrolledList = enrollments || [];
-
-      let studentRecords = enrolledList.map(e => e.students).filter(Boolean);
-      if (studentRecords.length === 0) {
-        const { data: allSts } = await supabase
-          .from('students')
-          .select('id, profile_id, roll_number, cgpa, batch_year, profiles(full_name, email, department)')
-          .limit(10);
-        studentRecords = allSts || [];
-      }
-
-      for (const st of studentRecords) {
+      for (const st of registeredStudents) {
         const profile = Array.isArray(st.profiles) ? st.profiles[0] : st.profiles;
         const { data: attLogs } = await supabase
           .from('attendance')
@@ -193,9 +201,10 @@ export const attendanceService = {
           student_id: st.id,
           profile_id: st.profile_id,
           full_name: profile?.full_name || 'Student Name',
-          roll_number: st.roll_number || '2026-CS-01',
+          roll_number: st.roll_number || `STU-${st.id.slice(0, 4)}`,
           email: profile?.email || 'student@university.edu',
           department: profile?.department || 'Computer Science',
+          semester: st.current_semester || 1,
           cgpa: st.cgpa || 8.0,
           course_total_classes: totalCls,
           course_attended_classes: attendedCls,
@@ -207,6 +216,7 @@ export const attendanceService = {
         course_id: course.id,
         code: course.code,
         title: course.title,
+        semester: course.semester || 1,
         students: studentDetails
       });
     }

@@ -10,22 +10,31 @@ import {
   FileText,
   Clock,
   RefreshCw,
-  Lock
+  Lock,
+  BookOpen,
+  Plus,
+  Trash2,
+  CheckCircle,
+  GraduationCap
 } from 'lucide-react';
 
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import { authService } from '../../auth/services/authService.js';
+import { courseService } from '../../services/courseService.js';
 import { getApiBaseUrl } from '../../services/api.js';
 
 export const UserManagementPage = () => {
   const { profile } = useAuth();
   const [users, setUsers] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [facultyList, setFacultyList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState('users');
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSemester, setSelectedSemester] = useState('all');
 
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminName, setAdminName] = useState('');
@@ -34,6 +43,16 @@ export const UserManagementPage = () => {
   const [adminPass, setAdminPass] = useState('');
   const [adminMsg, setAdminMsg] = useState('');
   const [adminErr, setAdminErr] = useState('');
+
+  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [courseCode, setCourseCode] = useState('');
+  const [courseTitle, setCourseTitle] = useState('');
+  const [courseCredits, setCourseCredits] = useState('4');
+  const [courseSemester, setCourseSemester] = useState('6');
+  const [courseFacultyId, setCourseFacultyId] = useState('');
+  const [courseMsg, setCourseMsg] = useState('');
+  const [courseErr, setCourseErr] = useState('');
+  const [submittingCourse, setSubmittingCourse] = useState(false);
 
   const isSuperAdmin = profile?.role === 'super_admin';
 
@@ -45,8 +64,14 @@ export const UserManagementPage = () => {
 
       const logs = await authService.fetchAuditLogs();
       setAuditLogs(logs);
+
+      const allCourses = await courseService.getAllCourses();
+      setCourses(allCourses);
+
+      const faculties = await courseService.getFacultyList();
+      setFacultyList(faculties);
     } catch (err) {
-      console.error('Error loading user management data:', err);
+      console.error('Error loading management data:', err);
     } finally {
       setLoading(false);
     }
@@ -110,6 +135,54 @@ export const UserManagementPage = () => {
     }
   };
 
+  const handleCreateCourse = async (e) => {
+    e.preventDefault();
+    setCourseMsg('');
+    setCourseErr('');
+
+    if (!courseCode || !courseTitle) {
+      setCourseErr('Course code and course title are required.');
+      return;
+    }
+
+    setSubmittingCourse(true);
+    try {
+      const selectedFac = facultyList.find(f => f.faculty_id === courseFacultyId);
+      await courseService.createAdminCourse({
+        code: courseCode,
+        title: courseTitle,
+        credits: courseCredits,
+        semester: courseSemester,
+        faculty_id: courseFacultyId || null,
+        instructor_name: selectedFac?.full_name || 'Faculty Instructor'
+      });
+
+      setCourseMsg(`Subject "${courseTitle}" designed successfully for Semester ${courseSemester}!`);
+      setCourseCode('');
+      setCourseTitle('');
+      setCourseFacultyId('');
+      setTimeout(() => {
+        setShowCourseModal(false);
+        setCourseMsg('');
+      }, 1500);
+      loadData();
+    } catch (err) {
+      setCourseErr(err.message || 'Failed to create semester course.');
+    } finally {
+      setSubmittingCourse(false);
+    }
+  };
+
+  const handleDeleteCourse = async (courseId, title) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+    try {
+      await courseService.deleteCourse(courseId);
+      loadData();
+    } catch (err) {
+      alert(err.message || 'Failed to delete course.');
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -120,6 +193,12 @@ export const UserManagementPage = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const filteredCourses = courses.filter((c) => {
+    const matchesSem = selectedSemester === 'all' || String(c.semester || 1) === String(selectedSemester);
+    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || c.code.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSem && matchesSearch;
+  });
+
   return (
     <div className="space-y-7 animate-fade-in font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -128,10 +207,10 @@ export const UserManagementPage = () => {
             <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
               <ShieldCheck className="w-5 h-5" />
             </span>
-            User Management & Security Control
+            Admin Control & Curriculum Management
           </h1>
           <p className="text-sm text-slate-500 font-medium mt-1">
-            Authorize user registrations, enforce account statuses, assign roles, and audit campus security logs.
+            Manage campus users, design semester subjects, assign faculty leads, and inspect security logs.
           </p>
         </div>
 
@@ -144,7 +223,17 @@ export const UserManagementPage = () => {
             Refresh
           </button>
 
-          {isSuperAdmin && (
+          {activeTab === 'subjects' && (
+            <button
+              onClick={() => setShowCourseModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              Add Semester Subject
+            </button>
+          )}
+
+          {isSuperAdmin && activeTab === 'users' && (
             <button
               onClick={() => setShowAdminModal(true)}
               className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
@@ -156,7 +245,7 @@ export const UserManagementPage = () => {
         </div>
       </div>
 
-      <div className="flex gap-2 border-b border-slate-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-1">
         <button
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
@@ -167,6 +256,18 @@ export const UserManagementPage = () => {
         >
           <Users className="w-4 h-4" />
           Campus Users & Approvals ({users.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('subjects')}
+          className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+            activeTab === 'subjects'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          Semester Subjects & Faculty ({courses.length})
         </button>
 
         <button
@@ -182,7 +283,7 @@ export const UserManagementPage = () => {
         </button>
       </div>
 
-      {activeTab === 'users' ? (
+      {activeTab === 'users' && (
         <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="relative flex-1 max-w-md">
@@ -311,7 +412,91 @@ export const UserManagementPage = () => {
             </table>
           </div>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'subjects' && (
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search subject title or course code..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-indigo-600" />
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 outline-none cursor-pointer font-bold"
+              >
+                <option value="all">All Semesters</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map((c) => (
+                <div key={c.id} className="p-5 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-3 hover:bg-slate-50 transition-all flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100 font-mono">
+                        {c.code}
+                      </span>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                        Semester {c.semester || 1}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Instructor: <span className="font-bold text-slate-700">{c.instructor_name || 'Faculty Member'}</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      Credits: {c.credits || 4} Hours
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-200/80 flex justify-between items-center">
+                    <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                      Live on Student & Faculty Portals
+                    </span>
+                    <button
+                      onClick={() => handleDeleteCourse(c.id, c.title)}
+                      className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"
+                      title="Delete Subject"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center text-slate-400 font-medium bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 space-y-2">
+                <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="text-sm font-bold text-slate-700">No Semester Subjects Found</p>
+                <p className="text-xs text-slate-500">Click "+ Add Semester Subject" to design subjects for your curriculum.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'audit' && (
         <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-indigo-600" /> Administrative & System Audit Trail
@@ -342,6 +527,121 @@ export const UserManagementPage = () => {
             ) : (
               <p className="text-slate-400 text-xs py-4 text-center">No audit logs recorded yet.</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {showCourseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-up">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-indigo-600" /> Add Semester Subject
+              </h3>
+              <button onClick={() => setShowCourseModal(false)} className="text-slate-400 hover:text-slate-600 font-bold text-sm">
+                ✕
+              </button>
+            </div>
+
+            {courseErr && (
+              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-xs font-semibold">
+                {courseErr}
+              </div>
+            )}
+            {courseMsg && (
+              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" /> {courseMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateCourse} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Subject Code</label>
+                <input
+                  type="text"
+                  value={courseCode}
+                  onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
+                  placeholder="CS-601"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 font-mono outline-none focus:border-indigo-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Subject Title</label>
+                <input
+                  type="text"
+                  value={courseTitle}
+                  onChange={(e) => setCourseTitle(e.target.value)}
+                  placeholder="Advanced Machine Learning & AI"
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Target Semester</label>
+                  <select
+                    value={courseSemester}
+                    onChange={(e) => setCourseSemester(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  >
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Credits</label>
+                  <input
+                    type="number"
+                    value={courseCredits}
+                    onChange={(e) => setCourseCredits(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Assign Faculty Lead</label>
+                <select
+                  value={courseFacultyId}
+                  onChange={(e) => setCourseFacultyId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                >
+                  <option value="">-- Select Faculty Lead --</option>
+                  {facultyList.map((f) => (
+                    <option key={f.faculty_id} value={f.faculty_id}>
+                      {f.full_name} ({f.department})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowCourseModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingCourse}
+                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20"
+                >
+                  {submittingCourse ? 'Designing...' : 'Save Subject'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
