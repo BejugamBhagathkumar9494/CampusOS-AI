@@ -164,7 +164,7 @@ export const attendanceService = {
       .from('faculty')
       .select('id')
       .eq('profile_id', facultyProfileId)
-      .single();
+      .maybeSingle();
 
     const facultyId = faculty?.id;
 
@@ -175,18 +175,65 @@ export const attendanceService = {
     const { data: courses } = await coursesQuery;
     const activeCourses = (courses && courses.length > 0) ? courses : (await supabase.from('courses').select('id, code, title, semester')).data || [];
 
-    const { data: allStudents } = await supabase
-      .from('students')
-      .select('id, profile_id, roll_number, cgpa, batch_year, current_semester, profiles(full_name, email, department)');
+    // Fetch all profiles with role = student
+    const { data: studentProfiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'student');
 
-    const registeredStudents = allStudents || [];
+    // Fetch existing students rows
+    const { data: existingStudents } = await supabase
+      .from('students')
+      .select('*');
+
+    const studentMap = {};
+    (existingStudents || []).forEach(s => {
+      studentMap[s.profile_id] = s;
+    });
+
+    const registeredStudents = [];
+
+    for (const prof of studentProfiles || []) {
+      let stRecord = studentMap[prof.id];
+      if (!stRecord) {
+        // Auto-create student row if missing
+        try {
+          const { data: newSt } = await supabase
+            .from('students')
+            .insert([{
+              profile_id: prof.id,
+              roll_number: prof.institution_id || `STU-${prof.id.slice(0, 6).toUpperCase()}`,
+              batch_year: 2026,
+              cgpa: 8.0,
+              semester: 5
+            }])
+            .select()
+            .single();
+
+          if (newSt) stRecord = newSt;
+        } catch (e) {
+          console.warn('Auto-create student row error:', e);
+        }
+      }
+
+      registeredStudents.push({
+        id: stRecord?.id || prof.id,
+        profile_id: prof.id,
+        roll_number: stRecord?.roll_number || prof.institution_id || `STU-${prof.id.slice(0, 6).toUpperCase()}`,
+        cgpa: stRecord?.cgpa || 8.0,
+        current_semester: stRecord?.semester || 5,
+        full_name: prof.full_name || 'Student Name',
+        email: prof.email || 'student@university.edu',
+        department: prof.department || 'Computer Science & Engineering'
+      });
+    }
+
     const rosterList = [];
 
     for (const course of activeCourses) {
       const studentDetails = [];
 
       for (const st of registeredStudents) {
-        const profile = Array.isArray(st.profiles) ? st.profiles[0] : st.profiles;
         const { data: attLogs } = await supabase
           .from('attendance')
           .select('status')
@@ -200,12 +247,12 @@ export const attendanceService = {
         studentDetails.push({
           student_id: st.id,
           profile_id: st.profile_id,
-          full_name: profile?.full_name || 'Student Name',
-          roll_number: st.roll_number || `STU-${st.id.slice(0, 4)}`,
-          email: profile?.email || 'student@university.edu',
-          department: profile?.department || 'Computer Science',
-          semester: st.current_semester || 1,
-          cgpa: st.cgpa || 8.0,
+          full_name: st.full_name,
+          roll_number: st.roll_number,
+          email: st.email,
+          department: st.department,
+          semester: st.current_semester,
+          cgpa: st.cgpa,
           course_total_classes: totalCls,
           course_attended_classes: attendedCls,
           course_attendance_rate: rate

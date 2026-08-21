@@ -49,5 +49,15 @@ export const examService = {
     }
 
     return data;
+  },
+
+  async deleteExam(examId) {
+    const { error } = await supabase
+      .from('examinations')
+      .delete()
+      .eq('id', examId);
+
+    if (error) throw error;
+    return true;
   }
 };
