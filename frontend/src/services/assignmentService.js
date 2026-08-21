@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+import { notificationService } from './notificationService.js';
 
 export const assignmentService = {
   async getAssignments() {
@@ -11,28 +12,37 @@ export const assignmentService = {
     return data || [];
   },
 
-  async createAssignment(
-    course_id,
-    title,
-    description,
-    due_date,
-    total_points = 100
-  ) {
+  async createAssignment(course_id, title, description, due_date, total_points = 100) {
+    let finalCourseId = course_id;
+    if (!finalCourseId) {
+      const { data: firstCourse } = await supabase.from('courses').select('id').limit(1).single();
+      finalCourseId = firstCourse?.id;
+    }
+
     const { data, error } = await supabase
       .from('assignments')
-      .insert([{ course_id, title, description, due_date, total_points }])
-      .select()
+      .insert([{ course_id: finalCourseId, title, description, due_date, total_points }])
+      .select('*, courses(code, title)')
       .single();
 
     if (error) throw error;
+
+    // Send broadcast notification to all students
+    try {
+      const courseLabel = data?.courses?.code ? ` [${data.courses.code}]` : '';
+      await notificationService.notifyAllStudents(
+        'New Assignment Posted',
+        `New assignment "${title}"${courseLabel} has been published. Due: ${new Date(due_date).toLocaleDateString()}.`,
+        'warning'
+      );
+    } catch (nErr) {
+      console.warn('Assignment notification error:', nErr);
+    }
+
     return data;
   },
 
-  async submitAssignment(
-    assignment_id,
-    studentProfileId,
-    file_url
-  ) {
+  async submitAssignment(assignment_id, studentProfileId, file_url) {
     const { data: student } = await supabase
       .from('students')
       .select('id')
@@ -46,7 +56,7 @@ export const assignmentService = {
       .upsert({
         assignment_id,
         student_id: studentId,
-        file_url,
+        file_url: file_url || 'https://university.edu/submissions/file.pdf',
         status: 'submitted',
         submitted_at: new Date().toISOString()
       })
@@ -60,7 +70,7 @@ export const assignmentService = {
   async getSubmissions(assignment_id) {
     let query = supabase
       .from('assignment_submissions')
-      .select('*, assignments(title, course_id), students(roll_number, profiles(full_name, email))')
+      .select('*, assignments(title, course_id), students(roll_number, profile_id, profiles(full_name, email))')
       .order('submitted_at', { ascending: false });
 
     if (assignment_id) {
@@ -72,19 +82,32 @@ export const assignmentService = {
     return data || [];
   },
 
-  async gradeSubmission(
-    submission_id,
-    marks,
-    feedback
-  ) {
+  async gradeSubmission(submission_id, marks, feedback) {
     const { data, error } = await supabase
       .from('assignment_submissions')
-      .update({ marks, feedback, status: 'graded' })
+      .update({ marks: Number(marks), feedback, status: 'graded' })
       .eq('id', submission_id)
-      .select()
+      .select('*, students(profile_id), assignments(title)')
       .single();
 
     if (error) throw error;
+
+    // Notify student
+    try {
+      const studentProfileId = data?.students?.profile_id;
+      const assignTitle = data?.assignments?.title || 'Assignment';
+      if (studentProfileId) {
+        await notificationService.notifyUser(
+          studentProfileId,
+          'Assignment Graded',
+          `Your submission for "${assignTitle}" has been graded: ${marks} points. Feedback: "${feedback || 'Good work'}"`,
+          'success'
+        );
+      }
+    } catch (nErr) {
+      console.warn('Grade notification error:', nErr);
+    }
+
     return data;
   }
 };

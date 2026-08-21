@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+import { notificationService } from './notificationService.js';
 
 export const libraryService = {
   async getBooks(searchQuery) {
@@ -23,7 +24,7 @@ export const libraryService = {
 
     const { data: book } = await supabase
       .from('library_books')
-      .select('copies_available')
+      .select('title, copies_available')
       .eq('id', bookId)
       .single();
 
@@ -52,13 +53,85 @@ export const libraryService = {
       .update({ copies_available: book.copies_available - 1 })
       .eq('id', bookId);
 
+    // Notify student
+    try {
+      if (studentProfileId) {
+        await notificationService.notifyUser(
+          studentProfileId,
+          'Library Book Issued',
+          `"${book.title}" has been issued to you. Due date: ${dueDate.toLocaleDateString()}.`,
+          'info'
+        );
+      }
+    } catch (nErr) {
+      console.warn('Library issue notification error:', nErr);
+    }
+
+    return data;
+  },
+
+  async returnBook(issuedBookId) {
+    const { data: issued } = await supabase
+      .from('issued_books')
+      .select('*, library_books(title, copies_available), students(profile_id)')
+      .eq('id', issuedBookId)
+      .single();
+
+    if (!issued) throw new Error('Issued record not found.');
+
+    const returnDateStr = new Date().toISOString().split('T')[0];
+    const due = new Date(issued.due_date);
+    const now = new Date();
+
+    let fine = 0;
+    if (now > due) {
+      const diffTime = Math.abs(now - due);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      fine = diffDays * 5; // $5 per day fine
+    }
+
+    const { data, error } = await supabase
+      .from('issued_books')
+      .update({
+        return_date: returnDateStr,
+        fine_amount: fine
+      })
+      .eq('id', issuedBookId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    if (issued.library_books?.id) {
+      const currentCopies = issued.library_books.copies_available || 0;
+      await supabase
+        .from('library_books')
+        .update({ copies_available: currentCopies + 1 })
+        .eq('id', issued.library_books.id);
+    }
+
+    // Notify student
+    try {
+      const studentProfileId = issued.students?.profile_id;
+      if (studentProfileId) {
+        await notificationService.notifyUser(
+          studentProfileId,
+          'Library Book Returned',
+          `"${issued.library_books?.title || 'Book'}" has been returned. Fine accrued: $${fine}.`,
+          fine > 0 ? 'warning' : 'success'
+        );
+      }
+    } catch (nErr) {
+      console.warn('Return notification error:', nErr);
+    }
+
     return data;
   },
 
   async getIssuedBooks(studentProfileId) {
     let query = supabase
       .from('issued_books')
-      .select('*, library_books(*), students(roll_number, profiles(full_name))')
+      .select('*, library_books(*), students(roll_number, profile_id, profiles(full_name))')
       .is('return_date', null);
 
     if (studentProfileId) {
@@ -75,6 +148,23 @@ export const libraryService = {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+
+    // Dynamically calculate live fine for overdue books
+    return (data || []).map(b => {
+      const due = new Date(b.due_date);
+      const now = new Date();
+      let liveFine = Number(b.fine_amount || 0);
+
+      if (!b.return_date && now > due) {
+        const diffTime = Math.abs(now - due);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        liveFine = diffDays * 5;
+      }
+
+      return {
+        ...b,
+        calculated_fine: liveFine
+      };
+    });
   }
 };

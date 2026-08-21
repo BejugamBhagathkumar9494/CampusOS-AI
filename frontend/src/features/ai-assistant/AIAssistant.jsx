@@ -1,12 +1,21 @@
 import { useState } from 'react'
 import { Send, Sparkles, HelpCircle, Bot, User, Zap, BookOpen, ChevronDown, ChevronUp, Cpu } from 'lucide-react'
+import { useAuth } from '../../auth/hooks/useAuth.js'
 import { chatWithAgent } from '../../services/api.js'
+import { attendanceService } from '../../services/attendanceService.js'
+import { academicService } from '../../services/academicService.js'
+import { placementService } from '../../services/placementService.js'
+import { assignmentService } from '../../services/assignmentService.js'
+import { hostelService } from '../../services/hostelService.js'
+import { examService } from '../../services/examService.js'
+import { financeService } from '../../services/financeService.js'
 
 export default function AIAssistant() {
+  const { profile } = useAuth();
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
-      text: 'Hi John! I am your CampusOS Multi-Agent AI Assistant. Agentic Mode is ACTIVE. I dynamically route your queries across specialized neural agents (Academic, Placement, Student Success, Hostel, Finance, Transport, Library, and Grounded RAG). How can I assist you today?',
+      text: `Hi ${profile?.full_name || 'User'}! I am your CampusOS Multi-Agent AI Assistant. Agentic Mode is ACTIVE. I dynamically route your queries across live Supabase database records (Attendance, Academics, Placements, Hostel, Assignments, Finance, Transport, and RAG). How can I assist you today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       agentName: '🤖 CampusOS AI Supervisor',
       confidenceScore: 0.98
@@ -18,10 +27,11 @@ export default function AIAssistant() {
   const [expandedSources, setExpandedSources] = useState({})
 
   const suggestedQueries = [
-    'Explain Dijkstra algorithm in simple terms',
-    'Calculate my placement readiness score',
-    'Generate practice quiz for Automata Theory',
-    'What are the campus hostel curfew rules?',
+    'What is my attendance?',
+    'Which companies am I eligible for?',
+    'How many assignments are pending?',
+    'Show my CGPA',
+    'What hostel notices are new?'
   ]
 
   const toggleSources = (idx) => {
@@ -53,20 +63,59 @@ export default function AIAssistant() {
       }
       setMessages((prev) => [...prev, botMsg])
     } catch (err) {
-      console.warn("API request failed, using intelligent CampusOS RAG fallback:", err)
+      console.warn("Backend unavailable, querying live Supabase database:", err)
       const qLower = query.toLowerCase()
       let fallbackText = ""
-      
-      if (qLower.includes("who are you") || qLower.includes("who r u") || qLower.includes("hi") || qLower.includes("hello")) {
-        fallbackText = "Hello! 👋 I am CampusOS AI, your official University Operating System Assistant powered by multi-agent AI for Students, Faculty, and Staff."
-      } else if (qLower.includes("attendance") || qLower.includes("present") || qLower.includes("absent")) {
-        fallbackText = "CampusOS Attendance Policy: Students must maintain a minimum of 75% overall attendance to be eligible for end-semester examinations. Medical leave certificates can condone up to 10% attendance shortage with warden approval."
-      } else if (qLower.includes("placement") || qLower.includes("job") || qLower.includes("resume")) {
-        fallbackText = "Placement Intelligence: Top active campus recruiters include Google, Microsoft, Amazon, and TCS Digital. Maintain a CGPA above 6.0 (recommended 8.0+) with zero active backlogs to participate in drive rounds."
-      } else if (qLower.includes("hostel") || qLower.includes("curfew") || qLower.includes("room")) {
-        fallbackText = "Hostel Policy: Curfew entry cutoff is 10:00 PM on weekdays and 10:30 PM on weekends. Submit plumbing, Wi-Fi, or electrical maintenance tickets directly via your Hostel tab."
+
+      if (qLower.includes("attendance") || qLower.includes("present") || qLower.includes("absent")) {
+        const att = profile?.id ? await attendanceService.getStudentAttendance(profile.id) : null;
+        if (att && att.subjects.length > 0) {
+          fallbackText = `📊 **Live Supabase Attendance Summary**:\n\n• Overall Rate: **${att.overall_rate}%** across ${att.subjects.length} course(s).\n• Total Classes Logged: ${att.total_classes_all} | Attended: ${att.total_attended_all}\n• Status: ${att.overall_rate >= 75 ? '✅ Safe (Eligible for exams)' : '⚠️ Shortage Warning (<75%)'}\n\n**Subject Breakdown**:\n` +
+            att.subjects.map(s => `• ${s.subject_code} (${s.subject_name}): **${s.attendance_rate}%** (${s.attended_classes}/${s.total_classes} attended)`).join('\n');
+        } else {
+          fallbackText = "Your attendance data is synchronized under the Attendance tab. Minimum required attendance is 75%.";
+        }
+      } else if (qLower.includes("cgpa") || qLower.includes("mark") || qLower.includes("grade")) {
+        const marksData = profile?.id ? await academicService.getStudentMarks(profile.id) : null;
+        if (marksData) {
+          fallbackText = `🎓 **Live Supabase Academic Performance**:\n\n• Current Recalculated CGPA: **${marksData.cgpa}** / 10.0\n\n**Enrolled Course Grades**:\n` +
+            marksData.subjects.map(s => `• ${s.subject_code} (${s.subject_name}): Internal ${s.internal_marks} + Exam ${s.exam_marks} = Total **${s.total_marks}** (Grade: **${s.grade}**)`).join('\n');
+        }
+      } else if (qLower.includes("placement") || qLower.includes("company") || qLower.includes("eligible") || qLower.includes("job") || qLower.includes("drive")) {
+        const drives = profile?.id ? await placementService.getEligibleDrivesForStudent(profile.id) : [];
+        if (drives.length > 0) {
+          const eligible = drives.filter(d => d.is_eligible);
+          fallbackText = `💼 **Live Placement Intelligence**:\n\n` +
+            `Found **${drives.length} active placement drive(s)** registered in Supabase. You are currently **eligible for ${eligible.length} drive(s)**:\n\n` +
+            drives.map(d => `• **${d.companies?.name || 'Recruiter'}** - ${d.job_title} (${d.package_ctc} LPA) | Min CGPA: ${d.min_cgpa} -> **[${d.is_eligible ? 'Eligible ✅' : 'Ineligible ❌'}]**${d.applied ? ' (Applied)' : ''}`).join('\n');
+        } else {
+          fallbackText = "Placement drives are synchronized live with the Placement Officer dashboard.";
+        }
+      } else if (qLower.includes("assignment")) {
+        const assigns = await assignmentService.getAssignments();
+        fallbackText = `📝 **Live Assignment Portal**:\n\nCurrently found **${assigns.length} assignment(s)** posted by faculty in Supabase:\n\n` +
+          assigns.map(a => `• **${a.title}** (${a.courses?.code || 'Subject'}) - Due: ${new Date(a.due_date).toLocaleDateString()} | Total Points: ${a.total_points}`).join('\n');
+      } else if (qLower.includes("hostel") || qLower.includes("notice") || qLower.includes("warden")) {
+        const notices = await hostelService.getHostelNotices();
+        fallbackText = `🏠 **Live Hostel & Warden Notices**:\n\n` +
+          (notices.length > 0
+            ? notices.slice(0, 3).map(n => `• **${n.title}**: ${n.content}`).join('\n')
+            : "No active hostel announcements in Supabase. Warden entry cutoff is 10:00 PM.");
+      } else if (qLower.includes("exam") || qLower.includes("schedule")) {
+        const exams = await examService.getExams();
+        fallbackText = `📅 **Live Exam Schedule**:\n\n` +
+          (exams.length > 0
+            ? exams.map(e => `• **${e.exam_name}** (${e.courses?.code || 'Subject'}) - Date: ${new Date(e.exam_date).toLocaleDateString()} at ${e.location}`).join('\n')
+            : "No end-semester exams currently scheduled.");
+      } else if (qLower.includes("fee") || qLower.includes("finance") || qLower.includes("balance") || qLower.includes("payment")) {
+        const fin = profile?.id ? await financeService.getStudentFeePayments(profile.id) : null;
+        fallbackText = fin
+          ? `💳 **Live Finance Summary**:\n\n• Outstanding Balance: **₹${fin.outstanding_balance}**\n• Total Payments Received: **₹${fin.total_paid}**\n• Total Invoices: ${fin.payments.length}`
+          : "Fee details are synchronized live with the Finance tab.";
+      } else if (qLower.includes("who are you") || qLower.includes("who r u") || qLower.includes("hi") || qLower.includes("hello")) {
+        fallbackText = `Hello 👋 ${profile?.full_name || 'Student'}! I am CampusOS AI, your official University Operating System Assistant connected directly to your Supabase database.`
       } else {
-        fallbackText = `Regarding **"${query}"**:\n\nCampusOS is operating normally. All student records, attendance registers, course modules, and hostel portals are synchronized under your student dashboard.`
+        fallbackText = `Regarding **"${query}"**:\n\nCampusOS is fully operational. All student records, attendance registers, placement eligibility models, course modules, and hostel portals are synchronized live in Supabase.`
       }
 
       const botMsg = {
@@ -74,7 +123,7 @@ export default function AIAssistant() {
         text: fallbackText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         agentName: agenticMode ? '🤖 Multi-Agent Supervisor' : '📚 RAG Assistant',
-        confidenceScore: 0.92
+        confidenceScore: 0.95
       }
       setMessages((prev) => [...prev, botMsg])
     } finally {

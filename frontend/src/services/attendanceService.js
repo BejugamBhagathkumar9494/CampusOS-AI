@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+import { notificationService } from './notificationService.js';
 
 export const attendanceService = {
   async getStudentAttendance(studentProfileId) {
@@ -179,7 +180,6 @@ export const attendanceService = {
       .select('id, profile_id, roll_number, cgpa, batch_year, current_semester, profiles(full_name, email, department)');
 
     const registeredStudents = allStudents || [];
-
     const rosterList = [];
 
     for (const course of activeCourses) {
@@ -254,6 +254,59 @@ export const attendanceService = {
       .select();
 
     if (error) throw error;
+
+    // Send notifications to students whose attendance was logged
+    try {
+      const { data: course } = await supabase.from('courses').select('code, title').eq('id', sample.course_id).single();
+      const courseLabel = course ? `${course.code}` : 'your course';
+
+      for (const rec of records) {
+        const { data: student } = await supabase.from('students').select('profile_id').eq('id', rec.student_id).single();
+        if (student?.profile_id) {
+          await notificationService.notifyUser(
+            student.profile_id,
+            'Attendance Updated',
+            `Attendance for ${courseLabel} on ${sample.date} was logged as ${rec.status.toUpperCase()}.`,
+            'info'
+          );
+        }
+      }
+    } catch (notifErr) {
+      console.warn('Error sending attendance notifications:', notifErr);
+    }
+
     return data || [];
+  },
+
+  async getAllStudentAttendanceReports() {
+    const { data: allStudents } = await supabase
+      .from('students')
+      .select('id, profile_id, roll_number, cgpa, batch_year, current_semester, profiles(full_name, email, department)');
+
+    const reports = [];
+    for (const st of allStudents || []) {
+      const profile = Array.isArray(st.profiles) ? st.profiles[0] : st.profiles;
+      const { data: attLogs } = await supabase
+        .from('attendance')
+        .select('status')
+        .eq('student_id', st.id);
+
+      const total = attLogs?.length || 0;
+      const attended = attLogs?.filter(a => a.status === 'present' || a.status === 'late').length || 0;
+      const rate = total > 0 ? parseFloat(((attended / total) * 100).toFixed(1)) : 100.0;
+
+      reports.push({
+        student_id: st.id,
+        profile_id: st.profile_id,
+        full_name: profile?.full_name || 'Student',
+        roll_number: st.roll_number || 'STU-001',
+        department: profile?.department || 'Computer Science',
+        total_classes: total,
+        attended_classes: attended,
+        overall_rate: rate,
+        status: rate >= 75 ? 'Eligible' : 'Shortage Risk'
+      });
+    }
+    return reports;
   }
 };

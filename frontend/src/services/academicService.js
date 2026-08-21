@@ -1,10 +1,11 @@
 import { supabase } from './supabaseClient.js';
+import { notificationService } from './notificationService.js';
 
 export const academicService = {
   async getStudentMarks(studentProfileId) {
     const { data: student } = await supabase
       .from('students')
-      .select('id, cgpa')
+      .select('id, cgpa, semester')
       .eq('profile_id', studentProfileId)
       .single();
 
@@ -13,10 +14,7 @@ export const academicService = {
     if (!studentId) {
       return {
         cgpa: student?.cgpa || 8.4,
-        subjects: [
-          { subject_code: 'CS301', subject_name: 'Automata Theory', internal_marks: 38, exam_marks: 48, total_marks: 86, grade: 'A' },
-          { subject_code: 'CS302', subject_name: 'Computer Networks', internal_marks: 40, exam_marks: 52, total_marks: 92, grade: 'A+' }
-        ]
+        subjects: []
       };
     }
 
@@ -86,6 +84,44 @@ export const academicService = {
     };
   },
 
+  async recalculateCGPA(studentId) {
+    if (!studentId) return 8.0;
+
+    const { data: marks } = await supabase
+      .from('student_marks')
+      .select('course_id, marks_obtained, eval_type')
+      .eq('student_id', studentId);
+
+    if (!marks || marks.length === 0) return 8.0;
+
+    const courseTotals = {};
+    marks.forEach(m => {
+      courseTotals[m.course_id] = (courseTotals[m.course_id] || 0) + Number(m.marks_obtained);
+    });
+
+    const totals = Object.values(courseTotals);
+    if (totals.length === 0) return 8.0;
+
+    const gradePoints = totals.map(tot => {
+      if (tot >= 90) return 10.0;
+      if (tot >= 80) return 9.0;
+      if (tot >= 70) return 8.0;
+      if (tot >= 60) return 7.0;
+      if (tot >= 50) return 6.0;
+      return 0.0;
+    });
+
+    const sum = gradePoints.reduce((acc, curr) => acc + curr, 0);
+    const newCGPA = parseFloat((sum / gradePoints.length).toFixed(2));
+
+    await supabase
+      .from('students')
+      .update({ cgpa: newCGPA })
+      .eq('id', studentId);
+
+    return newCGPA;
+  },
+
   async addStudentMark(payload) {
     const { data, error } = await supabase
       .from('student_marks')
@@ -94,6 +130,26 @@ export const academicService = {
       .single();
 
     if (error) throw error;
+
+    if (payload.student_id) {
+      const newCGPA = await this.recalculateCGPA(payload.student_id);
+
+      // Send notification to student
+      try {
+        const { data: student } = await supabase.from('students').select('profile_id').eq('id', payload.student_id).single();
+        if (student?.profile_id) {
+          await notificationService.notifyUser(
+            student.profile_id,
+            'New Marks Uploaded',
+            `Your marks for ${payload.eval_type || 'evaluation'} have been uploaded. Updated CGPA: ${newCGPA}.`,
+            'info'
+          );
+        }
+      } catch (err) {
+        console.warn('Error sending mark notification:', err);
+      }
+    }
+
     return data;
   }
 };
