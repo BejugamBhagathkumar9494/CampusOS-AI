@@ -138,46 +138,47 @@ export const courseService = {
   },
 
   async createAdminCourse(payload) {
-    const coursePayload = {
+    const minimalPayload = {
       code: payload.code.toUpperCase(),
       title: payload.title,
       credits: Number(payload.credits) || 4,
-      semester: Number(payload.semester) || 1,
-      faculty_id: payload.faculty_id || null,
-      instructor_name: payload.instructor_name || 'Faculty Member'
+      faculty_id: payload.faculty_id || null
     };
 
     let { data, error } = await supabase
       .from('courses')
-      .insert([coursePayload])
+      .insert([minimalPayload])
       .select()
       .single();
 
-    // Catch schema cache errors (missing 'semester' or 'instructor_name' column)
-    if (error && (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
-      delete coursePayload.instructor_name;
-      delete coursePayload.semester;
-
-      const retry = await supabase
-        .from('courses')
-        .insert([coursePayload])
-        .select()
-        .single();
-
-      data = retry.data;
-      error = retry.error;
+    if (error) {
+      console.error('Core course creation error:', error);
+      throw new Error(error.message || 'Failed to create course in database');
     }
 
-    if (error) throw error;
+    // Try setting optional fields if columns exist in database schema
+    if (data?.id) {
+      try {
+        await supabase
+          .from('courses')
+          .update({
+            semester: Number(payload.semester) || 1,
+            instructor_name: payload.instructor_name || 'Faculty Member'
+          })
+          .eq('id', data.id);
+      } catch (optErr) {
+        // Silently skip if optional columns do not exist
+      }
+    }
 
-    if (payload.semester) {
+    if (payload.semester && data?.id) {
       try {
         const { data: studentsInSem } = await supabase
           .from('students')
           .select('id')
           .eq('current_semester', Number(payload.semester));
 
-        if (studentsInSem && studentsInSem.length > 0 && data?.id) {
+        if (studentsInSem && studentsInSem.length > 0) {
           const enrollmentRows = studentsInSem.map(s => ({
             course_id: data.id,
             student_id: s.id
