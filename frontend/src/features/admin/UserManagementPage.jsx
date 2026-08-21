@@ -69,7 +69,18 @@ export const UserManagementPage = () => {
       const allCourses = await courseService.getAllCourses();
       setCourses(allCourses);
 
-      const faculties = await courseService.getFacultyList();
+      let faculties = await courseService.getFacultyList();
+      if (!faculties || faculties.length === 0) {
+        faculties = (fetchedUsers || [])
+          .filter(u => u.role === 'faculty' || u.role === 'admin' || u.role === 'super_admin')
+          .map(u => ({
+            faculty_id: u.id,
+            profile_id: u.id,
+            full_name: u.full_name || u.email,
+            email: u.email,
+            department: u.department || 'Academic'
+          }));
+      }
       setFacultyList(faculties);
     } catch (err) {
       console.error('Error loading management data:', err);

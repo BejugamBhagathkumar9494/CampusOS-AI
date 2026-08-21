@@ -74,18 +74,67 @@ export const courseService = {
   },
 
   async getFacultyList() {
-    const { data, error } = await supabase
+    // 1. Fetch profiles where role = 'faculty', 'admin', or 'super_admin'
+    const { data: facultyProfiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('role', ['faculty', 'admin', 'super_admin']);
+
+    // 2. Fetch existing faculty records
+    const { data: existingFaculty } = await supabase
       .from('faculty')
-      .select('id, employee_id, profiles(id, full_name, email, department)');
-    
-    if (error || !data) return [];
-    return data.map(f => ({
-      faculty_id: f.id,
-      profile_id: f.profiles?.id,
-      full_name: f.profiles?.full_name || 'Faculty Member',
-      email: f.profiles?.email || '',
-      department: f.profiles?.department || 'Academic'
-    }));
+      .select('id, profile_id, employee_id');
+
+    const facultyMap = {};
+    (existingFaculty || []).forEach(f => {
+      facultyMap[f.profile_id] = f;
+    });
+
+    const resultList = [];
+
+    for (const prof of facultyProfiles || []) {
+      let facRecord = facultyMap[prof.id];
+      if (!facRecord && prof.role === 'faculty') {
+        try {
+          const { data: newFac } = await supabase
+            .from('faculty')
+            .insert([{
+              profile_id: prof.id,
+              employee_id: prof.institution_id || `FAC-${prof.id.slice(0, 6).toUpperCase()}`
+            }])
+            .select()
+            .single();
+          if (newFac) facRecord = newFac;
+        } catch (e) {
+          console.warn('Auto-create faculty row warning:', e);
+        }
+      }
+
+      resultList.push({
+        faculty_id: facRecord?.id || prof.id,
+        profile_id: prof.id,
+        full_name: prof.full_name || prof.email || 'Faculty Member',
+        email: prof.email || '',
+        department: prof.department || 'Computer Science & Engineering'
+      });
+    }
+
+    if (resultList.length === 0) {
+      const { data: rawFac } = await supabase
+        .from('faculty')
+        .select('id, employee_id, profiles(id, full_name, email, department)');
+      if (rawFac && rawFac.length > 0) {
+        return rawFac.map(f => ({
+          faculty_id: f.id,
+          profile_id: f.profiles?.id,
+          full_name: f.profiles?.full_name || 'Faculty Member',
+          email: f.profiles?.email || '',
+          department: f.profiles?.department || 'Academic'
+        }));
+      }
+    }
+
+    return resultList;
   },
 
   async createAdminCourse(payload) {
@@ -104,30 +153,40 @@ export const courseService = {
       .select()
       .single();
 
-    if (error && (error.message?.includes('instructor_name') || error.code === 'PGRST204')) {
+    // Catch schema cache errors (missing 'semester' or 'instructor_name' column)
+    if (error && (error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
       delete coursePayload.instructor_name;
+      delete coursePayload.semester;
+
       const retry = await supabase
         .from('courses')
         .insert([coursePayload])
         .select()
         .single();
+
       data = retry.data;
       error = retry.error;
     }
 
     if (error) throw error;
 
-    const { data: studentsInSem } = await supabase
-      .from('students')
-      .select('id')
-      .eq('current_semester', coursePayload.semester);
+    if (payload.semester) {
+      try {
+        const { data: studentsInSem } = await supabase
+          .from('students')
+          .select('id')
+          .eq('current_semester', Number(payload.semester));
 
-    if (studentsInSem && studentsInSem.length > 0 && data?.id) {
-      const enrollmentRows = studentsInSem.map(s => ({
-        course_id: data.id,
-        student_id: s.id
-      }));
-      await supabase.from('course_enrollments').upsert(enrollmentRows);
+        if (studentsInSem && studentsInSem.length > 0 && data?.id) {
+          const enrollmentRows = studentsInSem.map(s => ({
+            course_id: data.id,
+            student_id: s.id
+          }));
+          await supabase.from('course_enrollments').upsert(enrollmentRows);
+        }
+      } catch (semErr) {
+        console.warn('Auto course enrollment warning:', semErr);
+      }
     }
 
     return data;
