@@ -122,7 +122,7 @@ export default function LandingPage() {
     }, 2800)
     return () => clearInterval(timer)
   }, [])
-  
+
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState([
     {
@@ -186,7 +186,7 @@ export default function LandingPage() {
 
   const handleCopilotSubmit = (text) => {
     if (!text.trim() || isTyping) return
-    
+
     const userMsg = text
     setChatMessages(prev => [...prev, { sender: 'user', text: userMsg }])
     setChatInput('')

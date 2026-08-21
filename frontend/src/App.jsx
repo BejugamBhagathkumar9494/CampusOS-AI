@@ -19,7 +19,6 @@ import Attendance from './features/attendance/AttendancePage';
 import Exams from './features/exams/ExamsPage';
 import Assignments from './features/assignments/AssignmentsPage';
 import Library from './features/library/LibraryPage';
-import Hostel from './features/hostel/HostelPage';
 import Transport from './features/transport/TransportPage';
 import Placements from './features/placements/PlacementsPage';
 import Finance from './features/finance/FinancePage';
@@ -56,7 +55,6 @@ const DashboardRedirect = () => {
     student: '/student/dashboard',
     faculty: '/faculty/dashboard',
     admin: '/admin/dashboard',
-    hostel_warden: '/hostel/dashboard',
     placement_officer: '/placement/dashboard',
     super_admin: '/super-admin/dashboard',
   };
@@ -158,25 +156,6 @@ export default function App() {
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="audit-logs" element={<UserManagementPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="*" element={<Navigate to="dashboard" replace />} />
-                  </Routes>
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/hostel/*"
-            element={
-              <ProtectedRoute allowedRoles={['hostel_warden']}>
-                <DashboardLayout>
-                  <Routes>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="ai-assistant" element={<AIAssistant />} />
-                    <Route path="hostel" element={<Hostel />} />
-                    <Route path="notices" element={<Notices />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />

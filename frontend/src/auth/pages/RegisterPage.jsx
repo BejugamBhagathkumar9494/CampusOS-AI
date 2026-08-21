@@ -99,7 +99,6 @@ export const RegisterPage = () => {
   const roleOptions = [
     { value: 'student', label: 'Student', desc: 'Access class portals, academics, & placements', sampleId: 'e.g. STU001' },
     { value: 'faculty', label: 'Faculty Member', desc: 'Manage courses, grades, & schedules', sampleId: 'e.g. FAC001' },
-    { value: 'hostel_warden', label: 'Hostel Warden', desc: 'Manage rooms & student accommodations', sampleId: 'e.g. WAR001' },
     { value: 'placement_officer', label: 'Placement Officer', desc: 'Coordinate corporate recruitment drives', sampleId: 'e.g. PO001' },
   ];
 

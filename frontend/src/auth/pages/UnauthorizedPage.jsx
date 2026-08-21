@@ -21,7 +21,6 @@ export const UnauthorizedPage = () => {
       student: '/student/dashboard',
       faculty: '/faculty/dashboard',
       admin: '/admin/dashboard',
-      hostel_warden: '/hostel/dashboard',
       placement_officer: '/placement/dashboard',
       super_admin: '/super-admin/dashboard',
     };

@@ -6,7 +6,6 @@ import { attendanceService } from '../../services/attendanceService.js'
 import { academicService } from '../../services/academicService.js'
 import { placementService } from '../../services/placementService.js'
 import { assignmentService } from '../../services/assignmentService.js'
-import { hostelService } from '../../services/hostelService.js'
 import { examService } from '../../services/examService.js'
 import { financeService } from '../../services/financeService.js'
 
@@ -150,23 +149,20 @@ export default function AIAssistant() {
           <div className="flex items-center gap-2">
             <Cpu className={`w-4 h-4 ${agenticMode ? 'text-indigo-600 animate-pulse' : 'text-slate-400'}`} />
             <span className="text-xs font-extrabold text-slate-800">Agentic Mode</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-              agenticMode ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-            }`}>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${agenticMode ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+              }`}>
               {agenticMode ? 'ON' : 'OFF'}
             </span>
           </div>
 
           <button
             onClick={() => setAgenticMode(!agenticMode)}
-            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              agenticMode ? 'bg-indigo-600' : 'bg-slate-300'
-            }`}
+            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${agenticMode ? 'bg-indigo-600' : 'bg-slate-300'
+              }`}
           >
             <span
-              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                agenticMode ? 'translate-x-5' : 'translate-x-0'
-              }`}
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${agenticMode ? 'translate-x-5' : 'translate-x-0'
+                }`}
             />
           </button>
         </div>
@@ -176,20 +172,18 @@ export default function AIAssistant() {
         <div className="flex-1 p-6 overflow-y-auto space-y-5">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${
-                msg.sender === 'user'
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${msg.sender === 'user'
                   ? 'bg-gradient-to-tr from-indigo-600 to-violet-600 text-white'
                   : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-              }`}>
+                }`}>
                 {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4.5 h-4.5" />}
               </div>
 
               <div
-                className={`max-w-[85%] sm:max-w-[75%] px-5 py-3.5 rounded-[24px] text-sm leading-relaxed overflow-hidden break-words flex flex-col justify-between shadow-sm ${
-                  msg.sender === 'user'
+                className={`max-w-[85%] sm:max-w-[75%] px-5 py-3.5 rounded-[24px] text-sm leading-relaxed overflow-hidden break-words flex flex-col justify-between shadow-sm ${msg.sender === 'user'
                     ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white rounded-tr-xs'
                     : 'bg-slate-50 border border-slate-200/80 text-slate-800 rounded-tl-xs'
-                }`}
+                  }`}
               >
                 {msg.sender === 'assistant' && msg.agentName && (
                   <div className="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-slate-200/60">
@@ -242,9 +236,8 @@ export default function AIAssistant() {
                   </div>
                 )}
 
-                <span className={`text-[10px] font-medium block text-right mt-2 pt-1 ${
-                  msg.sender === 'user' ? 'text-indigo-200/90 border-t border-white/10' : 'text-slate-400 border-t border-slate-200/50'
-                }`}>
+                <span className={`text-[10px] font-medium block text-right mt-2 pt-1 ${msg.sender === 'user' ? 'text-indigo-200/90 border-t border-white/10' : 'text-slate-400 border-t border-slate-200/50'
+                  }`}>
                   {msg.timestamp}
                 </span>
               </div>

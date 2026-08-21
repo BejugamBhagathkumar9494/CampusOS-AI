@@ -115,17 +115,6 @@ export async function searchLibraryBooks(query = '') {
   return fetchWithAuth(`/library/search?query=${encodeURIComponent(query)}`);
 }
 
-export async function getHostelComplaints() {
-  return fetchWithAuth('/hostel/complaints');
-}
-
-export async function fileHostelComplaint(title, description, room_number = '302-B') {
-  return fetchWithAuth('/hostel/complaints', {
-    method: 'POST',
-    body: JSON.stringify({ title, description, room_number }),
-  });
-}
-
 export async function getTransportRoutes() {
   return fetchWithAuth('/transport/routes');
 }
@@ -191,24 +180,6 @@ export async function applyPlacementDrive(drive_id) {
 
 export async function updatePlacementApplicationStatus(application_id, status) {
   return fetchWithAuth(`/placements/applications/${application_id}/status`, {
-    method: 'PUT',
-    body: JSON.stringify({ status }),
-  });
-}
-
-export async function getHostelLeaveRequests() {
-  return fetchWithAuth('/hostel/leave-requests');
-}
-
-export async function applyHostelLeave(reason, start_date, end_date) {
-  return fetchWithAuth('/hostel/leave-requests', {
-    method: 'POST',
-    body: JSON.stringify({ reason, start_date, end_date }),
-  });
-}
-
-export async function reviewHostelLeave(request_id, status) {
-  return fetchWithAuth(`/hostel/leave-requests/${request_id}/review`, {
     method: 'PUT',
     body: JSON.stringify({ status }),
   });

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { 
-  Sparkles, Calendar, BookOpen, Clock, AlertTriangle, 
-  Users, CheckSquare, Building2, ShieldCheck, 
+import {
+  Sparkles, Calendar, BookOpen, Clock, AlertTriangle,
+  Users, CheckSquare, Building2, ShieldCheck,
   ClipboardList, Target, ArrowRight, ArrowUpRight as ArrowUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';

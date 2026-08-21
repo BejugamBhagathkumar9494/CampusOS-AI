@@ -89,7 +89,6 @@ export default function DashboardLayout({ children }) {
       case 'student': return 'Student';
       case 'faculty': return 'Faculty Member';
       case 'admin': return 'Administrator';
-      case 'hostel_warden': return 'Hostel Warden';
       case 'placement_officer': return 'Placement Officer';
       case 'super_admin': return 'Super Admin';
       default: return 'User';
@@ -145,15 +144,6 @@ export default function DashboardLayout({ children }) {
       { name: 'Profile', path: '/super-admin/profile', icon: User },
     ];
 
-    const wardenItems = [
-      { name: 'Dashboard', path: '/hostel/dashboard', icon: LayoutDashboard },
-      { name: 'AI Assistant', path: '/hostel/ai-assistant', icon: MessageSquare },
-      { name: 'Hostel Hub', path: '/hostel/hostel', icon: Home },
-      { name: 'Notice Board', path: '/hostel/notices', icon: Bell },
-      { name: 'Settings', path: '/hostel/settings', icon: Settings },
-      { name: 'Profile', path: '/hostel/profile', icon: User },
-    ];
-
     const placementItems = [
       { name: 'Dashboard', path: '/placement/dashboard', icon: LayoutDashboard },
       { name: 'AI Assistant', path: '/placement/ai-assistant', icon: MessageSquare },
@@ -166,7 +156,6 @@ export default function DashboardLayout({ children }) {
       case 'faculty': return facultyItems;
       case 'admin': return adminItems;
       case 'super_admin': return superAdminItems;
-      case 'hostel_warden': return wardenItems;
       case 'placement_officer': return placementItems;
       case 'student':
       default:
@@ -175,7 +164,7 @@ export default function DashboardLayout({ children }) {
   };
 
   const sidebarItems = getSidebarItems(role);
-  const homePath = `/${role === 'hostel_warden' ? 'hostel' : role === 'placement_officer' ? 'placement' : role === 'super_admin' ? 'super-admin' : role}/dashboard`;
+  const homePath = `/${role === 'placement_officer' ? 'placement' : role === 'super_admin' ? 'super-admin' : role}/dashboard`;
 
   const handleSignOut = async () => {
     await signOut();

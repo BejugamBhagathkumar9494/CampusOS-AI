@@ -194,7 +194,6 @@ export const LoginPage = () => {
                 { label: 'Bhagath (Student)', email: 'bhagath.student@campus.edu', pass: 'bhagath123' },
                 { label: 'Rahul (Student)', email: 'rahul.student@campus.edu', pass: 'rahul123' },
                 { label: 'Faculty', email: 'arun.faculty@campus.edu', pass: 'arun123' },
-                { label: 'Warden', email: 'ramesh.warden@campus.edu', pass: 'ramesh123' },
                 { label: 'Super Admin', email: 'superadmin@campus.edu', pass: 'superadmin123' }
               ].map((acc) => (
                 <button

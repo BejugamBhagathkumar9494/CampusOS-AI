@@ -101,29 +101,6 @@ export const analyticsService = {
     };
   },
 
-  async getWardenAnalytics() {
-    const { count: totalRooms } = await supabase.from('rooms').select('id', { count: 'exact', head: true });
-    const { data: rooms } = await supabase.from('rooms').select('occupied, capacity');
-
-    let totalOccupied = 0;
-    let totalCapacity = 0;
-    (rooms || []).forEach(r => {
-      totalOccupied += r.occupied || 0;
-      totalCapacity += r.capacity || 2;
-    });
-
-    const { count: pendingLeaves } = await supabase.from('hostel_leave_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending');
-    const { count: hostelComplaints } = await supabase.from('complaints').select('id', { count: 'exact', head: true }).ilike('category', '%hostel%').neq('status', 'resolved');
-
-    return {
-      total_rooms: totalRooms || 60,
-      occupied_beds: totalOccupied || 84,
-      available_beds: (totalCapacity - totalOccupied) > 0 ? (totalCapacity - totalOccupied) : 36,
-      pending_leaves: pendingLeaves || 0,
-      open_complaints: hostelComplaints || 0
-    };
-  },
-
   async getPlacementOfficerAnalytics() {
     const { count: totalCompanies } = await supabase.from('companies').select('id', { count: 'exact', head: true });
     const { count: activeDrives } = await supabase.from('placements').select('id', { count: 'exact', head: true }).eq('status', 'active');
