@@ -180,7 +180,7 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={isSubmitting || loading}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-full shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed border border-indigo-400/30 mt-2"
             >
               <span>{isSubmitting ? 'Authenticating...' : 'Sign In'}</span>
               {!isSubmitting && <ArrowRight className="w-4 h-4" />}

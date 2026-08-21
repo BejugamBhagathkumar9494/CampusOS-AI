@@ -127,7 +127,7 @@ export default function AIAssistant() {
         <div className="flex-1 p-6 overflow-y-auto space-y-5">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-xs ${
                 msg.sender === 'user'
                   ? 'bg-gradient-to-tr from-indigo-600 to-violet-600 text-white'
                   : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
@@ -136,9 +136,9 @@ export default function AIAssistant() {
               </div>
 
               <div
-                className={`max-w-[80%] p-4.5 rounded-[20px] text-sm leading-relaxed ${
+                className={`max-w-[85%] sm:max-w-[75%] px-5 py-3.5 rounded-[24px] text-sm leading-relaxed overflow-hidden break-words flex flex-col justify-between shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-tr-xs shadow-sm'
+                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white rounded-tr-xs'
                     : 'bg-slate-50 border border-slate-200/80 text-slate-800 rounded-tl-xs'
                 }`}
               >
@@ -156,7 +156,7 @@ export default function AIAssistant() {
                   </div>
                 )}
 
-                <p className="whitespace-pre-wrap">{msg.text}</p>
+                <p className="whitespace-pre-wrap break-words">{msg.text}</p>
 
                 {msg.sender === 'assistant' && msg.sourceDocs && msg.sourceDocs.length > 0 && (
                   <div className="mt-3.5 pt-3 border-t border-slate-200/80">
@@ -193,7 +193,9 @@ export default function AIAssistant() {
                   </div>
                 )}
 
-                <span className={`text-[10px] block text-right mt-2 ${msg.sender === 'user' ? 'text-indigo-200' : 'text-slate-400'}`}>
+                <span className={`text-[10px] font-medium block text-right mt-2 pt-1 ${
+                  msg.sender === 'user' ? 'text-indigo-200/90 border-t border-white/10' : 'text-slate-400 border-t border-slate-200/50'
+                }`}>
                   {msg.timestamp}
                 </span>
               </div>
