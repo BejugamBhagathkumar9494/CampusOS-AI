@@ -456,8 +456,30 @@ function StudentAttendanceBoard({ profile }) {
         if (isMounted) setLoading(false);
       }
     }
+
     loadAttendance();
-    return () => { isMounted = false; };
+
+    // 1. Real-time Supabase attendance listener
+    let channel;
+    try {
+      channel = supabase
+        .channel('public:attendance_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () => {
+          loadAttendance();
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime subscription warning:', e);
+    }
+
+    // 2. Fast heartbeat interval to guarantee live sync across browser sessions
+    const intervalId = setInterval(loadAttendance, 3000);
+
+    return () => {
+      isMounted = false;
+      if (channel) supabase.removeChannel(channel);
+      clearInterval(intervalId);
+    };
   }, [profile]);
 
   const pred = attendanceData?.prediction;
