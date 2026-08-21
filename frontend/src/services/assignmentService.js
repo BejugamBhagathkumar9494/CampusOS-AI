@@ -19,13 +19,29 @@ export const assignmentService = {
       finalCourseId = firstCourse?.id;
     }
 
-    const { data, error } = await supabase
+    const payload = { course_id: finalCourseId, title, description, due_date };
+
+    let { data, error } = await supabase
       .from('assignments')
-      .insert([{ course_id: finalCourseId, title, description, due_date, total_points }])
+      .insert([payload])
       .select('*, courses(code, title)')
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Assignment creation error:', error);
+      throw new Error(error.message || 'Failed to post assignment in database');
+    }
+
+    if (data?.id && total_points) {
+      try {
+        await supabase
+          .from('assignments')
+          .update({ total_points: Number(total_points) })
+          .eq('id', data.id);
+      } catch (optErr) {
+        // Silently skip if total_points column does not exist
+      }
+    }
 
     // Send broadcast notification to all students
     try {

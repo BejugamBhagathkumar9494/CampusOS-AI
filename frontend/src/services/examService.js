@@ -19,22 +19,38 @@ export const examService = {
       courseId = firstCourse?.id;
     }
 
-    const record = {
+    const minimalRecord = {
       course_id: courseId,
       exam_name: payload.exam_name || 'End-Semester Examination',
       exam_date: payload.exam_date || new Date(Date.now() + 86400000 * 5).toISOString(),
-      location: payload.location || 'Hall A - Main Auditorium',
-      total_marks: payload.total_marks ? Number(payload.total_marks) : 100,
-      semester: payload.semester ? Number(payload.semester) : 5
+      location: payload.location || 'Hall A - Main Auditorium'
     };
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('examinations')
-      .insert([record])
+      .insert([minimalRecord])
       .select('*, courses(code, title)')
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Exam schedule creation error:', error);
+      throw new Error(error.message || 'Failed to schedule exam in database');
+    }
+
+    // Try setting optional fields if columns exist in examinations schema
+    if (data?.id) {
+      try {
+        await supabase
+          .from('examinations')
+          .update({
+            total_marks: payload.total_marks ? Number(payload.total_marks) : 100,
+            semester: payload.semester ? Number(payload.semester) : 5
+          })
+          .eq('id', data.id);
+      } catch (optErr) {
+        // Silently skip if optional columns do not exist in table
+      }
+    }
 
     // Broadcast notification to all students
     try {
