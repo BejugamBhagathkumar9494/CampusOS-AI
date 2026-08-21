@@ -98,11 +98,22 @@ export const courseService = {
       instructor_name: payload.instructor_name || 'Faculty Member'
     };
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('courses')
       .insert([coursePayload])
       .select()
       .single();
+
+    if (error && (error.message?.includes('instructor_name') || error.code === 'PGRST204')) {
+      delete coursePayload.instructor_name;
+      const retry = await supabase
+        .from('courses')
+        .insert([coursePayload])
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) throw error;
 
@@ -111,7 +122,7 @@ export const courseService = {
       .select('id')
       .eq('current_semester', coursePayload.semester);
 
-    if (studentsInSem && studentsInSem.length > 0) {
+    if (studentsInSem && studentsInSem.length > 0 && data?.id) {
       const enrollmentRows = studentsInSem.map(s => ({
         course_id: data.id,
         student_id: s.id
