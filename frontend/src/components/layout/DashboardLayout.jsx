@@ -138,6 +138,7 @@ export default function DashboardLayout({ children }) {
     const superAdminItems = [
       { name: 'Dashboard', path: '/super-admin/dashboard', icon: LayoutDashboard },
       { name: 'User & Role Control', path: '/super-admin/users', icon: Users },
+      { name: 'Student Clubs', path: '/super-admin/clubs', icon: Users },
       { name: 'AI Assistant', path: '/super-admin/ai-assistant', icon: MessageSquare },
       { name: 'Audit Logs', path: '/super-admin/audit-logs', icon: FileText },
       { name: 'Settings', path: '/super-admin/settings', icon: Settings },

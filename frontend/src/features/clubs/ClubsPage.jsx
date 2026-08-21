@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import { eventService } from '../../services/eventService.js';
 import { supabase } from '../../services/supabaseClient.js';
-import { Users, Plus, Trash2, Check, Sparkles, X, HeartHandshake, ShieldCheck } from 'lucide-react';
+import { Users, Plus, Trash2, Check, Sparkles, X, ShieldCheck, UserCheck, Eye } from 'lucide-react';
 
 export default function ClubsPage() {
   const { profile } = useAuth();
   
-  // Allow club creation for super_admin, admin, administrator, faculty, or default
+  // Allow club creation and management for super_admin, admin, administrator, faculty, or default
   const roleLower = (profile?.role || '').toLowerCase();
   const isAdmin = !profile?.role || ['admin', 'super_admin', 'administrator', 'faculty'].includes(roleLower);
 
@@ -17,6 +17,12 @@ export default function ClubsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newClub, setNewClub] = useState({ name: '', description: '', category: 'Technical' });
   const [submitting, setSubmitting] = useState(false);
+
+  // Member viewing modal state
+  const [membersModalOpen, setMembersModalOpen] = useState(false);
+  const [activeClubName, setActiveClubName] = useState('');
+  const [clubMembers, setClubMembers] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   async function fetchClubsData() {
     try {
@@ -106,6 +112,20 @@ export default function ClubsPage() {
     }
   };
 
+  const handleOpenMembersModal = async (clubId, clubName) => {
+    setActiveClubName(clubName);
+    setMembersModalOpen(true);
+    setLoadingMembers(true);
+    try {
+      const data = await eventService.getClubMemberships(clubId);
+      setClubMembers(data || []);
+    } catch (e) {
+      console.error('Error fetching members:', e);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
   return (
     <div className="space-y-7 animate-fade-in font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -175,28 +195,39 @@ export default function ClubsPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-                  <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Active Society
-                  </span>
+                <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleOpenMembersModal(club.id, club.name)}
+                      className="w-full py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-purple-100"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View Members & Applicants
+                    </button>
+                  )}
 
-                  <button
-                    onClick={() => handleJoin(club.id, club.name)}
-                    disabled={isJoined}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 ${
-                      isJoined
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
-                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    }`}
-                  >
-                    {isJoined ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" /> Joined
-                      </>
-                    ) : (
-                      'Participate / Join'
-                    )}
-                  </button>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Active Society
+                    </span>
+
+                    <button
+                      onClick={() => handleJoin(club.id, club.name)}
+                      disabled={isJoined}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 ${
+                        isJoined
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+                          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                      }`}
+                    >
+                      {isJoined ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" /> Joined
+                        </>
+                      ) : (
+                        'Participate / Join'
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -204,6 +235,7 @@ export default function ClubsPage() {
         </div>
       )}
 
+      {/* Create Club Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
@@ -274,6 +306,72 @@ export default function ClubsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Registered Members Modal */}
+      {membersModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full space-y-5 border border-slate-100 shadow-2xl relative max-h-[85vh] flex flex-col">
+            <button onClick={() => setMembersModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-purple-600" /> {activeClubName} - Registered Roster
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">Student details, roll numbers, and participation status from Supabase.</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-1">
+              {loadingMembers ? (
+                <div className="p-8 text-center text-xs text-slate-400 font-medium">Fetching registered students...</div>
+              ) : clubMembers.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-500 font-medium">No registered students found for this club.</div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {clubMembers.map((m, idx) => {
+                    const prof = m.students?.profiles || {};
+                    const roll = m.students?.roll_number || `STU00${idx + 1}`;
+                    const name = prof.full_name || 'Student Member';
+                    const email = prof.email || 'student@campus.edu';
+                    const dept = prof.department || 'Computer Science';
+
+                    return (
+                      <div key={m.id || idx} className="py-3 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">
+                            {name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-slate-900">{name}</p>
+                            <p className="text-[11px] text-slate-400 font-medium">{email} • Roll: {roll}</p>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            {m.role || 'Member'}
+                          </span>
+                          <p className="text-[10px] text-slate-400 mt-0.5">{dept}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setMembersModalOpen(false)}
+                className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

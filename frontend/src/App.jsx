@@ -155,6 +155,7 @@ export default function App() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="audit-logs" element={<UserManagementPage />} />
+                    <Route path="clubs" element={<Clubs />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="profile" element={<Profile />} />
