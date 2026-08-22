@@ -84,7 +84,7 @@ def resolve_gemini_api_key() -> str:
                 pass
 
     import base64
-    return base64.b64decode("QVEuQWI4Uk42SkNhUHFubVhkdS13R3FpcTl3TTE1OW50Uy1jTXZ2LWRMeTlvNklXUjZBM3c=").decode("utf-8")
+    return base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
 
 
 async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] = None) -> str:

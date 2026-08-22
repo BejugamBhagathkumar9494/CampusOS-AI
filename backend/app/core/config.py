@@ -58,8 +58,9 @@ class Settings(BaseSettings):
     SUPABASE_BUCKET_NAME: str = "campusos-media"
 
     # AI & Vector RAG Settings
-    GEMINI_API_KEY: str = "QVEuQWI4Uk42SkNhUHFubVhkdS13R3FpcTl3TTE1OW50Uy1jTXZ2LWRMeTlvNklXUjZBM3c="
-    GOOGLE_API_KEY: str = "QVEuQWI4Uk42SkNhUHFubVhkdS13R3FpcTl3TTE1OW50Uy1jTXZ2LWRMeTlvNklXUjZBM3c="
+    GEMINI_API_KEY: str = "QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE="
+    GOOGLE_API_KEY: str = "QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE="
+
 
 
     OPENAI_API_KEY: str = ""
