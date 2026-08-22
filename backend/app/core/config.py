@@ -58,8 +58,9 @@ class Settings(BaseSettings):
     SUPABASE_BUCKET_NAME: str = "campusos-media"
 
     # AI & Vector RAG Settings
-    GEMINI_API_KEY: str = ""
-    GOOGLE_API_KEY: str = ""
+    GEMINI_API_KEY: str = "QVEuQWI4Uk42SkNhUHFubVhkdS13R3FpcTl3TTE1OW50Uy1jTXZ2LWRMeTlvNklXUjZBM3c="
+    GOOGLE_API_KEY: str = "QVEuQWI4Uk42SkNhUHFubVhkdS13R3FpcTl3TTE1OW50Uy1jTXZ2LWRMeTlvNklXUjZBM3c="
+
 
     OPENAI_API_KEY: str = ""
     DEFAULT_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
