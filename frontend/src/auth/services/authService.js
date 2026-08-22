@@ -454,6 +454,12 @@ export const authService = {
   async signOut() {
     localStorage.removeItem('campusos_token');
     localStorage.removeItem('campusos_mock_user');
+    // Clear user chat histories on logout so new logins start fresh
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('campusos_chat_history')) {
+        localStorage.removeItem(key);
+      }
+    });
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.warn('Supabase signout warning:', error);

@@ -15,16 +15,18 @@ export default function AIAssistant() {
     return localStorage.getItem('campusos_ai_mode') || 'llm';
   });
 
+  const userId = profile?.id || profile?.email || 'guest';
+  const llmStorageKey = `campusos_chat_history_llm_${userId}`;
+  const ragStorageKey = `campusos_chat_history_rag_${userId}`;
+
   // Separate conversation history for LLM Mode
   const [llmMessages, setLlmMessages] = useState(() => {
-    const saved = localStorage.getItem('campusos_chat_history_llm');
+    const saved = localStorage.getItem(llmStorageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {
-        console.warn('Could not parse saved LLM chat history');
-      }
+      } catch (e) {}
     }
     return [
       {
@@ -41,14 +43,12 @@ export default function AIAssistant() {
 
   // Separate conversation history for RAG Mode
   const [ragMessages, setRagMessages] = useState(() => {
-    const saved = localStorage.getItem('campusos_chat_history_rag');
+    const saved = localStorage.getItem(ragStorageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {
-        console.warn('Could not parse saved RAG chat history');
-      }
+      } catch (e) {}
     }
     return [
       {
@@ -69,6 +69,49 @@ export default function AIAssistant() {
   const [expandedSources, setExpandedSources] = useState({});
   const messagesEndRef = useRef(null);
 
+  // Re-sync user-isolated chat messages when profile or login user changes
+  useEffect(() => {
+    const savedLlm = localStorage.getItem(llmStorageKey);
+    if (savedLlm) {
+      try {
+        const parsed = JSON.parse(savedLlm);
+        if (Array.isArray(parsed) && parsed.length > 0) setLlmMessages(parsed);
+      } catch (e) {}
+    } else {
+      setLlmMessages([
+        {
+          id: 'msg-welcome-llm',
+          role: 'assistant',
+          sender: 'assistant',
+          content: `Hi ${profile?.full_name || 'Student'}! Welcome to ✨ LLM Mode powered by Gemini. Ask me general programming, academic concepts, reasoning, or technical interview questions!`,
+          mode: 'llm',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          agentName: '✨ Gemini 2.5 Flash'
+        }
+      ]);
+    }
+
+    const savedRag = localStorage.getItem(ragStorageKey);
+    if (savedRag) {
+      try {
+        const parsed = JSON.parse(savedRag);
+        if (Array.isArray(parsed) && parsed.length > 0) setRagMessages(parsed);
+      } catch (e) {}
+    } else {
+      setRagMessages([
+        {
+          id: 'msg-welcome-rag',
+          role: 'assistant',
+          sender: 'assistant',
+          content: `Hi ${profile?.full_name || 'Student'}! Welcome to 📚 RAG Mode. Ask questions grounded strictly in official university handbooks, hostel rules, attendance, and placement guidelines!`,
+          mode: 'rag',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          agentName: '📚 RAG Knowledge Base'
+        }
+      ]);
+    }
+  }, [userId]);
+
   // Active messages based on current mode
   const messages = mode === 'llm' ? llmMessages : ragMessages;
 
@@ -86,23 +129,23 @@ export default function AIAssistant() {
     localStorage.setItem('campusos_ai_mode', mode);
   }, [mode]);
 
-  // Persist LLM messages history
+  // Persist LLM messages history for current user
   useEffect(() => {
     try {
-      localStorage.setItem('campusos_chat_history_llm', JSON.stringify(llmMessages));
+      localStorage.setItem(llmStorageKey, JSON.stringify(llmMessages));
     } catch (e) {
       console.warn('Failed to persist LLM chat messages', e);
     }
-  }, [llmMessages]);
+  }, [llmMessages, llmStorageKey]);
 
-  // Persist RAG messages history
+  // Persist RAG messages history for current user
   useEffect(() => {
     try {
-      localStorage.setItem('campusos_chat_history_rag', JSON.stringify(ragMessages));
+      localStorage.setItem(ragStorageKey, JSON.stringify(ragMessages));
     } catch (e) {
       console.warn('Failed to persist RAG chat messages', e);
     }
-  }, [ragMessages]);
+  }, [ragMessages, ragStorageKey]);
 
   // Auto-scroll to bottom on message change
   const scrollToBottom = () => {
