@@ -57,11 +57,23 @@ class SaveMessageRequest(BaseModel):
 
 async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
     import os
-    import httpx
+    from dotenv import load_dotenv
+    load_dotenv()
+    from google import genai
+    from google.genai import types
     from app.core.config import settings
-    gemini_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or settings.GOOGLE_API_KEY
 
-    system_instruction = (
+    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or getattr(settings, "GEMINI_API_KEY", "")
+
+    if not gemini_key or not str(gemini_key).strip():
+        err_msg = "GEMINI_API_KEY is missing from server environment variables (.env)."
+        print(f"[Gemini Config Error]: {err_msg}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"success": False, "error": "Gemini API key is not configured on the server."}
+        )
+
+    system_prompt = (
         "You are CampusOS AI, an intelligent academic assistant for university students.\n\n"
         "Answer every question directly using clear and simple English.\n\n"
         "You can:\n"
@@ -79,62 +91,45 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
         "- Format with Markdown when useful."
     )
 
-    contents = [
-        {"role": "user", "parts": [{"text": f"[System Prompt: {system_instruction}]\n\nHello!"}]},
-        {"role": "model", "parts": [{"text": "Hello! I am CampusOS AI. How can I help you today?"}]}
-    ]
+    try:
+        client = genai.Client(api_key=str(gemini_key).strip())
 
-    if history:
-        for item in history:
-            role = "user" if item.get("role") == "user" or item.get("sender") == "user" else "model"
-            text_content = item.get("content") or item.get("text") or ""
-            if text_content:
-                contents.append({"role": role, "parts": [{"text": text_content}]})
+        contents = [
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=f"[System Prompt: {system_prompt}]\n\nHello!")]
+            ),
+            types.Content(
+                role="model",
+                parts=[types.Part.from_text(text="Hello! I am CampusOS AI. How can I help you today?")]
+            )
+        ]
 
-    contents.append({"role": "user", "parts": [{"text": message}]})
+        if history:
+            for item in history:
+                role = "user" if item.get("role") == "user" or item.get("sender") == "user" else "model"
+                text_content = item.get("content") or item.get("text") or ""
+                if text_content:
+                    contents.append(types.Content(role=role, parts=[types.Part.from_text(text=text_content)]))
 
-    if not gemini_key or not gemini_key.strip():
-        raise HTTPException(
-            status_code=500,
-            detail="GEMINI_API_KEY environment variable is not configured on the server."
+        contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=contents
         )
 
-    endpoints = [
-        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}",
-        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
-    ]
+        if response and hasattr(response, "text") and response.text:
+            return response.text.strip()
+        else:
+            raise ValueError("Empty or invalid response object received from Gemini API.")
 
-    last_err = None
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        for url in endpoints:
-            try:
-                res = await client.post(
-                    url,
-                    json={
-                        "contents": contents,
-                        "generationConfig": {
-                            "temperature": 0.7,
-                            "maxOutputTokens": 2048
-                        }
-                    }
-                )
-                if res.status_code == 200:
-                    data = res.json()
-                    candidates = data.get("candidates", [])
-                    if candidates and "content" in candidates[0]:
-                        parts = candidates[0]["content"].get("parts", [])
-                        if parts and "text" in parts[0]:
-                            return parts[0]["text"].strip()
-                else:
-                    last_err = f"API Error {res.status_code}: {res.text}"
-            except Exception as e:
-                last_err = str(e)
-                print(f"[Gemini REST Call Error]: {e}")
-
-    raise HTTPException(
-        status_code=502,
-        detail=f"Unable to connect to Gemini LLM API: {last_err or 'Network Timeout'}"
-    )
+    except Exception as err:
+        print(f"[Gemini API Error]: {err}")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={"success": False, "error": f"Gemini API authentication failed: {str(err)}"}
+        )
 
 
 @router.post("/chat/llm")
