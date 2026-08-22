@@ -126,24 +126,73 @@ export const assignmentService = {
     return [];
   },
 
-  async gradeSubmission(submission_id, marks, feedback) {
+  async getUserSubmissions(studentProfileId) {
+    try {
+      const { data: student } = await supabase
+        .from('students')
+        .select('id')
+        .eq('profile_id', studentProfileId)
+        .maybeSingle();
+
+      const studentId = student?.id || studentProfileId;
+
+      const { data } = await supabase
+        .from('assignment_submissions')
+        .select('*, assignments(title, total_points)')
+        .eq('student_id', studentId);
+
+      if (data && data.length > 0) return data;
+    } catch (e) {}
+
+    // Fallback: Read backend API or local storage
+    try {
+      const { fetchWithAuth } = await import('./api.js');
+      const apiSubs = await fetchWithAuth('/academic-ext/assignments/my-submissions');
+      if (apiSubs) return apiSubs;
+    } catch (e) {}
+
+    return [];
+  },
+
+  async gradeSubmission(submission_id, marks, feedback, studentProfileId = null, assignmentTitle = 'Assignment') {
+    // 1. Backend API Call
+    try {
+      const { fetchWithAuth } = await import('./api.js');
+      await fetchWithAuth(`/academic-ext/assignments/submissions/${submission_id}/grade`, {
+        method: 'POST',
+        body: JSON.stringify({ marks_obtained: Number(marks), feedback })
+      });
+    } catch (apiErr) {
+      console.warn('Backend API grade error:', apiErr);
+    }
+
+    // 2. Supabase update
     try {
       const { data, error } = await supabase
         .from('assignment_submissions')
         .update({ marks: Number(marks), feedback, status: 'graded' })
         .eq('id', submission_id)
-        .select()
+        .select('*, students(profile_id), assignments(title)')
         .maybeSingle();
 
-      if (!error && data) return data;
+      if (!error && data) {
+        const targetProfileId = studentProfileId || data.students?.profile_id;
+        const title = data.assignments?.title || assignmentTitle;
 
-      await supabase
-        .from('submissions')
-        .update({ marks: Number(marks), feedback, status: 'graded' })
-        .eq('id', submission_id);
+        if (targetProfileId) {
+          await notificationService.notifyUser(
+            targetProfileId,
+            'Assignment Evaluated',
+            `Your submission for "${title}" has been evaluated by faculty. Score: ${marks} marks. Feedback: "${feedback}".`,
+            'info'
+          );
+        }
+        return data;
+      }
     } catch (e) {
-      console.warn('Grade submission error:', e);
+      console.warn('Grade submission Supabase warning:', e);
     }
+
     return { id: submission_id, marks, feedback, status: 'graded' };
   }
 };

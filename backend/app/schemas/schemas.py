@@ -248,7 +248,7 @@ class AssignmentResponse(BaseModel):
 
 
 class AssignmentSubmissionCreate(BaseModel):
-    assignment_id: int
+    assignment_id: Optional[int] = None
     file_path: str
 
 

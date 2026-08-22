@@ -1,5 +1,6 @@
 from datetime import datetime, date, time, timedelta
 from typing import List, Optional
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -214,6 +215,64 @@ def submit_assignment(
         "marks_obtained": submission.marks_obtained,
         "feedback": submission.feedback,
         "status": submission.status
+    }
+
+
+@router.get("/assignments/my-submissions")
+def get_my_assignment_submissions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Student retrieves their assignment submissions and faculty grades."""
+    student = db.query(Student).filter(Student.user_id == current_user.id).first()
+    if not student:
+        return []
+
+    submissions = db.query(AssignmentSubmission).filter(AssignmentSubmission.student_id == student.id).all()
+    res = []
+    for sub in submissions:
+        res.append({
+            "id": sub.id,
+            "assignment_id": sub.assignment_id,
+            "assignment_title": sub.assignment.title if sub.assignment else "Assignment",
+            "file_path": sub.file_path,
+            "submission_date": sub.submission_date,
+            "marks_obtained": sub.marks_obtained,
+            "feedback": sub.feedback,
+            "status": sub.status
+        })
+    return res
+
+
+class GradePayload(BaseModel):
+    marks_obtained: float
+    feedback: Optional[str] = "Good work!"
+
+
+@router.post("/assignments/submissions/{submission_id}/grade", dependencies=[Depends(check_role(["faculty", "admin", "super_admin"]))])
+def grade_student_submission(
+    submission_id: int,
+    payload: GradePayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Faculty grades a student submission and saves score + feedback into DB."""
+    sub = db.query(AssignmentSubmission).filter(AssignmentSubmission.id == submission_id).first()
+    if not sub:
+        raise HTTPException(status_code=404, detail="Submission record not found")
+
+    sub.marks_obtained = payload.marks_obtained
+    sub.feedback = payload.feedback
+    sub.status = "Graded"
+
+    db.commit()
+    db.refresh(sub)
+    return {
+        "message": f"Successfully evaluated submission. Score: {sub.marks_obtained}",
+        "submission_id": sub.id,
+        "marks_obtained": sub.marks_obtained,
+        "feedback": sub.feedback,
+        "status": sub.status
     }
 
 
