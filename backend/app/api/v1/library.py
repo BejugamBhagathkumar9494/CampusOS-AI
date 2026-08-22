@@ -17,8 +17,50 @@ class BookRequestPayload(BaseModel):
     reason: Optional[str] = ""
 
 
+class BookCreatePayload(BaseModel):
+    title: str
+    author: Optional[str] = "Academic Author"
+    category: Optional[str] = "General"
+    isbn: Optional[str] = "N/A"
+    copies_available: Optional[int] = 3
+
+
 # In-memory storage fallback for requests
 _book_requests_store = []
+
+
+@router.post("/books", dependencies=[Depends(check_role(["admin", "super_admin", "librarian"]))])
+def add_book_to_catalog(
+    payload: BookCreatePayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Admin / Super Admin / Librarian directly adds a new book or research paper into DB catalog."""
+    raw_isbn = payload.isbn if (payload.isbn and payload.isbn != "N/A") else f"ISBN-{Date.now() if 'Date' in globals() else 99999}"
+    existing_book = db.query(Book).filter(
+        (Book.title == payload.title) | (Book.isbn == raw_isbn)
+    ).first()
+
+    if existing_book:
+        existing_book.copies_available += (payload.copies_available or 3)
+        db.commit()
+        db.refresh(existing_book)
+        return {"message": f"Updated existing book '{existing_book.title}' copies in DB!", "book_id": existing_book.id}
+
+    import time
+    clean_isbn = raw_isbn if (payload.isbn and payload.isbn != "N/A") else f"ISBN-{int(time.time() * 1000)}"
+
+    new_book = Book(
+        title=payload.title,
+        author=payload.author or "Academic Author",
+        isbn=clean_isbn,
+        category=payload.category or "General",
+        copies_available=payload.copies_available or 3
+    )
+    db.add(new_book)
+    db.commit()
+    db.refresh(new_book)
+    return {"message": f"Successfully added '{new_book.title}' to library catalogue DB!", "book_id": new_book.id}
 
 
 @router.post("/request")

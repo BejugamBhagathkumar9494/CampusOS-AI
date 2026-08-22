@@ -144,9 +144,81 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
     """
     Authenticate a user using Email and Password only.
     Role selection during login is forbidden; the trusted role is retrieved from the database.
+    If a valid faculty, placement officer, warden, librarian, or student logs in for the first time
+    and details do not exist in DB, send a registration request to Superadmin for approval.
     """
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    email_clean = form_data.username.strip().lower()
+    user = db.query(User).filter(User.email == email_clean).first()
+
+    # First-time login auto-request flow if user does not exist in DB yet
+    if not user:
+        allowed_domains = ["@campus.edu", "@campusos.edu"]
+        role_email_tags = {
+            ".faculty": "faculty",
+            ".pofficer": "placement_officer",
+            ".warden": "hostel_warden",
+            ".librarian": "librarian",
+            ".student": "student"
+        }
+        is_campus_domain = any(email_clean.endswith(d) for d in allowed_domains)
+        matched_tag = next((tag for tag in role_email_tags if tag in email_clean), None)
+
+        if is_campus_domain and matched_tag:
+            derived_role = role_email_tags[matched_tag]
+            db_role = db.query(Role).filter(Role.name == derived_role).first()
+            if not db_role:
+                db_role = Role(name=derived_role, description=f"{derived_role} role")
+                db.add(db_role)
+                db.commit()
+                db.refresh(db_role)
+
+            hashed_pw = get_password_hash(form_data.password)
+            name_part = email_clean.split('@')[0].split('.')[0]
+            display_name = name_part.replace('_', ' ').replace('-', ' ').title()
+
+            new_user = User(
+                email=email_clean,
+                hashed_password=hashed_pw,
+                full_name=display_name,
+                status="pending",
+                is_active=False
+            )
+            new_user.roles.append(db_role)
+            db.add(new_user)
+            db.flush()
+
+            profile = Profile(
+                id=str(new_user.id),
+                auth_user_id=str(new_user.id),
+                full_name=display_name,
+                email=email_clean,
+                role=derived_role,
+                status="pending",
+                email_verified=True
+            )
+            db.add(profile)
+
+            if derived_role == "student":
+                student_profile = Student(
+                    user_id=new_user.id,
+                    roll_number=f"STU{new_user.id:05d}",
+                    cgpa=0.0,
+                    current_semester=1
+                )
+                db.add(student_profile)
+
+            db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Request has been successfully sent. Your account registration is pending Superadmin approval. Once approved by Superadmin, you will be able to access CampusOS."
+            )
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect email address or password.",
+        )
+
+    if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email address or password.",

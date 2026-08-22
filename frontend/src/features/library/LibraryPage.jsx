@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import { libraryService } from '../../services/libraryService.js';
-import { BookOpen, Search, CheckCircle, Plus, ShieldCheck, Clock, FileText, Check, X } from 'lucide-react';
+import { BookOpen, Search, CheckCircle, Plus, ShieldCheck, Clock, Check } from 'lucide-react';
 
 export default function LibraryPage() {
   const { profile } = useAuth();
@@ -13,7 +13,7 @@ export default function LibraryPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
 
-  // Request modal state for students
+  // Student Request modal state
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [reqTitle, setReqTitle] = useState('');
   const [reqAuthor, setReqAuthor] = useState('');
@@ -21,6 +21,15 @@ export default function LibraryPage() {
   const [reqIsbn, setReqIsbn] = useState('');
   const [reqReason, setReqReason] = useState('');
   const [submittingReq, setSubmittingReq] = useState(false);
+
+  // Admin Direct Add Book modal state
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newAuthor, setNewAuthor] = useState('');
+  const [newCategory, setNewCategory] = useState('General');
+  const [newIsbn, setNewIsbn] = useState('');
+  const [newCopies, setNewCopies] = useState(5);
+  const [addingBook, setAddingBook] = useState(false);
 
   // Book requests roster
   const [requests, setRequests] = useState([]);
@@ -97,6 +106,35 @@ export default function LibraryPage() {
     }
   };
 
+  const handleDirectAddBook = async (e) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+
+    setAddingBook(true);
+    try {
+      await libraryService.addBookDirectly({
+        title: newTitle,
+        author: newAuthor,
+        category: newCategory,
+        isbn: newIsbn,
+        copies_available: newCopies
+      });
+
+      setShowAddBookModal(false);
+      setNewTitle('');
+      setNewAuthor('');
+      setNewIsbn('');
+      setNewCopies(5);
+      setMsg(`Successfully added "${newTitle}" directly into the library catalogue DB!`);
+      setTimeout(() => setMsg(''), 5000);
+      fetchBooks();
+    } catch (err) {
+      alert(err.message || 'Failed to add book to catalogue.');
+    } finally {
+      setAddingBook(false);
+    }
+  };
+
   const handleApproveRequest = async (requestId, title) => {
     try {
       await libraryService.approveBookRequest(requestId, 3);
@@ -131,12 +169,22 @@ export default function LibraryPage() {
           <p className="text-sm text-slate-500 font-medium mt-1">Search reference books, research papers, and manage university requests.</p>
         </div>
 
-        <button
-          onClick={() => setShowRequestModal(true)}
-          className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2 active:scale-95"
-        >
-          <Plus className="w-4 h-4" /> Request Book / Paper
-        </button>
+        {/* Super Admin / Admin does NOT have request option; Admin directly adds books for users. Students can request books. */}
+        {isAdmin ? (
+          <button
+            onClick={() => setShowAddBookModal(true)}
+            className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2 active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> Add Book / Paper to Library
+          </button>
+        ) : (
+          <button
+            onClick={() => setShowRequestModal(true)}
+            className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2 active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> Request Book / Paper
+          </button>
+        )}
       </div>
 
       {msg && (
@@ -152,9 +200,9 @@ export default function LibraryPage() {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-indigo-600" /> Admin Library Management: Student Book & Paper Requests
+                <ShieldCheck className="w-5 h-5 text-indigo-600" /> Admin Library Control: Student Book & Paper Requests
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Approve student requests to automatically add new books and papers to the library catalog.</p>
+              <p className="text-xs text-slate-500 mt-0.5">Approve student requests or add books directly to make them available for students to borrow.</p>
             </div>
             <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-extrabold">
               {requests.filter(r => r.status === 'pending_approval').length} Pending Requests
@@ -240,6 +288,7 @@ export default function LibraryPage() {
         </div>
       )}
 
+      {/* Main Library Catalog View */}
       <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -298,8 +347,8 @@ export default function LibraryPage() {
         </div>
       </div>
 
-      {/* Request Modal */}
-      {showRequestModal && (
+      {/* Student Request Modal */}
+      {showRequestModal && !isAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
             <div className="flex justify-between items-center">
@@ -381,6 +430,98 @@ export default function LibraryPage() {
                   className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-50"
                 >
                   {submittingReq ? 'Submitting...' : 'Submit Request'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Direct Add Book Modal */}
+      {showAddBookModal && isAdmin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-extrabold text-slate-900">Add Book or Paper to Library Catalogue</h3>
+              <button onClick={() => setShowAddBookModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <form onSubmit={handleDirectAddBook} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Book / Paper Title</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Distributed Systems Architecture 2026"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Author / Publisher</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Prof. Andrew Tanenbaum"
+                  value={newAuthor}
+                  onChange={(e) => setNewAuthor(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Category</label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none"
+                  >
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Research Paper">Research Paper</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="General">General Reference</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Copies Available</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={newCopies}
+                    onChange={(e) => setNewCopies(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">ISBN / Reference Code</label>
+                <input
+                  type="text"
+                  placeholder="e.g. ISBN-978-0133591620"
+                  value={newIsbn}
+                  onChange={(e) => setNewIsbn(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddBookModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingBook}
+                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-50"
+                >
+                  {addingBook ? 'Publishing...' : 'Add to Catalogue'}
                 </button>
               </div>
             </form>

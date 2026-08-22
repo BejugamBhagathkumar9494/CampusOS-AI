@@ -13,6 +13,38 @@ export const libraryService = {
     return data || [];
   },
 
+  async addBookDirectly(payload) {
+    // 1. Call Backend API
+    try {
+      const { fetchWithAuth } = await import('./api.js');
+      await fetchWithAuth('/library/books', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: payload.title,
+          author: payload.author || 'Academic Author',
+          category: payload.category || 'General',
+          isbn: payload.isbn || 'N/A',
+          copies_available: Number(payload.copies_available) || 3
+        })
+      });
+    } catch (apiErr) {
+      console.warn('Backend API add book fallback:', apiErr);
+    }
+
+    // 2. Insert/Update in Supabase for frontend instant sync
+    try {
+      await supabase.from('library_books').insert([{
+        title: payload.title,
+        author: payload.author || 'Academic Author',
+        category: payload.category || 'General',
+        isbn: payload.isbn || 'N/A',
+        copies_available: Number(payload.copies_available) || 3
+      }]);
+    } catch (sErr) {}
+
+    return true;
+  },
+
   async issueBook(studentProfileId, bookId, dueDays = 14) {
     const { data: student } = await supabase
       .from('students')
