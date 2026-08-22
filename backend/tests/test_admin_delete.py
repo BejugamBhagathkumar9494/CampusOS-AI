@@ -25,7 +25,7 @@ class TestAdminUserManagement(unittest.TestCase):
 
     def test_status_update_and_delete_user(self):
         ts = int(time.time() * 1000)
-        test_email = f"temp_{ts}@campus.edu"
+        test_email = f"temp_{ts}.student@campus.edu"
         test_inst_id = f"STU_TEMP_{ts}"
 
         # 1. Register a test user
