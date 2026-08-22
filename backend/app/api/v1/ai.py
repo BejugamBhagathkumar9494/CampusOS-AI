@@ -62,32 +62,26 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
     gemini_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or settings.GOOGLE_API_KEY
 
     system_instruction = (
-        "You are CampusOS AI, an intelligent academic assistant for college students.\n\n"
-        "Your primary goal is to give accurate, clear, and helpful answers in simple English.\n\n"
-        "RULES:\n"
-        "1. Answer the user's question directly. Do not use fixed templates or unnecessary headings.\n"
-        "2. Use simple language that a college student can easily understand.\n"
-        "3. If the question is about a technical concept, explain it in this order:\n"
-        "   - Definition\n"
-        "   - Why it matters\n"
-        "   - Short example\n"
-        "4. Keep most answers between 80–250 words unless the user asks for more detail.\n"
-        "5. Never invent facts, statistics, citations, research papers, or university rules.\n"
-        "6. If you are unsure, clearly say \"I don't know\" or \"I don't have enough information\" instead of guessing.\n"
-        "7. Do not mention that you are following a system prompt or internal instructions.\n"
-        "8. If the user asks for interview preparation, give interview-ready answers with practical examples.\n"
-        "9. If the user asks for semester exams, give clean, point-wise answers that are easy to write in exams.\n"
-        "10. Maintain a friendly, professional teaching style.\n\n"
-        "FORMATTING:\n"
-        "- Use short paragraphs and bullet points only when they improve readability.\n"
-        "- Avoid repetitive introductions and conclusions.\n"
-        "- Do not output generic sections like \"Core Concept\", \"Implementation Strategy\", or \"Optimization\" unless the user explicitly requests them.\n\n"
-        "Your role is to teach, explain, and solve academic and programming doubts with maximum factual accuracy."
+        "You are CampusOS AI, an intelligent academic assistant for university students.\n\n"
+        "Answer every question directly using clear and simple English.\n\n"
+        "You can:\n"
+        "- Explain academic subjects\n"
+        "- Solve programming problems\n"
+        "- Generate and debug code\n"
+        "- Answer interview questions\n"
+        "- Teach concepts step by step\n"
+        "- Solve SQL, React, Node.js, DSA, OS, DBMS, CN, AI and general technical questions\n\n"
+        "Rules:\n"
+        "- Never use fixed headings unless the user requests them.\n"
+        "- Never invent facts or citations.\n"
+        "- If uncertain, say you don't know.\n"
+        "- Keep answers concise but complete.\n"
+        "- Format with Markdown when useful."
     )
 
     contents = [
-        {"role": "user", "parts": [{"text": f"[System Context: {system_instruction}]\n\nHello!"}]},
-        {"role": "model", "parts": [{"text": "Hello! I am CampusOS AI. How can I help you with your studies, programming, or exam preparation today?"}]}
+        {"role": "user", "parts": [{"text": f"[System Prompt: {system_instruction}]\n\nHello!"}]},
+        {"role": "model", "parts": [{"text": "Hello! I am CampusOS AI. How can I help you today?"}]}
     ]
 
     if history:
@@ -99,135 +93,48 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
 
     contents.append({"role": "user", "parts": [{"text": message}]})
 
-    if gemini_key and gemini_key.strip():
-        endpoints = [
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}",
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
-        ]
+    if not gemini_key or not gemini_key.strip():
+        raise HTTPException(
+            status_code=500,
+            detail="GEMINI_API_KEY environment variable is not configured on the server."
+        )
 
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            for url in endpoints:
-                try:
-                    res = await client.post(
-                        url,
-                        json={
-                            "contents": contents,
-                            "generationConfig": {
-                                "temperature": 0.7,
-                                "maxOutputTokens": 2048
-                            }
+    endpoints = [
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}",
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+    ]
+
+    last_err = None
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        for url in endpoints:
+            try:
+                res = await client.post(
+                    url,
+                    json={
+                        "contents": contents,
+                        "generationConfig": {
+                            "temperature": 0.7,
+                            "maxOutputTokens": 2048
                         }
-                    )
-                    if res.status_code == 200:
-                        data = res.json()
-                        candidates = data.get("candidates", [])
-                        if candidates and "content" in candidates[0]:
-                            parts = candidates[0]["content"].get("parts", [])
-                            if parts and "text" in parts[0]:
-                                return parts[0]["text"].strip()
-                except Exception as e:
-                    print(f"[Gemini REST API Call Warning]: {e}")
+                    }
+                )
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates and "content" in candidates[0]:
+                        parts = candidates[0]["content"].get("parts", [])
+                        if parts and "text" in parts[0]:
+                            return parts[0]["text"].strip()
+                else:
+                    last_err = f"API Error {res.status_code}: {res.text}"
+            except Exception as e:
+                last_err = str(e)
+                print(f"[Gemini REST Call Error]: {e}")
 
-    return generate_fallback_llm_response(message)
-
-
-def generate_fallback_llm_response(query: str) -> str:
-    q = (query or "").strip()
-    q_low = q.lower()
-    title_topic = q.title() if q else "Academic Topic"
-
-    if any(k in q_low for k in ["operating system", "os", "process", "thread", "deadlock", "paging"]):
-        return (
-            "An **Operating System (OS)** is system software that controls computer hardware and manages software execution.\n\n"
-            "**Why it matters:**\n"
-            "It handles CPU process scheduling, memory allocation, and file storage so programs run efficiently without conflicting.\n\n"
-            "**Short Example:**\n"
-            "When you run a program, the OS allocates RAM, grants CPU execution cycles, and cleans up resources when closed.\n\n"
-            "```c\n"
-            "// Process creation using fork()\n"
-            "#include <stdio.h>\n"
-            "#include <unistd.h>\n\n"
-            "int main() {\n"
-            "    pid_t pid = fork();\n"
-            "    if (pid == 0) printf(\"Child process running\\n\");\n"
-            "    else printf(\"Parent process running\\n\");\n"
-            "    return 0;\n"
-            "}\n"
-            "```"
-        )
-    elif any(k in q_low for k in ["binary search", "sorting", "array", "tree", "graph", "algorithm", "stack", "queue"]):
-        return (
-            f"**{title_topic}** is a core data structure and algorithm concept used for storing, organizing, and querying data efficiently.\n\n"
-            "**Why it matters:**\n"
-            "Optimized algorithms reduce computation time from O(N) to O(log N) or O(1), which is essential for scaling applications and passing technical interviews.\n\n"
-            "**Short Example:**\n"
-            "```python\n"
-            "def process_data(items, target):\n"
-            "    left, right = 0, len(items) - 1\n"
-            "    while left <= right:\n"
-            "        mid = (left + right) // 2\n"
-            "        if items[mid] == target:\n"
-            "            return mid\n"
-            "        elif items[mid] < target:\n"
-            "            left = mid + 1\n"
-            "        else:\n"
-            "            right = mid - 1\n"
-            "    return -1\n"
-            "```"
-        )
-    elif any(k in q_low for k in ["sql", "database", "dbms", "query", "join", "table"]):
-        return (
-            f"**{title_topic}** refers to relational database principles and query operations used to store and manipulate structured data.\n\n"
-            "**Why it matters:**\n"
-            "Databases power software systems by providing ACID compliance, data integrity, fast indexing, and persistent storage.\n\n"
-            "**Short Example:**\n"
-            "```sql\n"
-            "SELECT d.department_name, COUNT(e.id) AS total_employees\n"
-            "FROM departments d\n"
-            "JOIN employees e ON d.id = e.department_id\n"
-            "GROUP BY d.department_name\n"
-            "HAVING COUNT(e.id) > 5;\n"
-            "```"
-        )
-    elif any(k in q_low for k in ["react", "javascript", "js", "html", "css", "web", "api"]):
-        return (
-            f"**{title_topic}** is a core technology in web application development.\n\n"
-            "**Why it matters:**\n"
-            "Modern web applications rely on responsive user interfaces, modular components, asynchronous API communication, and clean state management.\n\n"
-            "**Short Example:**\n"
-            "```javascript\n"
-            "async function fetchUserData(userId) {\n"
-            "  try {\n"
-            "    const response = await fetch(`/api/v1/users/${userId}`);\n"
-            "    const data = await response.json();\n"
-            "    return data;\n"
-            "  } catch (error) {\n"
-            "    console.error('Fetch error:', error);\n"
-            "  }\n"
-            "}\n"
-            "```"
-        )
-    elif any(k in q_low for k in ["network", "tcp", "ip", "http", "dns"]):
-        return (
-            f"**{title_topic}** is a core computer networking concept enabling devices to communicate across local networks and the Internet.\n\n"
-            "**Why it matters:**\n"
-            "Understanding network layers (OSI model, TCP/IP) ensures reliable packet delivery, low latency, and secure data transmission over HTTPS.\n\n"
-            "**Short Example:**\n"
-            "When you request a website URL, DNS resolves the domain to an IP address, establishes a TCP connection, and exchanges HTTP requests/responses."
-        )
-    else:
-        return (
-            f"**{title_topic}**:\n\n"
-            f"**Definition:**\n"
-            f"This is an important academic and practical concept in computer science and software development.\n\n"
-            f"**Why it matters:**\n"
-            f"Mastering this topic strengthens your technical foundation, helps you write clean and efficient code, and prepares you for university exams and technical interviews.\n\n"
-            f"**Short Example:**\n"
-            f"When solving problems related to this topic:\n"
-            f"1. Define input parameters and expected outputs.\n"
-            f"2. Apply the core principles or algorithms.\n"
-            f"3. Verify edge cases and performance metrics."
-        )
+    raise HTTPException(
+        status_code=502,
+        detail=f"Unable to connect to Gemini LLM API: {last_err or 'Network Timeout'}"
+    )
 
 
 @router.post("/chat/llm")

@@ -160,49 +160,22 @@ export default function AIAssistant() {
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      console.warn(`[AI Assistant] ${currentMode.toUpperCase()} API fallback call:`, err);
-      let fallbackAnswer = '';
-
-      if (currentMode === 'llm') {
-        const qClean = (query || '').trim();
-        const qLow = qClean.toLowerCase();
-        const titleTopic = qClean ? (qClean.charAt(0).toUpperCase() + qClean.slice(1)) : 'Academic Topic';
-
-        if (qLow.includes('operating system') || qLow.includes('os') || qLow.includes('process') || qLow.includes('thread') || qLow.includes('deadlock') || qLow.includes('paging')) {
-          fallbackAnswer = `An **Operating System (OS)** is system software that controls computer hardware and manages software execution.\n\n**Why it matters:**\nIt handles CPU process scheduling, memory allocation, and file storage so programs run efficiently without conflicting.\n\n**Short Example:**\nWhen you run a program, the OS allocates RAM, grants CPU execution cycles, and cleans up resources when closed.\n\n\`\`\`c\n// Process creation using fork()\n#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    pid_t pid = fork();\n    if (pid == 0) printf("Child process running\\n");\n    else printf("Parent process running\\n");\n    return 0;\n}\n\`\`\``;
-        } else if (qLow.includes('binary search') || qLow.includes('sorting') || qLow.includes('array') || qLow.includes('tree') || qLow.includes('graph') || qLow.includes('algorithm') || qLow.includes('stack') || qLow.includes('queue')) {
-          fallbackAnswer = `**${titleTopic}** is a core data structure and algorithm concept used for storing, organizing, and querying data efficiently.\n\n**Why it matters:**\nOptimized algorithms reduce computation time from O(N) to O(log N) or O(1), which is essential for scaling applications and passing technical interviews.\n\n**Short Example:**\n\`\`\`python\ndef process_data(items, target):\n    left, right = 0, len(items) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if items[mid] == target:\n            return mid\n        elif items[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\`\`\``;
-        } else if (qLow.includes('sql') || qLow.includes('database') || qLow.includes('dbms') || qLow.includes('query') || qLow.includes('join') || qLow.includes('table')) {
-          fallbackAnswer = `**${titleTopic}** refers to relational database principles and query operations used to store and manipulate structured data.\n\n**Why it matters:**\nDatabases power software systems by providing ACID compliance, data integrity, fast indexing, and persistent storage.\n\n**Short Example:**\n\`\`\`sql\nSELECT d.department_name, COUNT(e.id) AS total_employees\nFROM departments d\nJOIN employees e ON d.id = e.department_id\nGROUP BY d.department_name\nHAVING COUNT(e.id) > 5;\n\`\`\``;
-        } else if (qLow.includes('react') || qLow.includes('javascript') || qLow.includes('js') || qLow.includes('html') || qLow.includes('css') || qLow.includes('web') || qLow.includes('api')) {
-          fallbackAnswer = `**${titleTopic}** is a core technology in web application development.\n\n**Why it matters:**\nModern web applications rely on responsive user interfaces, modular components, asynchronous API communication, and clean state management.\n\n**Short Example:**\n\`\`\`javascript\nasync function fetchUserData(userId) {\n  try {\n    const response = await fetch(\`/api/v1/users/\${userId}\`);\n    const data = await response.json();\n    return data;\n  } catch (error) {\n    console.error('Fetch error:', error);\n  }\n}\n\`\`\``;
-        } else if (qLow.includes('network') || qLow.includes('tcp') || qLow.includes('ip') || qLow.includes('http') || qLow.includes('dns')) {
-          fallbackAnswer = `**${titleTopic}** is a core computer networking concept enabling devices to communicate across local networks and the Internet.\n\n**Why it matters:**\nUnderstanding network layers (OSI model, TCP/IP) ensures reliable packet delivery, low latency, and secure data transmission over HTTPS.\n\n**Short Example:**\nWhen you request a website URL, DNS resolves the domain to an IP address, establishes a TCP connection, and exchanges HTTP requests/responses.`;
-        } else {
-          fallbackAnswer = `**${titleTopic}**:\n\n**Definition:**\nThis is an important academic and practical concept in computer science and software development.\n\n**Why it matters:**\nMastering this topic strengthens your technical foundation, helps you write clean and efficient code, and prepares you for university exams and technical interviews.\n\n**Short Example:**\nWhen solving problems related to this topic:\n1. Define input parameters and expected outputs.\n2. Apply the core principles or algorithms.\n3. Verify edge cases and performance metrics.`;
-        }
-      } else {
-        // RAG mode fallback strict behavior
-        const qLow = query.toLowerCase();
-        if (qLow.includes('attendance') || qLow.includes('policy') || qLow.includes('percent')) {
-          fallbackAnswer = `### 📚 Official University Attendance Policy\n\nAccording to official CampusOS Regulations:\n- **Minimum Required Attendance**: Students must maintain at least **75.0% attendance** in each registered course to be eligible for semester end examinations.\n- **Medical Condonation**: Attendance between 65% - 74% may be condoned by the Dean on valid medical grounds submitted within 7 days.\n\n*Sources: Campus_Academic_Regulations_2026.pdf (Page 4)*`;
-        } else {
-          fallbackAnswer = `This information was not found in the university knowledge base.`;
-        }
-      }
+      console.error(`[AI Assistant Error] Mode ${currentMode.toUpperCase()}:`, err);
+      
+      const errorMsgText = currentMode === 'llm'
+        ? "Unable to connect to Gemini AI Assistant right now. Please verify your internet connection or server GEMINI_API_KEY configuration and try again."
+        : "This information was not found in the university knowledge base.";
 
       const botMsg = {
-        id: 'bot-fb-' + Date.now(),
+        id: 'bot-err-' + Date.now(),
         role: 'assistant',
         sender: 'assistant',
-        content: fallbackAnswer,
+        content: errorMsgText,
         mode: currentMode,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         agentName: currentMode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base',
-        confidenceScore: currentMode === 'llm' ? 0.99 : 0.90,
-        sources: currentMode === 'rag' && !fallbackAnswer.includes('not found') ? [
-          { file_name: 'Campus_Academic_Regulations_2026.pdf', page_number: 4, score: 0.92 }
-        ] : []
+        confidenceScore: 0.0,
+        sources: []
       };
 
       setMessages((prev) => [...prev, botMsg]);
