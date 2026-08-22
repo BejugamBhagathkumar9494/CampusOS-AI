@@ -132,16 +132,19 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
 
 
 def generate_fallback_llm_response(query: str) -> str:
-    q = query.lower()
-    if "operating system" in q or "os" in q:
+    q = (query or "").strip()
+    q_low = q.lower()
+    title_topic = q.title() if q else "Academic Topic"
+
+    if any(k in q_low for k in ["operating system", "os", "process", "thread", "deadlock", "paging"]):
         return (
-            "An **Operating System (OS)** is the main system software that controls computer hardware and runs applications.\n\n"
+            "An **Operating System (OS)** is system software that controls computer hardware and manages software execution.\n\n"
             "**Why it matters:**\n"
-            "Without an OS, programs would have to interact directly with raw hardware circuits. The OS abstracts hardware details, schedules CPU processes, manages memory safely, and provides a file system.\n\n"
+            "It handles CPU process scheduling, memory allocation, and file storage so programs run efficiently without conflicting.\n\n"
             "**Short Example:**\n"
-            "When you run a program, the OS allocates RAM, assigns CPU execution time, and cleans up memory when the process finishes.\n\n"
+            "When you run a program, the OS allocates RAM, grants CPU execution cycles, and cleans up resources when closed.\n\n"
             "```c\n"
-            "// Creating a process using fork()\n"
+            "// Process creation using fork()\n"
             "#include <stdio.h>\n"
             "#include <unistd.h>\n\n"
             "int main() {\n"
@@ -152,35 +155,78 @@ def generate_fallback_llm_response(query: str) -> str:
             "}\n"
             "```"
         )
-    elif "binary search" in q or "algo" in q or "tree" in q:
+    elif any(k in q_low for k in ["binary search", "sorting", "array", "tree", "graph", "algorithm", "stack", "queue"]):
         return (
-            "**Binary Search** is an efficient searching algorithm for sorted lists that divides the search interval in half every step.\n\n"
+            f"**{title_topic}** is a core data structure and algorithm concept used for storing, organizing, and querying data efficiently.\n\n"
             "**Why it matters:**\n"
-            "Instead of checking elements one by one in O(N) time, Binary Search finds the target in O(log N) time, making it ideal for massive datasets.\n\n"
+            "Optimized algorithms reduce computation time from O(N) to O(log N) or O(1), which is essential for scaling applications and passing technical interviews.\n\n"
             "**Short Example:**\n"
             "```python\n"
-            "def binary_search(arr, target):\n"
-            "    left, right = 0, len(arr) - 1\n"
+            "def process_data(items, target):\n"
+            "    left, right = 0, len(items) - 1\n"
             "    while left <= right:\n"
             "        mid = (left + right) // 2\n"
-            "        if arr[mid] == target:\n"
+            "        if items[mid] == target:\n"
             "            return mid\n"
-            "        elif arr[mid] < target:\n"
+            "        elif items[mid] < target:\n"
             "            left = mid + 1\n"
             "        else:\n"
             "            right = mid - 1\n"
             "    return -1\n"
             "```"
         )
+    elif any(k in q_low for k in ["sql", "database", "dbms", "query", "join", "table"]):
+        return (
+            f"**{title_topic}** refers to relational database principles and query operations used to store and manipulate structured data.\n\n"
+            "**Why it matters:**\n"
+            "Databases power software systems by providing ACID compliance, data integrity, fast indexing, and persistent storage.\n\n"
+            "**Short Example:**\n"
+            "```sql\n"
+            "SELECT d.department_name, COUNT(e.id) AS total_employees\n"
+            "FROM departments d\n"
+            "JOIN employees e ON d.id = e.department_id\n"
+            "GROUP BY d.department_name\n"
+            "HAVING COUNT(e.id) > 5;\n"
+            "```"
+        )
+    elif any(k in q_low for k in ["react", "javascript", "js", "html", "css", "web", "api"]):
+        return (
+            f"**{title_topic}** is a core technology in web application development.\n\n"
+            "**Why it matters:**\n"
+            "Modern web applications rely on responsive user interfaces, modular components, asynchronous API communication, and clean state management.\n\n"
+            "**Short Example:**\n"
+            "```javascript\n"
+            "async function fetchUserData(userId) {\n"
+            "  try {\n"
+            "    const response = await fetch(`/api/v1/users/${userId}`);\n"
+            "    const data = await response.json();\n"
+            "    return data;\n"
+            "  } catch (error) {\n"
+            "    console.error('Fetch error:', error);\n"
+            "  }\n"
+            "}\n"
+            "```"
+        )
+    elif any(k in q_low for k in ["network", "tcp", "ip", "http", "dns"]):
+        return (
+            f"**{title_topic}** is a core computer networking concept enabling devices to communicate across local networks and the Internet.\n\n"
+            "**Why it matters:**\n"
+            "Understanding network layers (OSI model, TCP/IP) ensures reliable packet delivery, low latency, and secure data transmission over HTTPS.\n\n"
+            "**Short Example:**\n"
+            "When you request a website URL, DNS resolves the domain to an IP address, establishes a TCP connection, and exchanges HTTP requests/responses."
+        )
     else:
         return (
-            f"Here is a direct overview of **{query.title()}**:\n\n"
+            f"**{title_topic}**:\n\n"
             f"**Definition:**\n"
-            f"{query.title()} is a fundamental topic in academic curriculum and practical application.\n\n"
+            f"This is an important academic and practical concept in computer science and software development.\n\n"
             f"**Why it matters:**\n"
-            f"Understanding this concept helps solve complex problem requirements, write efficient code, and excel in technical evaluations.\n\n"
+            f"Mastering this topic strengthens your technical foundation, helps you write clean and efficient code, and prepares you for university exams and technical interviews.\n\n"
             f"**Short Example:**\n"
-            f"In practical engineering, this principle is applied to optimize resource usage and maintain clear component boundaries."
+            f"When solving problems related to this topic:\n"
+            f"1. Define input parameters and expected outputs.\n"
+            f"2. Apply the core principles or algorithms.\n"
+            f"3. Verify edge cases and performance metrics."
         )
 
 
