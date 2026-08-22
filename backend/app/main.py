@@ -21,16 +21,21 @@ from app.api.v1 import (
 )
 
 
+import asyncio
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     FastAPI Lifespan Context Manager.
     1. Validates required environment variables at startup.
-    2. Initializes singleton embedding model and global FAISS index once.
+    2. Initializes singleton embedding model and global FAISS index non-blocking.
     """
     print("[CampusOS AI] Initializing system & validating startup configuration...")
     settings.validate_required_env()
-    init_rag_service()
+    try:
+        asyncio.create_task(asyncio.to_thread(init_rag_service))
+    except Exception as e:
+        print(f"[CampusOS AI Startup Warning] RAG background init warning: {e}")
     print("[CampusOS AI] Startup complete. Service ready on 1 worker (<450MB RAM).")
     yield
     print("[CampusOS AI] Shutting down backend service...")
