@@ -61,6 +61,52 @@ export async function chatWithAgent(message, chatId, category, role, agenticMode
   });
 }
 
+export async function chatWithLLM(message, history = [], userId = null) {
+  try {
+    return await fetchWithAuth('/ai/chat/llm', {
+      method: 'POST',
+      body: JSON.stringify({ message, history, user_id: userId }),
+    });
+  } catch (err) {
+    // Try root fallback URL if v1 prefix varies
+    const token = await getAuthToken();
+    const rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '').replace(/\/api\/v1$/, '');
+    const res = await fetch(`${rawBaseUrl}/api/chat/llm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ message, history, user_id: userId }),
+    });
+    if (!res.ok) throw err;
+    return res.json();
+  }
+}
+
+export async function chatWithRAG(message, role = 'student', userId = null) {
+  try {
+    return await fetchWithAuth('/ai/chat/rag', {
+      method: 'POST',
+      body: JSON.stringify({ message, role, user_id: userId }),
+    });
+  } catch (err) {
+    const token = await getAuthToken();
+    const rawBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '').replace(/\/api\/v1$/, '');
+    const res = await fetch(`${rawBaseUrl}/api/chat/rag`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ message, role, user_id: userId }),
+    });
+    if (!res.ok) throw err;
+    return res.json();
+  }
+}
+
+
 export async function searchKnowledgeBase(query, category) {
   return fetchWithAuth('/ai/knowledge/search', {
     method: 'POST',

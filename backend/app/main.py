@@ -71,6 +71,18 @@ app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
 app.include_router(academics_extended.router, prefix=f"{settings.API_V1_STR}/academic-ext")
 
+# Direct aliases for /api/chat/llm and /api/chat/rag as per specification
+from app.api.v1.ai import chat_llm_endpoint, chat_rag_endpoint, LLMChatRequest, RAGChatRequest
+
+@app.post("/api/chat/llm", tags=["AI & Agents"])
+async def root_chat_llm(payload: LLMChatRequest):
+    return await chat_llm_endpoint(payload)
+
+@app.post("/api/chat/rag", tags=["AI & Agents"])
+async def root_chat_rag(payload: RAGChatRequest):
+    return await chat_rag_endpoint(payload)
+
+
 
 @app.get("/", tags=["General"])
 def read_root():
