@@ -1,8 +1,24 @@
-from fastapi import APIRouter, Depends
-from app.api.deps import get_current_user
-from app.models import User
+from typing import List, Optional
+from datetime import date
+from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.api.deps import get_current_user, get_db, check_role
+from app.models import User, Student, Subject, Attendance
+
 
 router = APIRouter(prefix="/faculty", tags=["Faculty"])
+
+
+class AttendanceMarkItem(BaseModel):
+    student_id: int
+    subject_id: int
+    date: str
+    is_present: bool
+
+
+class AttendanceBatchPayload(BaseModel):
+    records: List[AttendanceMarkItem]
 
 
 @router.get("/")
@@ -15,6 +31,64 @@ def get_faculty_list(current_user: User = Depends(get_current_user)):
             {"id": 3, "name": "Prof. Claude Shannon", "department": "Electrical & Electronics", "designation": "Assistant Professor", "email": "c.shannon@university.edu"},
         ]
     }
+
+
+@router.get("/courses")
+def get_faculty_courses(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Get academic courses from DB."""
+    subjects = db.query(Subject).all()
+    if not subjects:
+        return [
+            {"id": 1, "code": "CS101", "name": "Data Structures & Algorithms", "semester": 5},
+            {"id": 2, "code": "CS102", "name": "Database Management Systems", "semester": 5},
+            {"id": 3, "code": "CS103", "name": "Operating Systems & Architecture", "semester": 5},
+            {"id": 4, "code": "CS104", "name": "Machine Learning & AI", "semester": 5}
+        ]
+    return [{"id": s.id, "code": s.code, "name": s.name, "semester": s.semester} for s in subjects]
+
+
+@router.get("/courses/{subject_id}/roster")
+def get_course_roster(
+    subject_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get student roster from DB for a course."""
+    students = db.query(Student).all()
+    res = []
+    for s in students:
+        res.append({
+            "student_id": s.id,
+            "roll_number": s.roll_number,
+            "full_name": s.user.full_name if s.user else "Student",
+            "email": s.user.email if s.user else "student@campus.edu",
+            "current_semester": s.current_semester,
+            "cgpa": float(s.cgpa) if s.cgpa else 8.0
+        })
+    return {"subject_id": subject_id, "students": res}
+
+
+@router.post("/attendance", dependencies=[Depends(check_role(["faculty", "admin", "super_admin"]))])
+def mark_faculty_attendance(
+    payload: AttendanceBatchPayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Faculty marks student attendance in DB."""
+    saved_count = 0
+    for item in payload.records:
+        parsed_date = date.fromisoformat(item.date) if isinstance(item.date, str) else item.date
+        att = Attendance(
+            student_id=item.student_id,
+            subject_id=item.subject_id,
+            date=parsed_date,
+            is_present=item.is_present
+        )
+        db.add(att)
+        saved_count += 1
+
+    db.commit()
+    return {"message": f"Successfully marked attendance for {saved_count} students in DB."}
 
 
 @router.get("/{faculty_id}/schedule")

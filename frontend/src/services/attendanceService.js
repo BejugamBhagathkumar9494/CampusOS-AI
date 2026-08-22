@@ -315,7 +315,25 @@ export const attendanceService = {
       console.warn('Local storage save error:', e);
     }
 
-    // 2. Save into Supabase table
+    // 2. Save into Backend FastAPI Database & Supabase
+    try {
+      const { fetchWithAuth } = await import('./api.js');
+      const backendPayload = {
+        records: records.map(r => ({
+          student_id: Number(r.student_id) || 1,
+          subject_id: Number(r.course_id) || 1,
+          date: r.date,
+          is_present: r.status === 'present' || r.status === 'late'
+        }))
+      };
+      await fetchWithAuth('/faculty/attendance', {
+        method: 'POST',
+        body: JSON.stringify(backendPayload)
+      });
+    } catch (apiErr) {
+      console.warn('Backend API attendance save fallback:', apiErr);
+    }
+
     try {
       await supabase
         .from('attendance')

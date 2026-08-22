@@ -57,6 +57,10 @@ const DashboardRedirect = () => {
     admin: '/admin/dashboard',
     placement_officer: '/placement/dashboard',
     super_admin: '/super-admin/dashboard',
+    hostel_warden: '/hostel/dashboard',
+    warden: '/hostel/dashboard',
+    librarian: '/library/dashboard',
+    library: '/library/dashboard'
   };
 
   return <Navigate to={dashboardRoutes[role] || '/login'} replace />;
@@ -175,6 +179,41 @@ export default function App() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="placements" element={<Placements />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="*" element={<Navigate to="dashboard" replace />} />
+                  </Routes>
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/hostel/*"
+            element={
+              <ProtectedRoute allowedRoles={['hostel_warden', 'warden', 'admin', 'super_admin']}>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="ai-assistant" element={<AIAssistant />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="*" element={<Navigate to="dashboard" replace />} />
+                  </Routes>
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/library/*"
+            element={
+              <ProtectedRoute allowedRoles={['librarian', 'library', 'admin', 'super_admin']}>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="library" element={<Library />} />
+                    <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />

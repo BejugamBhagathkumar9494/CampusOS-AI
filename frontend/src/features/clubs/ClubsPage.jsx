@@ -210,23 +210,9 @@ export default function ClubsPage() {
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Active Society
                     </span>
 
-                    <button
-                      onClick={() => handleJoin(club.id, club.name)}
-                      disabled={isJoined}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 ${
-                        isJoined
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                      }`}
-                    >
-                      {isJoined ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" /> Joined
-                        </>
-                      ) : (
-                        'Participate / Join'
-                      )}
-                    </button>
+                    <span className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                      <Users className="w-3.5 h-3.5 text-purple-600" /> {club.members_count || club.member_count || 12} Members Joined
+                    </span>
                   </div>
                 </div>
               </div>

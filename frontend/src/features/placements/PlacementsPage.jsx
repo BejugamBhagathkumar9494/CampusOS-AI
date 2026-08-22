@@ -26,6 +26,21 @@ export default function PlacementsPage() {
 
   const [applyMsg, setApplyMsg] = useState('');
 
+  const isOfficer = ['placement_officer', 'admin', 'super_admin'].includes((profile?.role || '').toLowerCase());
+
+  // Officer drive creation modal state
+  const [showDriveModal, setShowDriveModal] = useState(false);
+  const [newDrive, setNewDrive] = useState({ company_name: '', job_title: '', package_ctc: '12.0', min_cgpa: '6.0' });
+  const [creatingDrive, setCreatingDrive] = useState(false);
+
+  // Applicant management state
+  const [applicants, setApplicants] = useState([]);
+  const [selectedDriveId, setSelectedDriveId] = useState(null);
+  const [loadingApplicants, setLoadingApplicants] = useState(false);
+
+  // Student application status state
+  const [myApplications, setMyApplications] = useState([]);
+
   useEffect(() => {
     async function loadStudentProfileDetails() {
       if (!profile?.id) return;
@@ -39,8 +54,11 @@ export default function PlacementsPage() {
         if (student?.cgpa) {
           setCgpa(String(student.cgpa));
         }
+
+        const myApps = await placementService.getStudentApplications(profile.id);
+        setMyApplications(myApps || []);
       } catch (e) {
-        console.error('Error fetching student CGPA:', e);
+        console.error('Error fetching student CGPA/apps:', e);
       }
     }
     loadStudentProfileDetails();
@@ -52,8 +70,24 @@ export default function PlacementsPage() {
       setCompanies(cList);
       const dList = await placementService.getPlacementDrives();
       setDrives(dList);
+      if (dList.length > 0 && !selectedDriveId) {
+        setSelectedDriveId(dList[0].id);
+      }
     } catch (err) {
       console.error('Error fetching placement data:', err);
+    }
+  };
+
+  const fetchDriveApplicants = async (driveId) => {
+    if (!driveId) return;
+    setLoadingApplicants(true);
+    try {
+      const appList = await placementService.getDriveApplicants(driveId);
+      setApplicants(appList || []);
+    } catch (err) {
+      console.error('Error fetching applicants:', err);
+    } finally {
+      setLoadingApplicants(false);
     }
   };
 
@@ -61,6 +95,39 @@ export default function PlacementsPage() {
     fetchPlacementData();
     getPlacementAnalytics().then(setAnalytics).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (selectedDriveId && isOfficer) {
+      fetchDriveApplicants(selectedDriveId);
+    }
+  }, [selectedDriveId, isOfficer]);
+
+  const handleCreateDriveSubmit = async (e) => {
+    e.preventDefault();
+    if (!newDrive.company_name.trim()) return;
+    setCreatingDrive(true);
+    try {
+      await placementService.createPlacementDrive(newDrive);
+      setShowDriveModal(false);
+      setNewDrive({ company_name: '', job_title: '', package_ctc: '12.0', min_cgpa: '6.0' });
+      fetchPlacementData();
+      alert(`Placement drive for ${newDrive.company_name} created successfully in DB!`);
+    } catch (err) {
+      alert(err.message || 'Failed to create placement drive');
+    } finally {
+      setCreatingDrive(false);
+    }
+  };
+
+  const handleStatusChange = async (applicationId, newStatus) => {
+    try {
+      await placementService.updateApplicationStatus(applicationId, newStatus);
+      setApplicants(prev => prev.map(a => a.application_id === applicationId ? { ...a, status: newStatus } : a));
+      alert(`Student application status updated to '${newStatus.toUpperCase()}' in DB!`);
+    } catch (err) {
+      alert(err.message || 'Failed to update application status.');
+    }
+  };
 
   const calculateReadiness = async () => {
     setLoading(true);
@@ -118,7 +185,7 @@ export default function PlacementsPage() {
           <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">Check drive eligibility, apply for active recruiters, and predict readiness scores.</p>
         </div>
         {analytics && (
-          <div className="flex gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
               <span className="text-[11px] font-bold text-slate-400 uppercase">Dataset Total</span>
               <div className="text-base font-extrabold text-slate-900">{analytics.total_records?.toLocaleString()}</div>
@@ -131,6 +198,14 @@ export default function PlacementsPage() {
               <span className="text-[11px] font-bold text-slate-400 uppercase">Avg Salary</span>
               <div className="text-base font-extrabold text-indigo-600">{analytics.avg_salary_lpa} LPA</div>
             </div>
+            {isOfficer && (
+              <button
+                onClick={() => setShowDriveModal(true)}
+                className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+              >
+                + Create Recruitment Drive
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -138,6 +213,79 @@ export default function PlacementsPage() {
       {applyMsg && (
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold animate-fade-in">
           {applyMsg}
+        </div>
+      )}
+
+      {/* Placement Officer Drive Applicants Roster */}
+      {isOfficer && drives.length > 0 && (
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-indigo-600" /> Placement Officer: Drive Applications & Decisions
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">Select a drive to manage student applications and issue Shortlists/Offers directly into DB.</p>
+            </div>
+
+            <select
+              value={selectedDriveId || ''}
+              onChange={(e) => setSelectedDriveId(e.target.value)}
+              className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none"
+            >
+              {drives.map(d => (
+                <option key={d.id} value={d.id}>
+                  {d.companies?.name || 'Drive'} - {d.job_title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {loadingApplicants ? (
+            <p className="text-xs text-slate-400 font-medium p-4 text-center">Loading applicant roster from database...</p>
+          ) : applicants.length === 0 ? (
+            <p className="text-xs text-slate-500 font-medium p-4 text-center bg-slate-50 rounded-xl">No student applications recorded for this drive yet.</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {applicants.map((app) => (
+                <div key={app.application_id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">{app.full_name} <span className="text-slate-400 font-normal">({app.roll_number})</span></p>
+                    <p className="text-[11px] text-slate-500 font-medium">{app.email} • CGPA: {app.cgpa} • Dept: {app.department}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md border ${
+                      app.status === 'offered' || app.status === 'placed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                      app.status === 'shortlisted' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                      app.status === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                      'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}>
+                      {app.status}
+                    </span>
+
+                    <button
+                      onClick={() => handleStatusChange(app.application_id, 'shortlisted')}
+                      className="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-bold hover:bg-amber-100"
+                    >
+                      Shortlist
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(app.application_id, 'offered')}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 shadow-2xs"
+                    >
+                      Offer / Place Student
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(app.application_id, 'rejected')}
+                      className="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-bold hover:bg-rose-50 hover:text-rose-700"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -288,6 +436,84 @@ export default function PlacementsPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Drive Modal */}
+      {showDriveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-extrabold text-slate-900">Create Recruitment Drive</h3>
+              <button onClick={() => setShowDriveModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <form onSubmit={handleCreateDriveSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Company Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Microsoft"
+                  value={newDrive.company_name}
+                  onChange={(e) => setNewDrive({ ...newDrive, company_name: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Job Title</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Software Development Engineer (SDE-1)"
+                  value={newDrive.job_title}
+                  onChange={(e) => setNewDrive({ ...newDrive, job_title: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Package (CTC LPA)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={newDrive.package_ctc}
+                    onChange={(e) => setNewDrive({ ...newDrive, package_ctc: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Min CGPA Required</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={newDrive.min_cgpa}
+                    onChange={(e) => setNewDrive({ ...newDrive, min_cgpa: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDriveModal(false)}
+                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingDrive}
+                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-50"
+                >
+                  {creatingDrive ? 'Creating...' : 'Create Drive'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
