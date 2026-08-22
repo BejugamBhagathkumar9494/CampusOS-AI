@@ -50,13 +50,34 @@ export const RegisterPage = () => {
       return;
     }
 
-    if (!email.trim() || !validateEmail(email)) {
+    const roleEmailTags = {
+      student: '.student',
+      faculty: '.faculty',
+      placement_officer: '.pofficer',
+      hostel_warden: '.warden',
+      librarian: '.librarian'
+    };
+
+    if (!selectedRole) {
+      setErrorMsg('Please select your university role.');
+      return;
+    }
+
+    const reqTag = roleEmailTags[selectedRole] || `.${selectedRole}`;
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail || !validateEmail(cleanEmail)) {
       setErrorMsg('Please enter a valid email address.');
       return;
     }
 
-    if (!selectedRole) {
-      setErrorMsg('Please select your university role.');
+    if (!cleanEmail.endsWith('@campus.edu') && !cleanEmail.endsWith('@campusos.edu')) {
+      setErrorMsg(`Email must end with @campus.edu (e.g. username${reqTag}@campus.edu).`);
+      return;
+    }
+
+    if (!cleanEmail.includes(reqTag)) {
+      setErrorMsg(`Email for role '${selectedRole}' must contain '${reqTag}' before @campus.edu (e.g. 'name${reqTag}@campus.edu').`);
       return;
     }
 
@@ -83,11 +104,12 @@ export const RegisterPage = () => {
     setIsSubmitting(true);
     try {
       await signUp(email, password, fullName, selectedRole, institutionId);
-      setSuccessMsg('Account registered successfully! If pending administrator approval, your account will be activated by campus admin.');
+      const pendingMsg = 'Request has been successfully sent. Your account registration is pending Superadmin approval. Once approved by Superadmin, you will be able to access CampusOS.';
+      setSuccessMsg(pendingMsg);
       
       setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        navigate('/login', { state: { infoMessage: pendingMsg } });
+      }, 3000);
     } catch (err) {
       console.error('Registration error:', err);
       setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during registration.'));
@@ -97,9 +119,9 @@ export const RegisterPage = () => {
   };
 
   const roleOptions = [
-    { value: 'student', label: 'Student', desc: 'Access class portals, academics, & placements', sampleId: 'e.g. STU001' },
-    { value: 'faculty', label: 'Faculty Member', desc: 'Manage courses, grades, & schedules', sampleId: 'e.g. FAC001' },
-    { value: 'placement_officer', label: 'Placement Officer', desc: 'Coordinate corporate recruitment drives', sampleId: 'e.g. PO001' },
+    { value: 'student', label: 'Student (.student@campus.edu)', desc: 'Access class portals, academics, & placements', sampleId: 'e.g. STU001', tag: '.student' },
+    { value: 'faculty', label: 'Faculty Member (.faculty@campus.edu)', desc: 'Manage courses, grades, & schedules', sampleId: 'e.g. FAC001', tag: '.faculty' },
+    { value: 'placement_officer', label: 'Placement Officer (.pofficer@campus.edu)', desc: 'Coordinate corporate recruitment drives', sampleId: 'e.g. PO001', tag: '.pofficer' },
   ];
 
   return (

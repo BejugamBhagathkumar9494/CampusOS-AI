@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.js';
 import { getFriendlyErrorMessage } from '../utils/errorHelper.js';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, isAuthenticated, role, loading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [infoMsg, setInfoMsg] = useState(location.state?.infoMessage || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -123,6 +125,13 @@ export const LoginPage = () => {
               Enter your credentials to access your dashboard.
             </p>
           </div>
+
+          {infoMsg && !errorMsg && (
+            <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-medium animate-fade-in">
+              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
+              <span>{infoMsg}</span>
+            </div>
+          )}
 
           {errorMsg && (
             <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium animate-fade-in">

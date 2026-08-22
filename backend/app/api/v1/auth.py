@@ -40,6 +40,32 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="Administrative roles cannot be created via public registration. Contact Super Admin."
         )
 
+    # Validate institutional email format rules:
+    # Must end with @campus.edu or @campusos.edu and contain role tag (.student, .faculty, .pofficer, .warden, .librarian)
+    email_clean = user_in.email.strip().lower()
+    role_email_tags = {
+        "student": ".student",
+        "faculty": ".faculty",
+        "placement_officer": ".pofficer",
+        "pofficer": ".pofficer",
+        "hostel_warden": ".warden",
+        "warden": ".warden",
+        "librarian": ".librarian",
+        "library": ".librarian"
+    }
+
+    req_tag = role_email_tags.get(requested_role, f".{requested_role}")
+    allowed_domains = ["@campus.edu", "@campusos.edu"]
+    is_valid_domain = any(email_clean.endswith(domain) for domain in allowed_domains)
+    is_valid_tag = req_tag in email_clean
+
+    if not is_valid_domain or not is_valid_tag:
+        sample_email = f"username{req_tag}@campus.edu"
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Email format invalid. Email for role '{requested_role}' must end with '@campus.edu' and contain '{req_tag}' (e.g. '{sample_email}')."
+        )
+
     # Verify requested role and institution ID against pre-authorized registry
     auth_record = None
     if user_in.institution_id:
@@ -48,8 +74,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             AuthorizedUser.role == requested_role
         ).first()
 
-    # Determine status: active if matched authorized_users record, else pending approval
-    initial_status = "active" if (auth_record and not auth_record.is_used) else "pending"
+    # Initial status is pending Superadmin approval
+    initial_status = "pending"
 
     # Fetch database role
     db_role = db.query(Role).filter(Role.name == requested_role).first()
@@ -66,7 +92,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         full_name=user_in.full_name,
         institution_id=user_in.institution_id,
         status=initial_status,
-        is_active=(initial_status == "active")
+        is_active=False
     )
     new_user.roles.append(db_role)
     db.add(new_user)
@@ -127,25 +153,20 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         )
 
     # Account status validation
-    if user.status == "suspended":
+    if user.status == "pending" or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account is suspended. Please contact campus administrator."
-        )
-    elif user.status == "pending":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account registration is pending administrator approval."
+            detail="Request has been successfully sent. Your account registration is pending Superadmin approval. Once approved by Superadmin, you will be able to access CampusOS."
         )
     elif user.status == "rejected":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account registration request was rejected by administration."
         )
-    elif not user.is_active:
+    elif user.status == "suspended":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is inactive."
+            detail="Account is suspended. Please contact campus administrator."
         )
 
     # Audit Logging: Log successful sign-in
