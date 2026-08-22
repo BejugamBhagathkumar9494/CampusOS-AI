@@ -2,152 +2,116 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Send, Sparkles, HelpCircle, Bot, User, BookOpen,
   ChevronDown, ChevronUp, Copy, Check, RefreshCw, Trash2,
-  Database, Zap, Brain, Layers
+  Database, Zap, Brain, Layers, History, Plus, MessageSquare, Clock, X
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
-import { chatWithLLM, chatWithRAG } from '../../services/api.js';
+import { chatWithLLM, chatWithRAG, fetchWithAuth } from '../../services/api.js';
 
 export default function AIAssistant() {
   const { profile } = useAuth();
 
-  // Default mode is LLM as required
-  const [mode, setMode] = useState(() => {
-    return localStorage.getItem('campusos_ai_mode') || 'llm';
-  });
+  // Active chat session state
+  const [sessionId, setSessionId] = useState(null);
+  const [pastSessions, setPastSessions] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [showHistorySidebar, setShowHistorySidebar] = useState(false);
 
-  const userId = profile?.id || profile?.email || 'guest';
-  const llmStorageKey = `campusos_chat_history_llm_${userId}`;
-  const ragStorageKey = `campusos_chat_history_rag_${userId}`;
-
-  // Separate conversation history for LLM Mode
-  const [llmMessages, setLlmMessages] = useState(() => {
-    const saved = localStorage.getItem(llmStorageKey);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
-    return [
-      {
-        id: 'msg-welcome-llm',
-        role: 'assistant',
-        sender: 'assistant',
-        content: `Hi ${profile?.full_name || 'Student'}! Welcome to ✨ LLM Mode powered by Gemini. Ask me general programming, academic concepts, reasoning, or technical interview questions!`,
-        mode: 'llm',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        agentName: '✨ Gemini 2.5 Flash'
-      }
-    ];
-  });
-
-  // Separate conversation history for RAG Mode
-  const [ragMessages, setRagMessages] = useState(() => {
-    const saved = localStorage.getItem(ragStorageKey);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
-    return [
-      {
-        id: 'msg-welcome-rag',
-        role: 'assistant',
-        sender: 'assistant',
-        content: `Hi ${profile?.full_name || 'Student'}! Welcome to 📚 RAG Mode. Ask questions grounded strictly in official university handbooks, hostel rules, attendance, and placement guidelines!`,
-        mode: 'rag',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        agentName: '📚 RAG Knowledge Base'
-      }
-    ];
-  });
-
+  // Default mode (LLM or RAG)
+  const [mode, setMode] = useState(() => localStorage.getItem('campusos_ai_mode') || 'llm');
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [expandedSources, setExpandedSources] = useState({});
   const messagesEndRef = useRef(null);
 
-  // Re-sync user-isolated chat messages when profile or login user changes
-  useEffect(() => {
-    const savedLlm = localStorage.getItem(llmStorageKey);
-    if (savedLlm) {
-      try {
-        const parsed = JSON.parse(savedLlm);
-        if (Array.isArray(parsed) && parsed.length > 0) setLlmMessages(parsed);
-      } catch (e) {}
-    } else {
-      setLlmMessages([
+  // 1. Initialize a brand-new AI chat session on login/mount as per specification
+  const startNewChatSession = async () => {
+    try {
+      setIsLoading(true);
+      const newSession = await fetchWithAuth('/ai/sessions', {
+        method: 'POST',
+        body: JSON.stringify({ title: 'New AI Chat Session' })
+      });
+
+      setSessionId(newSession.id);
+      setMessages([
         {
-          id: 'msg-welcome-llm',
+          id: 'welcome-' + Date.now(),
           role: 'assistant',
           sender: 'assistant',
-          content: `Hi ${profile?.full_name || 'Student'}! Welcome to ✨ LLM Mode powered by Gemini. Ask me general programming, academic concepts, reasoning, or technical interview questions!`,
-          mode: 'llm',
+          content: `Hi ${profile?.full_name || 'Student'}! Welcome to your fresh CampusOS AI session. Ask me general programming, academic concepts, reasoning, or switch to RAG Mode for grounded university document search!`,
+          mode: mode,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          agentName: '✨ Gemini 2.5 Flash'
+          agentName: mode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'
         }
       ]);
-    }
 
-    const savedRag = localStorage.getItem(ragStorageKey);
-    if (savedRag) {
-      try {
-        const parsed = JSON.parse(savedRag);
-        if (Array.isArray(parsed) && parsed.length > 0) setRagMessages(parsed);
-      } catch (e) {}
-    } else {
-      setRagMessages([
-        {
-          id: 'msg-welcome-rag',
-          role: 'assistant',
-          sender: 'assistant',
-          content: `Hi ${profile?.full_name || 'Student'}! Welcome to 📚 RAG Mode. Ask questions grounded strictly in official university handbooks, hostel rules, attendance, and placement guidelines!`,
-          mode: 'rag',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          agentName: '📚 RAG Knowledge Base'
-        }
-      ]);
-    }
-  }, [userId]);
-
-  // Active messages based on current mode
-  const messages = mode === 'llm' ? llmMessages : ragMessages;
-
-  // Helper setter to update current mode messages
-  const updateMessages = (newMessagesOrFn) => {
-    if (mode === 'llm') {
-      setLlmMessages(newMessagesOrFn);
-    } else {
-      setRagMessages(newMessagesOrFn);
+      // Refresh past sessions list
+      loadPastSessions();
+    } catch (err) {
+      console.error('Error starting new AI chat session:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Save mode selection to localStorage
+  const loadPastSessions = async () => {
+    try {
+      const list = await fetchWithAuth('/ai/sessions');
+      setPastSessions(list || []);
+    } catch (err) {
+      console.warn('Could not fetch past AI sessions:', err);
+    }
+  };
+
+  const loadPastSessionMessages = async (targetSession) => {
+    try {
+      setIsLoading(true);
+      const res = await fetchWithAuth(`/ai/sessions/${targetSession.id}/messages`);
+      setSessionId(targetSession.id);
+
+      const formatted = (res.messages || []).map(m => ({
+        id: 'msg-' + m.id,
+        role: m.role,
+        sender: m.role,
+        content: m.message,
+        mode: m.mode || 'llm',
+        timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sources: m.sources || [],
+        agentName: m.role === 'assistant' ? (m.mode === 'rag' ? '📚 RAG Knowledge Base' : '✨ Gemini 2.5 Flash') : null
+      }));
+
+      if (formatted.length === 0) {
+        setMessages([
+          {
+            id: 'welcome-empty-' + Date.now(),
+            role: 'assistant',
+            sender: 'assistant',
+            content: `Session "${targetSession.title}". Ask your question to begin!`,
+            mode: mode,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            agentName: mode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'
+          }
+        ]);
+      } else {
+        setMessages(formatted);
+      }
+      setShowHistorySidebar(false);
+    } catch (err) {
+      alert('Failed to load chat history session.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    startNewChatSession();
+  }, [profile?.id]);
+
   useEffect(() => {
     localStorage.setItem('campusos_ai_mode', mode);
   }, [mode]);
 
-  // Persist LLM messages history for current user
-  useEffect(() => {
-    try {
-      localStorage.setItem(llmStorageKey, JSON.stringify(llmMessages));
-    } catch (e) {
-      console.warn('Failed to persist LLM chat messages', e);
-    }
-  }, [llmMessages, llmStorageKey]);
-
-  // Persist RAG messages history for current user
-  useEffect(() => {
-    try {
-      localStorage.setItem(ragStorageKey, JSON.stringify(ragMessages));
-    } catch (e) {
-      console.warn('Failed to persist RAG chat messages', e);
-    }
-  }, [ragMessages, ragStorageKey]);
-
-  // Auto-scroll to bottom on message change
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -178,26 +142,6 @@ export default function AIAssistant() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleClearChat = () => {
-    if (window.confirm(`Are you sure you want to clear ${mode.toUpperCase()} chat history?`)) {
-      const resetWelcome = [
-        {
-          id: `msg-welcome-${mode}-${Date.now()}`,
-          role: 'assistant',
-          sender: 'assistant',
-          content: mode === 'llm'
-            ? `LLM Chat history cleared. ✨ Ask me general questions, programming problems, or switch to 📚 RAG Mode for campus policy search!`
-            : `RAG Chat history cleared. 📚 Ask questions grounded strictly in official university documents!`,
-          mode: mode,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          agentName: mode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'
-        }
-      ];
-      updateMessages(resetWelcome);
-      localStorage.removeItem(`campusos_chat_history_${mode}`);
-    }
-  };
-
   const handleSend = async (customQuery) => {
     const query = (customQuery || inputValue).trim();
     if (!query || isLoading) return;
@@ -215,14 +159,26 @@ export default function AIAssistant() {
       user_id: profile?.id
     };
 
-    updateMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     if (!customQuery) setInputValue('');
     setIsLoading(true);
+
+    // Save user message to DB session if active
+    if (sessionId) {
+      try {
+        await fetchWithAuth(`/ai/sessions/${sessionId}/messages`, {
+          method: 'POST',
+          body: JSON.stringify({ role: 'user', message: query, mode: currentMode })
+        });
+      } catch (dbErr) {
+        console.warn('DB session user msg store warning:', dbErr);
+      }
+    }
 
     try {
       let responseData;
       if (currentMode === 'llm') {
-        const historyContext = llmMessages.slice(-6).map(m => ({
+        const historyContext = messages.slice(-6).map(m => ({
           role: m.role || m.sender,
           content: m.content || m.text
         }));
@@ -249,7 +205,25 @@ export default function AIAssistant() {
         sources: responseData.sources || responseData.source_documents || []
       };
 
-      updateMessages((prev) => [...prev, botMsg]);
+      setMessages((prev) => [...prev, botMsg]);
+
+      // Save assistant response to DB session
+      if (sessionId) {
+        try {
+          await fetchWithAuth(`/ai/sessions/${sessionId}/messages`, {
+            method: 'POST',
+            body: JSON.stringify({
+              role: 'assistant',
+              message: botMsgText,
+              mode: currentMode,
+              sources: botMsg.sources
+            })
+          });
+          loadPastSessions();
+        } catch (dbErr) {
+          console.warn('DB session bot msg store warning:', dbErr);
+        }
+      }
     } catch (err) {
       console.error(`[AI Assistant Error] Mode ${currentMode.toUpperCase()}:`, err);
 
@@ -269,25 +243,17 @@ export default function AIAssistant() {
         sources: []
       };
 
-      updateMessages((prev) => [...prev, botMsg]);
+      setMessages((prev) => [...prev, botMsg]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleRegenerate = () => {
-    if (messages.length < 2 || isLoading) return;
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user' || m.sender === 'user');
-    if (lastUserMsg && lastUserMsg.content) {
-      handleSend(lastUserMsg.content);
     }
   };
 
   const isLLM = mode === 'llm';
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8.5rem)] animate-fade-in space-y-4 font-sans max-w-7xl mx-auto w-full">
-      {/* Top Header with Segmented Toggle & Mode Status */}
+    <div className="flex flex-col h-[calc(100vh-8.5rem)] animate-fade-in space-y-4 font-sans max-w-7xl mx-auto w-full relative">
+      {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-[24px] border border-slate-100 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -300,251 +266,212 @@ export default function AIAssistant() {
               CampusOS AI Assistant
             </h1>
           </div>
-
-          {/* Active Mode Badge */}
-          <div className="inline-flex items-center gap-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-extrabold border transition-all ${
-              isLLM
-                ? 'bg-purple-500/10 text-purple-700 border-purple-200/80'
-                : 'bg-sky-500/10 text-sky-700 border-sky-200/80'
-            }`}>
-              {isLLM ? '✨ LLM Mode Active — General AI powered by Gemini' : '📚 RAG Mode Active — Grounded Knowledge Search'}
-            </span>
-          </div>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium">
+            {isLLM 
+              ? 'General knowledge, coding, academic concepts, and technical reasoning powered by Gemini 2.5 Flash.' 
+              : 'Grounded university search. Answers restricted strictly to indexed campus handbooks & rules.'}
+          </p>
         </div>
 
-        {/* Right Header Controls: Segmented Toggle & Clear Chat */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Segmented Toggle (LLM | RAG) */}
-          <div className="bg-slate-100/90 p-1.5 rounded-2xl flex items-center gap-1 border border-slate-200/60 shadow-inner">
+        <div className="flex items-center gap-3">
+          {/* Chat History Sidebar Toggle Button */}
+          <button
+            onClick={() => setShowHistorySidebar(!showHistorySidebar)}
+            className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+            title="View AI Chat History"
+          >
+            <History className="w-4 h-4 text-indigo-600" />
+            <span>Chat History ({pastSessions.length})</span>
+          </button>
+
+          <button
+            onClick={startNewChatSession}
+            className="px-3.5 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            title="Start New AI Chat Session"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Session</span>
+          </button>
+
+          {/* Segmented Mode Selector Switch */}
+          <div className="bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80 flex items-center gap-1">
             <button
               onClick={() => setMode('llm')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 ${
-                isLLM
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                isLLM ? 'bg-white text-purple-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              ✨ LLM (Default)
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              ✨ LLM Mode
             </button>
-
             <button
               onClick={() => setMode('rag')}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 ${
-                !isLLM
-                  ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md shadow-sky-500/20'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                !isLLM ? 'bg-white text-sky-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              📚 RAG
+              <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+              📚 RAG Mode
             </button>
           </div>
-
-          <button
-            onClick={handleClearChat}
-            className="px-3.5 py-2 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
-            title="Clear current mode chat history"
-          >
-            <Trash2 className="w-3.5 h-3.5 text-slate-400" />
-            Clear Chat
-          </button>
         </div>
       </div>
 
-      {/* Main Chat Conversation Container */}
-      <div className="flex-1 bg-white rounded-[24px] border border-slate-100 p-4 sm:p-6 shadow-sm overflow-y-auto flex flex-col space-y-4">
-        {messages.map((msg, idx) => {
-          const isUser = msg.role === 'user' || msg.sender === 'user';
-          const msgIsLLM = msg.mode === 'llm' || msg.mode === 'LLM';
+      {/* Main Chat Body with Collapsible Chat History Sidebar */}
+      <div className="flex-1 flex gap-4 overflow-hidden relative">
+        {/* Chat History Sidebar Overlay / Panel */}
+        {showHistorySidebar && (
+          <div className="absolute lg:relative z-40 inset-y-0 left-0 w-72 bg-white rounded-3xl p-4 border border-slate-200 shadow-xl lg:shadow-sm flex flex-col space-y-3 animate-fade-in shrink-0">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <History className="w-4 h-4 text-indigo-600" /> AI Chat History
+              </h3>
+              <button onClick={() => setShowHistorySidebar(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-          return (
-            <div
-              key={msg.id || idx}
-              className={`flex gap-3 max-w-[85%] sm:max-w-[75%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
+            <button
+              onClick={startNewChatSession}
+              className="w-full py-2.5 px-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center justify-center gap-2 border border-indigo-100 transition-all"
             >
-              {/* Avatar Icon */}
-              <div
-                className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 text-white shadow-xs font-bold text-xs ${
-                  isUser
-                    ? 'bg-slate-900'
-                    : msgIsLLM
-                    ? 'bg-gradient-to-tr from-purple-600 to-indigo-600'
-                    : 'bg-gradient-to-tr from-sky-600 to-blue-600'
-                }`}
-              >
-                {isUser ? <User className="w-4 h-4" /> : msgIsLLM ? <Sparkles className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
-              </div>
+              <Plus className="w-4 h-4" /> Start New Session
+            </button>
 
-              {/* Message Bubble Container */}
-              <div
-                className={`p-4 rounded-[22px] shadow-2xs relative group transition-all ${
-                  isUser
-                    ? isLLM
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tr-none'
-                      : 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none'
-                    : 'bg-slate-50 text-slate-800 border border-slate-200/60 rounded-tl-none'
-                }`}
-              >
-                {/* Assistant Metadata Badge */}
-                {!isUser && (
-                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/50">
-                    <div className="flex items-center gap-1.5">
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider ${
-                        msgIsLLM
-                          ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                          : 'bg-sky-100 text-sky-800 border border-sky-200'
-                      }`}>
-                        {msgIsLLM ? '✨ LLM' : '📚 RAG'}
-                      </span>
-
-                      <span className="text-xs font-bold text-slate-800">
-                        {msg.agentName || (msgIsLLM ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base')}
-                      </span>
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {pastSessions.length === 0 ? (
+                <p className="text-xs text-slate-400 p-4 text-center">No previous AI sessions recorded.</p>
+              ) : (
+                pastSessions.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => loadPastSessionMessages(s)}
+                    className={`w-full text-left p-3 rounded-xl transition-all border text-xs font-medium space-y-1 block ${
+                      sessionId === s.id
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-950 font-bold'
+                        : 'bg-slate-50/60 hover:bg-slate-100 border-slate-100 text-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 truncate">
+                      <MessageSquare className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                      <span className="truncate">{s.title || 'Chat Session'}</span>
                     </div>
-
-                    {/* Copy Response Action */}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleCopy(msg.content || msg.text, msg.id || idx)}
-                        className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-all"
-                        title="Copy Message"
-                      >
-                        {copiedId === (msg.id || idx) ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                      <span>{new Date(s.created_at).toLocaleDateString()}</span>
+                      <span>{s.message_count} msg(s)</span>
                     </div>
-                  </div>
-                )}
-
-                {/* Message Content */}
-                <div className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed space-y-2">
-                  {msg.content || msg.text}
-                </div>
-
-                {/* Grounded Source Citations for RAG mode */}
-                {!isUser && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3.5 pt-3 border-t border-slate-200/80 space-y-2">
-                    <div className="text-xs font-extrabold text-sky-800 flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-                      Retrieved Sources ({msg.sources.length}):
-                    </div>
-                    <div className="space-y-2">
-                      {msg.sources.map((doc, docIdx) => (
-                        <div key={docIdx} className="p-3 rounded-xl bg-white border border-slate-200/90 text-xs space-y-1 shadow-2xs">
-                          <div className="flex flex-wrap items-center justify-between font-bold text-slate-800 gap-1">
-                            <span>📄 {doc.file_name || doc.title || 'CampusOS Document'} (Page {doc.page_number || doc.page || 1})</span>
-                            {doc.score !== undefined && (
-                              <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 font-mono font-bold">
-                                Relevance Score: {(doc.score * 100).toFixed(0)}%
-                              </span>
-                            )}
-                          </div>
-                          {doc.content && (
-                            <p className="text-slate-600 line-clamp-3 text-[11px] italic bg-slate-50 p-2 rounded-lg border border-slate-100 mt-1">
-                              "{doc.content}"
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Timestamp & User label */}
-                <div className={`text-[10px] font-medium block text-right mt-2 pt-1 ${
-                  isUser ? 'text-white/80 border-t border-white/10' : 'text-slate-400 border-t border-slate-200/50'
-                }`}>
-                  {msg.timestamp || 'Just now'}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Loading Indicator */}
-        {isLoading && (
-          <div className="flex gap-3 max-w-[75%] mr-auto animate-pulse">
-            <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 text-white ${
-              isLLM ? 'bg-purple-600' : 'bg-sky-600'
-            }`}>
-              {isLLM ? <Sparkles className="w-4 h-4 animate-spin" /> : <BookOpen className="w-4 h-4 animate-bounce" />}
-            </div>
-            <div className="p-4 rounded-[22px] bg-slate-50 border border-slate-200/60 text-slate-500 text-xs font-semibold flex items-center gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin text-slate-400" />
-              {isLLM ? 'Gemini 2.5 Flash is thinking...' : 'Searching CampusOS vector embedding index...'}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        {/* Chat Feed */}
+        <div className="flex-1 bg-white rounded-[24px] border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+            {messages.map((msg) => {
+              const isUser = msg.role === 'user' || msg.sender === 'user';
+              return (
+                <div key={msg.id} className={`flex gap-3 sm:gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs ${
+                    isUser ? 'bg-indigo-600 text-white' : (isLLM ? 'bg-purple-100 text-purple-700' : 'bg-sky-100 text-sky-700')
+                  }`}>
+                    {isUser ? <User className="w-4 h-4 sm:w-5 sm:h-5" /> : <Bot className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  </div>
+
+                  <div className={`space-y-2 max-w-[85%] sm:max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
+                    <div className={`flex items-center gap-2 text-[11px] text-slate-400 font-medium ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <span className="font-bold text-slate-700">{isUser ? 'You' : (msg.agentName || 'AI Assistant')}</span>
+                      <span>•</span>
+                      <span>{msg.timestamp}</span>
+                    </div>
+
+                    <div className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed ${
+                      isUser
+                        ? 'bg-indigo-600 text-white rounded-tr-xs shadow-sm font-medium'
+                        : 'bg-slate-50 border border-slate-200/70 text-slate-800 rounded-tl-xs whitespace-pre-wrap'
+                    }`}>
+                      {msg.content}
+                    </div>
+
+                    {/* Grounded RAG Document Sources dropdown */}
+                    {!isUser && msg.sources && msg.sources.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        <button
+                          onClick={() => toggleSources(msg.id)}
+                          className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-100 hover:bg-sky-100/70 px-3 py-1 rounded-xl transition-all flex items-center gap-1.5"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+                          <span>Sources & Document Citations ({msg.sources.length})</span>
+                          {expandedSources[msg.id] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+
+                        {expandedSources[msg.id] && (
+                          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs text-slate-700 animate-fade-in max-h-48 overflow-y-auto">
+                            {msg.sources.map((src, i) => (
+                              <div key={i} className="p-2.5 rounded-xl bg-white border border-slate-100 space-y-1">
+                                <span className="font-bold text-slate-900 block text-[11px]">
+                                  📄 Document: {src.file_name || src.title || 'University Record'} (Page {src.page_number || 1})
+                                </span>
+                                <p className="text-[11px] text-slate-600 font-mono leading-relaxed bg-slate-50 p-2 rounded-lg">
+                                  "{src.content}"
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {isLoading && (
+              <div className="flex items-center gap-3 text-xs font-bold text-slate-500 bg-slate-50 p-4 rounded-2xl w-max animate-pulse">
+                <RefreshCw className="w-4 h-4 animate-spin text-indigo-600" />
+                <span>AI Assistant is generating response...</span>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Suggested Prompts */}
+          <div className="p-3 bg-slate-50/70 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
+            <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider shrink-0 px-2">Suggestions:</span>
+            {suggestedQueries.map((q, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSend(q)}
+                className="px-3 py-1 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 text-xs font-medium shrink-0 transition-all shadow-2xs"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+
+          {/* Input Box */}
+          <div className="p-4 bg-white border-t border-slate-100 flex items-center gap-3">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder={isLLM ? "Ask LLM Mode (General knowledge, DSA, React, SQL)..." : "Ask RAG Mode (Hostel rules, library policies, attendance criteria)..."}
+              className="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+            />
+
+            <button
+              onClick={() => handleSend()}
+              disabled={isLoading || !inputValue.trim()}
+              className="p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-40 transition-all active:scale-95 shrink-0"
+            >
+              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          </div>
+        </div>
       </div>
-
-      {/* Quick Prompts Bar */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        <span className="text-xs font-bold text-slate-400 flex items-center gap-1 shrink-0">
-          <HelpCircle className="w-3.5 h-3.5" /> Prompts:
-        </span>
-        {suggestedQueries.map((q, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSend(q)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border whitespace-nowrap transition-all shadow-2xs ${
-              isLLM
-                ? 'bg-purple-50/60 hover:bg-purple-100 text-purple-700 border-purple-200/60'
-                : 'bg-sky-50/60 hover:bg-sky-100 text-sky-700 border-sky-200/60'
-            }`}
-          >
-            {q}
-          </button>
-        ))}
-      </div>
-
-      {/* Input Form Bar */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
-        }}
-        className="bg-white p-2 sm:p-3 rounded-[24px] border border-slate-100 shadow-sm flex items-center gap-2"
-      >
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder={
-            isLLM
-              ? '✨ Ask Gemini anything (General AI, Programming, Math, Reasoning)...'
-              : '📚 Ask CampusOS Knowledge Base (Attendance, Hostel Rules, Placements)...'
-          }
-          className="flex-1 px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-900 placeholder-slate-400 text-sm font-medium rounded-2xl outline-hidden border border-transparent focus:border-slate-200 transition-all"
-        />
-
-        {messages.length > 1 && !isLoading && (
-          <button
-            type="button"
-            onClick={handleRegenerate}
-            className="p-3 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-2xl transition-all"
-            title="Regenerate Last Response"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        )}
-
-        <button
-          type="submit"
-          disabled={!inputValue.trim() || isLoading}
-          className={`p-3.5 rounded-2xl text-white font-bold transition-all shadow-md flex items-center justify-center ${
-            !inputValue.trim() || isLoading
-              ? 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
-              : isLLM
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-purple-500/20'
-              : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 shadow-sky-500/20'
-          }`}
-        >
-          <Send className="w-4 h-4" />
-        </button>
-      </form>
     </div>
   );
 }

@@ -332,12 +332,12 @@ export const authService = {
     if (error) throw error;
   },
 
-  async updateUserStatus(userId, newStatus) {
+  async updateUserStatus(userId, newStatus, rejectionReason = null) {
     try {
       const { fetchWithAuth } = await import('../../services/api.js');
       await fetchWithAuth(`/admin-management/users/${userId}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, rejection_reason: rejectionReason })
       });
     } catch (apiErr) {
       console.warn('Backend API status update fallback to Supabase:', apiErr);

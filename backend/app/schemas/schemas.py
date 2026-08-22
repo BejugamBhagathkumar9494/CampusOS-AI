@@ -39,6 +39,43 @@ class AdminUserCreate(BaseModel):
 
 class UserStatusUpdate(BaseModel):
     status: str  # active, suspended, rejected, pending
+    rejection_reason: Optional[str] = None
+
+
+class AIChatSessionCreate(BaseModel):
+    title: Optional[str] = "New AI Chat Session"
+
+
+class AIChatMessageCreate(BaseModel):
+    role: str  # user, assistant
+    message: str
+    mode: Optional[str] = "llm"
+    sources_json: Optional[str] = None
+
+
+class AIChatMessageResponse(BaseModel):
+    id: int
+    session_id: str
+    user_id: int
+    role: str
+    message: str
+    mode: Optional[str] = "llm"
+    sources_json: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AIChatSessionResponse(BaseModel):
+    id: str
+    user_id: int
+    title: str
+    created_at: datetime
+    messages: List[AIChatMessageResponse] = []
+
+    class Config:
+        from_attributes = True
 
 
 class UserUpdate(BaseModel):

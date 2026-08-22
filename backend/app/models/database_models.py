@@ -383,6 +383,52 @@ class AIChatHistory(Base):
     user = relationship("User", back_populates="chat_histories")
 
 
+class RegistrationRequest(Base):
+    __tablename__ = "registration_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    full_name = Column(String(100), nullable=False)
+    email = Column(String(255), nullable=False, index=True)
+    role = Column(String(50), nullable=False)  # student, faculty, placement_officer, hostel_warden
+    department = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    status = Column(String(20), default="pending", nullable=False)  # pending, approved, rejected
+    submitted_at = Column(DateTime, default=datetime.utcnow)
+    reviewed_at = Column(DateTime, nullable=True)
+    reviewed_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+
+
+class AIChatSession(Base):
+    __tablename__ = "ai_chat_sessions"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID session_id
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(200), default="New AI Chat Session")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    ended_at = Column(DateTime, nullable=True)
+
+    user = relationship("User")
+    messages = relationship("AIChatMessage", back_populates="session", cascade="all, delete-orphan")
+
+
+class AIChatMessage(Base):
+    __tablename__ = "ai_chat_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(36), ForeignKey("ai_chat_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = Column(String(20), nullable=False)  # user, assistant
+    message = Column(Text, nullable=False)
+    mode = Column(String(20), default="llm")  # llm, rag
+    sources_json = Column(Text, nullable=True)  # JSON-encoded array of sources
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    session = relationship("AIChatSession", back_populates="messages")
+    user = relationship("User")
+
+
 # RAG Knowledge Base
 class KnowledgeDocument(Base):
     __tablename__ = "knowledge_documents"

@@ -81,6 +81,21 @@ def update_user_status(
     if profile:
         profile.status = new_status
 
+    # Also update RegistrationRequest table if exists
+    user_email = user.email if user else (profile.email if profile else None)
+    if user_email:
+        from app.models import RegistrationRequest
+        from datetime import datetime
+        reg_req = db.query(RegistrationRequest).filter(RegistrationRequest.email == user_email).first()
+        if reg_req:
+            reg_req.status = new_status
+            reg_req.reviewed_at = datetime.utcnow()
+            reg_req.reviewed_by = current_user.id
+            if payload.rejection_reason:
+                reg_req.rejection_reason = payload.rejection_reason
+    
+    db.commit()
+
     # Try updating Supabase profiles table using Supabase Admin client if available
     try:
         from app.core.supabase import get_supabase_admin_client

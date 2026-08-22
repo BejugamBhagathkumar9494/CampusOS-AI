@@ -1,11 +1,13 @@
 from typing import List, Optional, Dict, Any
 import asyncio
+import uuid
+import json
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user, get_current_user_optional
-from app.models import User, Student, HostelRoom, Subject, KnowledgeDocument
+from app.models import User, Student, HostelRoom, Subject, KnowledgeDocument, AIChatSession, AIChatMessage
 from app.schemas import (
     ChatMessage, 
     ChatResponse, 
@@ -29,23 +31,23 @@ from app.services.rag_service import execute_pgvector_rag_query, process_and_ing
 router = APIRouter(prefix="/ai", tags=["AI & Agents"])
 
 
-class ChatMessagePayload(BaseModel):
-    message: Optional[str] = None
-    question: Optional[str] = None
-    chat_id: Optional[str] = "session_1"
-    category: Optional[str] = None
-    role: Optional[str] = None
-    agentic_mode: Optional[bool] = True
+class SessionCreatePayload(BaseModel):
+    title: Optional[str] = "New AI Chat Session"
+
 
 class LLMChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None
     user_id: Optional[str] = None
     history: Optional[List[Dict[str, Any]]] = []
 
+
 class RAGChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = None
     user_id: Optional[str] = None
     role: Optional[str] = "student"
+
 
 class SaveMessageRequest(BaseModel):
     id: Optional[str] = None
@@ -54,6 +56,174 @@ class SaveMessageRequest(BaseModel):
     mode: str = "llm"
     timestamp: Optional[str] = None
     user_id: Optional[str] = None
+
+
+class SessionMessagePayload(BaseModel):
+    role: str  # user, assistant
+    message: str
+    mode: Optional[str] = "llm"
+    sources: Optional[List[Any]] = []
+
+
+@router.post("/sessions")
+def create_ai_chat_session(
+    payload: Optional[SessionCreatePayload] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Every login initializes a new AI Chat Session in the database.
+    Creates a new ai_chat_sessions record for the current user.
+    """
+    session_id = str(uuid.uuid4())
+    title = payload.title if (payload and payload.title) else "New AI Chat Session"
+
+    chat_session = AIChatSession(
+        id=session_id,
+        user_id=current_user.id,
+        title=title
+    )
+    db.add(chat_session)
+    db.commit()
+    db.refresh(chat_session)
+
+    return {
+        "id": chat_session.id,
+        "user_id": chat_session.user_id,
+        "title": chat_session.title,
+        "created_at": chat_session.created_at,
+        "messages": []
+    }
+
+
+@router.get("/sessions")
+def get_user_ai_chat_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retrieve user's previous AI chat sessions (strictly user-isolated).
+    """
+    sessions = (
+        db.query(AIChatSession)
+        .filter(AIChatSession.user_id == current_user.id)
+        .order_by(AIChatSession.created_at.desc())
+        .all()
+    )
+
+    res = []
+    for s in sessions:
+        msg_count = db.query(AIChatMessage).filter(AIChatMessage.session_id == s.id).count()
+        res.append({
+            "id": s.id,
+            "user_id": s.user_id,
+            "title": s.title,
+            "created_at": s.created_at,
+            "message_count": msg_count
+        })
+    return res
+
+
+@router.get("/sessions/{session_id}/messages")
+def get_ai_chat_session_messages(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retrieve all messages in a specific chat session for the logged-in user.
+    """
+    session_obj = db.query(AIChatSession).filter(
+        AIChatSession.id == session_id,
+        AIChatSession.user_id == current_user.id
+    ).first()
+
+    if not session_obj:
+        raise HTTPException(status_code=404, detail="Chat session not found or unauthorized access.")
+
+    messages = (
+        db.query(AIChatMessage)
+        .filter(AIChatMessage.session_id == session_id)
+        .order_by(AIChatMessage.created_at.asc())
+        .all()
+    )
+
+    res = []
+    for m in messages:
+        sources = []
+        if m.sources_json:
+            try:
+                sources = json.loads(m.sources_json)
+            except Exception:
+                sources = []
+
+        res.append({
+            "id": m.id,
+            "session_id": m.session_id,
+            "role": m.role,
+            "message": m.message,
+            "mode": m.mode,
+            "sources": sources,
+            "created_at": m.created_at
+        })
+    return {"session_id": session_id, "title": session_obj.title, "messages": res}
+
+
+@router.post("/sessions/{session_id}/messages")
+def post_ai_chat_session_message(
+    session_id: str,
+    payload: SessionMessagePayload,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Store user or assistant chat message in the DB under the current session.
+    Automatically updates session title based on first user question snippet.
+    """
+    session_obj = db.query(AIChatSession).filter(
+        AIChatSession.id == session_id,
+        AIChatSession.user_id == current_user.id
+    ).first()
+
+    if not session_obj:
+        # Auto-create session if missing
+        session_obj = AIChatSession(
+            id=session_id,
+            user_id=current_user.id,
+            title="New AI Chat Session"
+        )
+        db.add(session_obj)
+        db.commit()
+        db.refresh(session_obj)
+
+    sources_str = json.dumps(payload.sources or []) if payload.sources else None
+
+    msg_obj = AIChatMessage(
+        session_id=session_id,
+        user_id=current_user.id,
+        role=payload.role,
+        message=payload.message,
+        mode=payload.mode or "llm",
+        sources_json=sources_str
+    )
+    db.add(msg_obj)
+
+    # Update session title if default
+    if payload.role == "user" and (session_obj.title == "New AI Chat Session" or not session_obj.title):
+        title_snippet = payload.message[:40] + ("..." if len(payload.message) > 40 else "")
+        session_obj.title = title_snippet
+
+    db.commit()
+    db.refresh(msg_obj)
+
+    return {
+        "id": msg_obj.id,
+        "session_id": msg_obj.session_id,
+        "role": msg_obj.role,
+        "message": msg_obj.message,
+        "mode": msg_obj.mode,
+        "created_at": msg_obj.created_at
+    }
 
 def resolve_gemini_api_key() -> str:
     import os

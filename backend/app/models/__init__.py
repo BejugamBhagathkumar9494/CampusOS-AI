@@ -27,6 +27,9 @@ from app.models.database_models import (
     Profile,
     AuthorizedUser,
     AuditLog,
+    RegistrationRequest,
+    AIChatSession,
+    AIChatMessage,
 )
 
 __all__ = [
@@ -58,5 +61,8 @@ __all__ = [
     "Profile",
     "AuthorizedUser",
     "AuditLog",
+    "RegistrationRequest",
+    "AIChatSession",
+    "AIChatMessage",
 ]
 

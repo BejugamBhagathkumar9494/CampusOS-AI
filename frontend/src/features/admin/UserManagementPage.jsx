@@ -94,8 +94,12 @@ export const UserManagementPage = () => {
   }, []);
 
   const handleStatusChange = async (userId, newStatus) => {
+    let rejectionReason = null;
+    if (newStatus === 'rejected') {
+      rejectionReason = window.prompt('Optional: Please enter a rejection reason for this registration request:') || null;
+    }
     try {
-      await authService.updateUserStatus(userId, newStatus);
+      await authService.updateUserStatus(userId, newStatus, rejectionReason);
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
       );

@@ -33,6 +33,13 @@ async def lifespan(app: FastAPI):
     print("[CampusOS AI] Initializing system & validating startup configuration...")
     settings.validate_required_env()
     try:
+        from app.core.database import Base, engine
+        import app.models.database_models
+        Base.metadata.create_all(bind=engine)
+    except Exception as db_init_err:
+        print(f"[CampusOS AI Startup Warning] Table creation warning: {db_init_err}")
+
+    try:
         asyncio.create_task(asyncio.to_thread(init_rag_service))
     except Exception as e:
         print(f"[CampusOS AI Startup Warning] RAG background init warning: {e}")
