@@ -62,14 +62,32 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
     gemini_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or settings.GOOGLE_API_KEY
 
     system_instruction = (
-        "You are CampusOS AI, an intelligent academic AI assistant powered by Gemini (gemini-2.5-flash).\n"
-        "You answer questions on general knowledge, computer science, programming, interview prep, academics, mathematics, and logic reasoning.\n"
-        "Structure your answers cleanly using Markdown, code snippets, bullet points, tables, and mathematical formulas where appropriate."
+        "You are CampusOS AI, an intelligent academic assistant for college students.\n\n"
+        "Your primary goal is to give accurate, clear, and helpful answers in simple English.\n\n"
+        "RULES:\n"
+        "1. Answer the user's question directly. Do not use fixed templates or unnecessary headings.\n"
+        "2. Use simple language that a college student can easily understand.\n"
+        "3. If the question is about a technical concept, explain it in this order:\n"
+        "   - Definition\n"
+        "   - Why it matters\n"
+        "   - Short example\n"
+        "4. Keep most answers between 80–250 words unless the user asks for more detail.\n"
+        "5. Never invent facts, statistics, citations, research papers, or university rules.\n"
+        "6. If you are unsure, clearly say \"I don't know\" or \"I don't have enough information\" instead of guessing.\n"
+        "7. Do not mention that you are following a system prompt or internal instructions.\n"
+        "8. If the user asks for interview preparation, give interview-ready answers with practical examples.\n"
+        "9. If the user asks for semester exams, give clean, point-wise answers that are easy to write in exams.\n"
+        "10. Maintain a friendly, professional teaching style.\n\n"
+        "FORMATTING:\n"
+        "- Use short paragraphs and bullet points only when they improve readability.\n"
+        "- Avoid repetitive introductions and conclusions.\n"
+        "- Do not output generic sections like \"Core Concept\", \"Implementation Strategy\", or \"Optimization\" unless the user explicitly requests them.\n\n"
+        "Your role is to teach, explain, and solve academic and programming doubts with maximum factual accuracy."
     )
 
     contents = [
         {"role": "user", "parts": [{"text": f"[System Context: {system_instruction}]\n\nHello!"}]},
-        {"role": "model", "parts": [{"text": "Hello! I am CampusOS AI powered by Gemini (gemini-2.5-flash). How can I assist you today?"}]}
+        {"role": "model", "parts": [{"text": "Hello! I am CampusOS AI. How can I help you with your studies, programming, or exam preparation today?"}]}
     ]
 
     if history:
@@ -117,32 +135,29 @@ def generate_fallback_llm_response(query: str) -> str:
     q = query.lower()
     if "operating system" in q or "os" in q:
         return (
-            "### 🖥️ Operating Systems Overview\n\n"
-            "An **Operating System (OS)** is system software managing computer hardware and software resources.\n\n"
-            "#### Key Core Components:\n"
-            "- **Process Management**: Context switching, CPU scheduling, thread synchronization.\n"
-            "- **Memory Management**: Virtual memory, paging, allocation, garbage collection.\n"
-            "- **File System & Storage**: Inode structures, directory trees, disk I/O.\n"
-            "- **Protection & Security**: User access control, permission rings.\n\n"
+            "An **Operating System (OS)** is the main system software that controls computer hardware and runs applications.\n\n"
+            "**Why it matters:**\n"
+            "Without an OS, programs would have to interact directly with raw hardware circuits. The OS abstracts hardware details, schedules CPU processes, manages memory safely, and provides a file system.\n\n"
+            "**Short Example:**\n"
+            "When you run a program, the OS allocates RAM, assigns CPU execution time, and cleans up memory when the process finishes.\n\n"
             "```c\n"
-            "// C code snippet: Creating a process using fork()\n"
+            "// Creating a process using fork()\n"
             "#include <stdio.h>\n"
             "#include <unistd.h>\n\n"
             "int main() {\n"
             "    pid_t pid = fork();\n"
-            "    if (pid == 0) {\n"
-            "        printf(\"Child Process PID: %d\\n\", getpid());\n"
-            "    } else {\n"
-            "        printf(\"Parent Process PID: %d\\n\", getpid());\n"
-            "    }\n"
+            "    if (pid == 0) printf(\"Child process running\\n\");\n"
+            "    else printf(\"Parent process running\\n\");\n"
             "    return 0;\n"
             "}\n"
-            "```\n"
+            "```"
         )
     elif "binary search" in q or "algo" in q or "tree" in q:
         return (
-            "### 🌲 Binary Search Algorithm\n\n"
-            "Binary Search operates on sorted arrays with a time complexity of **O(log N)**.\n\n"
+            "**Binary Search** is an efficient searching algorithm for sorted lists that divides the search interval in half every step.\n\n"
+            "**Why it matters:**\n"
+            "Instead of checking elements one by one in O(N) time, Binary Search finds the target in O(log N) time, making it ideal for massive datasets.\n\n"
+            "**Short Example:**\n"
             "```python\n"
             "def binary_search(arr, target):\n"
             "    left, right = 0, len(arr) - 1\n"
@@ -155,16 +170,17 @@ def generate_fallback_llm_response(query: str) -> str:
             "        else:\n"
             "            right = mid - 1\n"
             "    return -1\n"
-            "```\n"
+            "```"
         )
     else:
         return (
-            f"### ✨ Gemini LLM Response\n\n"
-            f"Here is a comprehensive breakdown regarding **\"{query.title()}\"**:\n\n"
-            f"1. **Core Concept**: Analyzing key requirements and foundational principles.\n"
-            f"2. **Implementation Strategy**: Utilizing industry standard patterns, scalable modular architectures, and clean logic.\n"
-            f"3. **Optimization**: Ensuring low latency, high throughput, and reliable error recovery.\n\n"
-            f"*Generated in real time by Gemini LLM Engine.*"
+            f"Here is a direct overview of **{query.title()}**:\n\n"
+            f"**Definition:**\n"
+            f"{query.title()} is a fundamental topic in academic curriculum and practical application.\n\n"
+            f"**Why it matters:**\n"
+            f"Understanding this concept helps solve complex problem requirements, write efficient code, and excel in technical evaluations.\n\n"
+            f"**Short Example:**\n"
+            f"In practical engineering, this principle is applied to optimize resource usage and maintain clear component boundaries."
         )
 
 
