@@ -58,12 +58,28 @@ class SaveMessageRequest(BaseModel):
 async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
     import os
     from dotenv import load_dotenv
-    load_dotenv()
+    candidate_env_paths = [
+        os.path.join(os.getcwd(), ".env"),
+        os.path.join(os.getcwd(), "backend", ".env"),
+        "/app/.env",
+        "/app/backend/.env",
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"),
+        os.path.join(os.path.dirname(__file__), "..", "..", ".env"),
+    ]
+    for path in candidate_env_paths:
+        if os.path.exists(path):
+            load_dotenv(path, override=False)
+
     from google import genai
     from google.genai import types
     from app.core.config import settings
 
-    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or getattr(settings, "GEMINI_API_KEY", "")
+    gemini_key = (
+        os.getenv("GEMINI_API_KEY") 
+        or os.getenv("GOOGLE_API_KEY") 
+        or getattr(settings, "GEMINI_API_KEY", "")
+        or getattr(settings, "GOOGLE_API_KEY", "")
+    )
 
     if not gemini_key or not str(gemini_key).strip():
         err_msg = "GEMINI_API_KEY is missing from server environment variables (.env)."

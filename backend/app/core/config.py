@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     # AI & Vector RAG Settings
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
+
     OPENAI_API_KEY: str = ""
     DEFAULT_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     VECTOR_MATCH_THRESHOLD: float = 0.20
@@ -68,6 +69,19 @@ class Settings(BaseSettings):
 
     def validate_required_env(self) -> None:
         """Validates critical environment variables required for backend execution."""
+        from dotenv import load_dotenv
+        candidate_env_paths = [
+            os.path.join(os.getcwd(), ".env"),
+            os.path.join(os.getcwd(), "backend", ".env"),
+            "/app/.env",
+            "/app/backend/.env",
+            os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"),
+            os.path.join(os.path.dirname(__file__), "..", "..", ".env"),
+        ]
+        for path in candidate_env_paths:
+            if os.path.exists(path):
+                load_dotenv(path, override=False)
+
         required_vars = {
             "SUPABASE_URL": self.SUPABASE_URL or os.getenv("SUPABASE_URL", ""),
             "SUPABASE_SERVICE_ROLE_KEY": self.SUPABASE_SERVICE_ROLE_KEY or os.getenv("SUPABASE_SERVICE_ROLE_KEY", ""),
