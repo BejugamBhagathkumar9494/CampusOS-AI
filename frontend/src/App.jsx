@@ -94,8 +94,6 @@ export default function App() {
                     <Route path="exams" element={<Exams />} />
                     <Route path="assignments" element={<Assignments />} />
                     <Route path="library" element={<Library />} />
-                    <Route path="transport" element={<Transport />} />
-                    <Route path="finance" element={<Finance />} />
                     <Route path="clubs" element={<Clubs />} />
                     <Route path="ai-insights" element={<AIInsights />} />
                     <Route path="settings" element={<Settings />} />
@@ -136,6 +134,7 @@ export default function App() {
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="users" element={<UserManagementPage />} />
+                    <Route path="library" element={<Library />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="finance" element={<Finance />} />
                     <Route path="events" element={<Events />} />
@@ -158,6 +157,7 @@ export default function App() {
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="users" element={<UserManagementPage />} />
+                    <Route path="library" element={<Library />} />
                     <Route path="audit-logs" element={<UserManagementPage />} />
                     <Route path="clubs" element={<Clubs />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />

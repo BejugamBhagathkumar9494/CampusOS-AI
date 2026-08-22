@@ -166,5 +166,159 @@ export const libraryService = {
         calculated_fine: liveFine
       };
     });
+  },
+
+  async requestBookOrPaper(studentProfileId, payload) {
+    // 1. Persist to local storage cache for instant UI feedback
+    const newReq = {
+      id: `req-${Date.now()}`,
+      student_profile_id: studentProfileId,
+      title: payload.title,
+      author: payload.author || 'Academic Author',
+      category: payload.category || 'Book',
+      isbn_or_link: payload.isbn_or_link || '',
+      reason: payload.reason || '',
+      status: 'pending_approval',
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      const rawLocal = localStorage.getItem('local_book_requests');
+      const existing = rawLocal ? JSON.parse(rawLocal) : [];
+      existing.unshift(newReq);
+      localStorage.setItem('local_book_requests', JSON.stringify(existing));
+    } catch (e) {}
+
+    try {
+      const { fetchWithAuth } = await import('./api.js');
+      await fetchWithAuth('/library/request', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: payload.title,
+          author: payload.author,
+          category: payload.category,
+          isbn_or_link: payload.isbn_or_link,
+          reason: payload.reason
+        })
+      });
+    } catch (apiErr) {
+      console.warn('Backend API request fallback:', apiErr);
+    }
+
+    try {
+      await supabase.from('book_requests').insert([{
+        student_profile_id: studentProfileId,
+        title: payload.title,
+        author: payload.author,
+        category: payload.category,
+        isbn_or_link: payload.isbn_or_link,
+        reason: payload.reason,
+        status: 'pending_approval'
+      }]);
+    } catch (e) {}
+
+    return newReq;
+  },
+
+  async getBookRequests(studentProfileId = null) {
+    let requests = [];
+
+    // Read from Supabase
+    try {
+      let query = supabase.from('book_requests').select('*, profiles(full_name, email, institution_id)').order('created_at', { ascending: false });
+      if (studentProfileId) {
+        query = query.eq('student_profile_id', studentProfileId);
+      }
+      const { data } = await query;
+      if (data) requests = data;
+    } catch (e) {}
+
+    // Merge local requests
+    try {
+      const rawLocal = localStorage.getItem('local_book_requests');
+      if (rawLocal) {
+        const localList = JSON.parse(rawLocal);
+        const filtered = studentProfileId ? localList.filter(l => l.student_profile_id === studentProfileId) : localList;
+        requests = [...filtered, ...requests];
+      }
+    } catch (e) {}
+
+    return requests;
+  },
+
+  async approveBookRequest(requestId, copiesAvailable = 3) {
+    let reqObj = null;
+
+    // Update local storage
+    try {
+      const rawLocal = localStorage.getItem('local_book_requests');
+      if (rawLocal) {
+        const localList = JSON.parse(rawLocal);
+        const match = localList.find(r => r.id === requestId);
+        if (match) {
+          match.status = 'approved';
+          reqObj = match;
+          localStorage.setItem('local_book_requests', JSON.stringify(localList));
+        }
+      }
+    } catch (e) {}
+
+    // Update Supabase
+    try {
+      const { data } = await supabase
+        .from('book_requests')
+        .update({ status: 'approved' })
+        .eq('id', requestId)
+        .select()
+        .single();
+      if (data) reqObj = data;
+    } catch (e) {}
+
+    // Insert approved item into active library catalog
+    if (reqObj) {
+      try {
+        await supabase.from('library_books').insert([{
+          title: reqObj.title,
+          author: reqObj.author || 'Academic Author',
+          category: reqObj.category || 'General',
+          isbn: reqObj.isbn_or_link || 'N/A',
+          copies_available: copiesAvailable
+        }]);
+      } catch (e) {}
+
+      // Notify requesting student
+      try {
+        if (reqObj.student_profile_id) {
+          await notificationService.notifyUser(
+            reqObj.student_profile_id,
+            'Library Book Request Approved',
+            `Your requested book/paper "${reqObj.title}" has been APPROVED by Admin and added to the library catalogue!`,
+            'success'
+          );
+        }
+      } catch (nErr) {}
+    }
+
+    return true;
+  },
+
+  async rejectBookRequest(requestId) {
+    try {
+      const rawLocal = localStorage.getItem('local_book_requests');
+      if (rawLocal) {
+        const localList = JSON.parse(rawLocal);
+        const match = localList.find(r => r.id === requestId);
+        if (match) {
+          match.status = 'rejected';
+          localStorage.setItem('local_book_requests', JSON.stringify(localList));
+        }
+      }
+    } catch (e) {}
+
+    try {
+      await supabase.from('book_requests').update({ status: 'rejected' }).eq('id', requestId);
+    } catch (e) {}
+
+    return true;
   }
 };

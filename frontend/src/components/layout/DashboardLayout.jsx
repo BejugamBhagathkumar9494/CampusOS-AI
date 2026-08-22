@@ -104,8 +104,6 @@ export default function DashboardLayout({ children }) {
       { name: 'Exams', path: '/student/exams', icon: FileText },
       { name: 'Assignments', path: '/student/assignments', icon: FileEdit },
       { name: 'Library', path: '/student/library', icon: Library },
-      { name: 'Transport', path: '/student/transport', icon: Bus },
-      { name: 'Finance', path: '/student/finance', icon: DollarSign },
       { name: 'Clubs', path: '/student/clubs', icon: Users },
       { name: 'AI Insights', path: '/student/ai-insights', icon: Sparkles },
       { name: 'Settings', path: '/student/settings', icon: Settings },
@@ -126,6 +124,7 @@ export default function DashboardLayout({ children }) {
     const adminItems = [
       { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
       { name: 'User Management', path: '/admin/users', icon: Users },
+      { name: 'Library Management', path: '/admin/library', icon: Library },
       { name: 'AI Assistant', path: '/admin/ai-assistant', icon: MessageSquare },
       { name: 'Finance', path: '/admin/finance', icon: DollarSign },
       { name: 'Events', path: '/admin/events', icon: Calendar },
@@ -138,6 +137,7 @@ export default function DashboardLayout({ children }) {
     const superAdminItems = [
       { name: 'Dashboard', path: '/super-admin/dashboard', icon: LayoutDashboard },
       { name: 'User & Role Control', path: '/super-admin/users', icon: Users },
+      { name: 'Library Management', path: '/super-admin/library', icon: Library },
       { name: 'Student Clubs', path: '/super-admin/clubs', icon: Users },
       { name: 'AI Assistant', path: '/super-admin/ai-assistant', icon: MessageSquare },
       { name: 'Audit Logs', path: '/super-admin/audit-logs', icon: FileText },
