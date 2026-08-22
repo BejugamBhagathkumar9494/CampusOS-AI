@@ -7,6 +7,7 @@ from app.models import (
     Role,
     User,
     Profile,
+    AuthorizedUser,
     Student,
     Subject,
     Attendance,
@@ -69,9 +70,6 @@ def init_db():
 
         print("Seeding database...")
 
-        # Import AuthorizedUser and Profile
-        from app.models.database_models import AuthorizedUser, Profile
-
         # 2. Seed Authorized Users Registry
         # Security: Pre-authorizes institution IDs to prevent unauthorized role claims.
         authorized_records = [
@@ -86,8 +84,10 @@ def init_db():
             {"institution_id": "SA001", "email": "superadmin@campus.edu", "full_name": "Super Admin", "role": "super_admin"},
         ]
         for rec in authorized_records:
-            auth_record = AuthorizedUser(**rec, is_used=True)
-            db.add(auth_record)
+            exists = db.query(AuthorizedUser).filter(AuthorizedUser.institution_id == rec["institution_id"]).first()
+            if not exists:
+                auth_record = AuthorizedUser(**rec, is_used=True)
+                db.add(auth_record)
         db.commit()
 
         # 3. Create Standard Roles (Stored as lowercase string identifiers)
@@ -101,8 +101,10 @@ def init_db():
         ]
         roles_dict = {}
         for name in role_names:
-            role = Role(name=name, description=f"{name.replace('_', ' ').title()} Role")
-            db.add(role)
+            role = db.query(Role).filter(Role.name == name).first()
+            if not role:
+                role = Role(name=name, description=f"{name.replace('_', ' ').title()} Role")
+                db.add(role)
             roles_dict[name] = role
         db.commit()
 
@@ -114,8 +116,10 @@ def init_db():
         ]
         perms_dict = {}
         for p_name in permissions_list:
-            perm = Permission(name=p_name, description=f"Permission to {p_name.replace('_', ' ')}")
-            db.add(perm)
+            perm = db.query(Permission).filter(Permission.name == p_name).first()
+            if not perm:
+                perm = Permission(name=p_name, description=f"Permission to {p_name.replace('_', ' ')}")
+                db.add(perm)
             perms_dict[p_name] = perm
         db.commit()
 
@@ -140,29 +144,31 @@ def init_db():
 
         created_users = {}
         for acc in default_accounts:
-            user_obj = User(
-                email=acc["email"],
-                hashed_password=get_password_hash(acc["pass"]),
-                full_name=acc["name"],
-                institution_id=acc["inst_id"],
-                status="active",
-                is_active=True
-            )
-            user_obj.roles.append(roles_dict[acc["role"]])
-            db.add(user_obj)
-            db.flush()
-            
-            profile_obj = Profile(
-                id=str(user_obj.id),
-                auth_user_id=str(user_obj.id),
-                full_name=acc["name"],
-                email=acc["email"],
-                role=acc["role"],
-                institution_id=acc["inst_id"],
-                status="active",
-                email_verified=True
-            )
-            db.add(profile_obj)
+            user_obj = db.query(User).filter(User.email == acc["email"]).first()
+            if not user_obj:
+                user_obj = User(
+                    email=acc["email"],
+                    hashed_password=get_password_hash(acc["pass"]),
+                    full_name=acc["name"],
+                    institution_id=acc["inst_id"],
+                    status="active",
+                    is_active=True
+                )
+                user_obj.roles.append(roles_dict[acc["role"]])
+                db.add(user_obj)
+                db.flush()
+                
+                profile_obj = Profile(
+                    id=str(user_obj.id),
+                    auth_user_id=str(user_obj.id),
+                    full_name=acc["name"],
+                    email=acc["email"],
+                    role=acc["role"],
+                    institution_id=acc["inst_id"],
+                    status="active",
+                    email_verified=True
+                )
+                db.add(profile_obj)
             created_users[acc["email"]] = user_obj
         db.commit()
 

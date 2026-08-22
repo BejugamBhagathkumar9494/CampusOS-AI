@@ -355,6 +355,43 @@ export const authService = {
     }
   },
 
+  async deleteUser(userId) {
+    try {
+      const { fetchWithAuth } = await import('../../services/api.js');
+      await fetchWithAuth(`/admin-management/users/${userId}`, {
+        method: 'DELETE'
+      });
+    } catch (apiErr) {
+      console.warn('Backend API delete user fallback to Supabase / local storage:', apiErr);
+    }
+
+    try {
+      await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+    } catch (supaErr) {
+      console.warn('Supabase profile delete warning:', supaErr);
+    }
+
+    try {
+      const localUsers = JSON.parse(localStorage.getItem('campusos_local_users') || '{}');
+      let updated = false;
+      Object.keys(localUsers).forEach(email => {
+        if (localUsers[email]?.profile?.id === userId || localUsers[email]?.profile?.email === userId) {
+          delete localUsers[email];
+          updated = true;
+        }
+      });
+      if (updated) {
+        localStorage.setItem('campusos_local_users', JSON.stringify(localUsers));
+      }
+    } catch (e) {}
+
+    return true;
+  },
+
+
   async fetchAuditLogs() {
     try {
       const { fetchWithAuth } = await import('../../services/api.js');

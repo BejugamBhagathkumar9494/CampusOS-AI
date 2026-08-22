@@ -190,7 +190,7 @@ async def chat_llm_endpoint(payload: LLMChatRequest):
 @router.post("/chat/rag")
 async def chat_rag_endpoint(payload: RAGChatRequest):
     """
-    📚 RAG Chat Endpoint powered by pgvector document search.
+    📚 RAG Chat Endpoint powered by vector embedding document search.
     Grounded answers ONLY from retrieved university document context.
     """
     msg = payload.message.strip()
@@ -198,13 +198,15 @@ async def chat_rag_endpoint(payload: RAGChatRequest):
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
     user_role = (payload.role or "student").lower()
-    rag_res = execute_pgvector_rag_query(query=msg, user_role=user_role, match_threshold=0.20, k=5)
+    rag_res = execute_pgvector_rag_query(query=msg, user_role=user_role, match_threshold=0.30, k=5)
 
     answer = rag_res.get("answer", "")
     sources = rag_res.get("source_documents", [])
 
-    if not sources or "couldn't find" in answer.lower() or answer == "I couldn't find this information in the CampusOS knowledge base.":
-        answer = "This information was not found in the university knowledge base."
+    NOT_FOUND_MSG = "This information is not available in the university knowledge base."
+
+    if not sources or "not available in the university knowledge base" in answer.lower() or answer == NOT_FOUND_MSG:
+        answer = NOT_FOUND_MSG
         sources = []
 
     return {

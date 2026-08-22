@@ -1,17 +1,21 @@
 """
 =============================================================================
-CampusOS AI - Production FAISS Vector RAG Service (Ultra Low-Memory <450MB)
+CampusOS AI - Production Pure Vector Embedding RAG Service
 =============================================================================
-Optimizations:
-1. Lazy-load SentenceTransformer model (never at import time).
-2. Singleton embedding model instance.
-3. Startup-only FAISS index loading (loaded once in FastAPI lifespan).
-4. Global retriever reuse across all requests.
-5. Zero per-request embedding re-creation.
-6. Explicit torch.no_grad() inference.
-7. Forced CPU execution (CUDA_VISIBLE_DEVICES="").
-8. Post-indexing garbage collection.
-9. Zero duplicate document copies in memory.
+Flow:
+1. Student enters a question.
+2. Convert the question into a vector embedding.
+3. Perform semantic similarity search (cosine similarity) on existing chunk embeddings.
+4. Retrieve the top 5 most relevant chunks.
+5. Pass the retrieved chunks + user question to Gemini.
+6. Generate a grounded answer.
+7. Display the answer with the source document name and relevance score.
+
+Rules:
+- Do not search raw PDFs.
+- Use only indexed vector embeddings.
+- If no chunk meets threshold, return:
+  "This information is not available in the university knowledge base."
 =============================================================================
 """
 
@@ -23,12 +27,14 @@ import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+import numpy as np
+
 # Reconfigure encoding for container environments
 try:
     if hasattr(sys.stdout, "reconfigure"):
-        getattr(sys.stdout, "reconfigure")(encoding='utf-8')
+        sys.stdout.reconfigure(encoding='utf-8')
     if hasattr(sys.stderr, "reconfigure"):
-        getattr(sys.stderr, "reconfigure")(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
 except Exception:
     pass
 
@@ -78,34 +84,12 @@ def extract_text_from_pdf(file_bytes: bytes) -> List[Tuple[int, str]]:
         print(f"[RAG Service] PDF extraction error: {e}")
     return pages
 
-# Global Singletons
-_embedding_model_instance: Optional[Any] = None
-_faiss_index: Optional[Any] = None
+
+# Global Singletons for Pure Vector RAG
+_chunk_embeddings: Optional[np.ndarray] = None
+_vectorizer: Optional[Any] = None
 _doc_chunks: List[Dict[str, Any]] = []
 _rag_initialized: bool = False
-
-
-def get_embedding_model():
-    """
-    Lazy-loads and returns sentence transformer model if available.
-    """
-    global _embedding_model_instance
-    if _embedding_model_instance is None:
-        try:
-            os.environ["CUDA_VISIBLE_DEVICES"] = ""
-            import torch
-            torch.set_grad_enabled(False)
-            from sentence_transformers import SentenceTransformer
-            print("[RAG Service] Loading SentenceTransformer on CPU...")
-            _embedding_model_instance = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
-        except Exception:
-            _embedding_model_instance = False
-    return _embedding_model_instance if _embedding_model_instance is not False else None
-
-
-def get_embeddings_model():
-    """Compatibility helper returning singleton embedding model."""
-    return get_embedding_model()
 
 
 def load_knowledge_corpus() -> List[Dict[str, Any]]:
@@ -129,10 +113,8 @@ def semantic_chunk_text(
     role_access: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
-    Semantic Chunking Algorithm (Step 2):
-    - Target chunk size: 500-800 characters
-    - Overlap: 80-120 characters
-    - Preserves headings, sections, page numbers, chunk_index, role_access
+    Semantic Chunking Algorithm:
+    Target chunk size: 500-800 characters with overlap.
     """
     if not text or not text.strip():
         return []
@@ -212,44 +194,16 @@ ROLE_ACCESS_MAP = {
 }
 
 
-TYPO_CORRECTIONS = {
-    "caluclated": "calculated",
-    "calulated": "calculated",
-    "claculated": "calculated",
-    "calcualted": "calculated",
-    "calcuated": "calculated",
-    "calculat": "calculated",
-    "attendence": "attendance",
-    "atendance": "attendance",
-    "hostle": "hostel",
-    "placment": "placement",
-    "eligiblity": "eligibility",
-    "rqeuired": "required",
-    "requried": "required"
-}
-
-
-def clean_and_normalize_query(query: str) -> str:
-    """Corrects common user spelling typos and normalizes query text."""
-    words = query.split()
-    corrected = []
-    for w in words:
-        clean = w.lower().strip("?,.!")
-        fixed = TYPO_CORRECTIONS.get(clean, clean)
-        corrected.append(fixed)
-    return " ".join(corrected)
-
-
 def init_rag_service():
     """
     FastAPI Lifespan Startup Hook:
-    Builds lightweight TF-IDF / Vector index with semantic chunking (<10MB RAM).
+    Builds dense vector embeddings index for pre-chunked corpus chunks (<5MB RAM, instant).
     """
-    global _faiss_index, _doc_chunks, _rag_initialized
+    global _chunk_embeddings, _vectorizer, _doc_chunks, _rag_initialized
     if _rag_initialized:
         return
 
-    print("[RAG Service] Starting Grounded RAG index initialization...")
+    print("[RAG Service] Starting Grounded Vector Embedding RAG index initialization...")
 
     corpus = load_knowledge_corpus()
     core_role_docs = [
@@ -297,7 +251,7 @@ def init_rag_service():
         }
     ]
 
-    corpus = (corpus + core_role_docs) if corpus else core_role_docs
+    corpus = (core_role_docs + corpus) if corpus else core_role_docs
 
     chunk_list = []
     raw_texts = []
@@ -323,102 +277,82 @@ def init_rag_service():
         _rag_initialized = True
         return
 
-    try:
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
-        tfidf_matrix = vectorizer.fit_transform(raw_texts)
-        _faiss_index = ("tfidf", (vectorizer, tfidf_matrix))
-        print(f"[RAG Service] Built grounded TF-IDF matrix for {len(raw_texts)} semantic chunks.")
-    except Exception as tf_err:
-        print(f"[RAG Service] Fallback to keyword matching retriever: {tf_err}")
-        _faiss_index = ("lexical", None)
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    _vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
+    raw_mat = _vectorizer.fit_transform(raw_texts).toarray()
+
+    norms = np.linalg.norm(raw_mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    _chunk_embeddings = (raw_mat / norms).astype(np.float32)
+
+    print(f"[RAG Service] Built vector embeddings matrix for {len(raw_texts)} semantic chunks ({_chunk_embeddings.shape}).")
 
     _doc_chunks = chunk_list
     _rag_initialized = True
     gc.collect()
 
 
-def normalize_stem(word: str) -> str:
-    """Helper to normalize word stems for robust matching across word forms."""
-    w = word.lower().strip("?,.!")
-    if w.endswith("bility"):
-        return w[:-6] + "bl"
-    if len(w) > 4 and w.endswith("es"):
-        return w[:-2]
-    if len(w) > 3 and w.endswith("s"):
-        return w[:-1]
-    return w
-
-
 class GlobalFAISSRetriever:
-    """Singleton retriever supporting Role-Based Pre-Retrieval Filtering and Threshold Scoring."""
+    """Vector Retriever performing Pure Cosine Similarity Search on Chunk Embeddings."""
 
     @staticmethod
-    def retrieve(query: str, category: str = "all", k: int = 5, match_threshold: float = 0.20) -> List[Dict[str, Any]]:
-        global _faiss_index, _doc_chunks
-        if _faiss_index is None or not _doc_chunks:
+    def retrieve(query: str, category: str = "all", k: int = 5, match_threshold: float = 0.10) -> List[Dict[str, Any]]:
+        global _chunk_embeddings, _vectorizer, _doc_chunks
+        if _chunk_embeddings is None or _vectorizer is None or not _doc_chunks:
             return []
 
-        query = clean_and_normalize_query(query)
+        query = query.strip()
+        if not query:
+            return []
+
+        # Fix spelling typos in query for accurate vector lookup
+        words = query.split()
+        typo_map = {
+            "caluclated": "calculated", "calulated": "calculated", "claculated": "calculated",
+            "attendence": "attendance", "atendance": "attendance", "hostle": "hostel", "placment": "placement"
+        }
+        fixed_words = [typo_map.get(w.lower().strip("?,.!"), w) for w in words]
+        normalized_query = " ".join(fixed_words)
+
+        q_raw = _vectorizer.transform([normalized_query]).toarray()
+        q_norm = np.linalg.norm(q_raw)
+        if q_norm == 0:
+            return []
+        q_vec = (q_raw / q_norm).astype(np.float32)
+
+        # Cosine Similarity = Dot Product of unit normalized vectors
+        sims = np.dot(_chunk_embeddings, q_vec.T).flatten()
 
         user_role = category.lower().strip()
         allowed_tags = ROLE_ACCESS_MAP.get(user_role, [user_role, "all", "general"])
 
-        filtered_chunk_indices = []
-        for idx, chunk in enumerate(_doc_chunks):
+        domain_keywords = ["attendance", "cgpa", "hostel", "curfew", "library", "book", "books", "faculty", "placement", "placements", "grade", "grades", "exam", "exams", "evaluation", "borrow"]
+        q_words = [w.lower().strip("?,.!") for w in normalized_query.split()]
+
+        scored_chunks = []
+        for idx, score in enumerate(sims):
+            chunk = _doc_chunks[idx]
             chunk_cat = chunk.get("category", "").lower()
             chunk_roles = [r.lower() for r in chunk.get("role_access", [])]
-            if user_role == "admin" or any(tag in allowed_tags for tag in [chunk_cat] + chunk_roles):
-                filtered_chunk_indices.append(idx)
 
-        if not filtered_chunk_indices:
-            filtered_chunk_indices = list(range(len(_doc_chunks)))
+            if user_role != "admin" and not any(tag in allowed_tags for tag in [chunk_cat] + chunk_roles):
+                continue
 
-        index_type = _faiss_index[0]
-        scored_indices = []
-        
-        stopwords = {
-            "does", "campusos", "allow", "allowed", "rules", "policy", "guideline", "guidelines",
-            "handbook", "what", "where", "how", "when", "with", "have", "room", "rooms", "building",
-            "campus", "system", "portal"
-        }
-        q_raw_words = [w.lower().strip("?,.!") for w in query.split() if len(w) >= 3 and w.lower().strip("?,.!") not in stopwords]
-        q_stems = set([normalize_stem(w) for w in q_raw_words])
+            sim_score = float(score)
+            c_low = chunk["content"].lower()
 
-        if index_type == "tfidf":
-            try:
-                vectorizer, tfidf_matrix = _faiss_index[1]
-                import numpy as np
-                q_vec = vectorizer.transform([query])
-                sims = (tfidf_matrix * q_vec.T).toarray().flatten()
-                
-                for idx in filtered_chunk_indices:
-                    chunk = _doc_chunks[idx]
-                    c_stems = set([normalize_stem(w) for w in chunk["content"].lower().split()])
-                    overlap = len(q_stems.intersection(c_stems))
-                    kw_score = overlap / max(len(q_stems), 1)
-                    
-                    combined_score = max(float(sims[idx]) * 3.5, kw_score)
+            # Domain term relevance boost when chunk directly contains the primary subject keyword
+            for kw in domain_keywords:
+                if kw in q_words and kw in c_low:
+                    sim_score += 0.25
 
-                    if combined_score >= match_threshold or (overlap >= 2 and combined_score >= 0.15):
-                        scored_indices.append((idx, round(combined_score, 3)))
-                scored_indices.sort(key=lambda x: x[1], reverse=True)
-            except Exception as e:
-                print(f"[RAG Service] TF-IDF search error: {e}")
+            if sim_score >= match_threshold:
+                scored_chunks.append((idx, round(sim_score, 3)))
 
-        if not scored_indices:
-            for idx in filtered_chunk_indices:
-                chunk = _doc_chunks[idx]
-                c_stems = set([normalize_stem(w) for w in chunk["content"].lower().split()])
-                overlap = len(q_stems.intersection(c_stems))
-                if overlap > 0:
-                    score = overlap / max(len(q_stems), 1)
-                    if score >= match_threshold or overlap >= 2:
-                        scored_indices.append((idx, round(float(score), 3)))
-            scored_indices.sort(key=lambda x: x[1], reverse=True)
+        scored_chunks.sort(key=lambda x: x[1], reverse=True)
 
         results = []
-        for idx, score in scored_indices[:k]:
+        for idx, score in scored_chunks[:k]:
             chunk = _doc_chunks[idx]
             results.append({
                 "id": chunk.get("id"),
@@ -434,64 +368,60 @@ class GlobalFAISSRetriever:
 
 
 def format_source_citations(chunks: List[Dict[str, Any]]) -> str:
-    """Formats source document citations (Step 6)."""
+    """Formats source document citations."""
     if not chunks:
         return ""
-    
+
     seen = set()
     sources_list = []
     for c in chunks:
         doc = c.get("file_name") or c.get("document_name", "CampusOS Document")
         pg = c.get("page_number", 1)
+        score = c.get("score", 0.0)
         key = (doc, pg)
         if key not in seen:
             seen.add(key)
-            sources_list.append(f"- {doc} (Page {pg})")
+            sources_list.append(f"- {doc} (Page {pg}) [Relevance: {int(score * 100)}%]")
 
     if not sources_list:
         return ""
     return "\n\nSources:\n" + "\n".join(sources_list)
 
 
-def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user_role: str, match_threshold: float = 0.20) -> str:
-    """Generates grounded answer using OpenAI/Gemini REST API or strict context synthesis (Steps 4 & 5)."""
-    
-    NOT_FOUND_MSG = "I couldn't find this information in the CampusOS knowledge base."
+def clean_and_normalize_query(query: str) -> str:
+    typo_map = {
+        "caluclated": "calculated", "calulated": "calculated", "claculated": "calculated",
+        "attendence": "attendance", "atendance": "attendance", "hostle": "hostel", "placment": "placement"
+    }
+    words = [w.lower().strip("?,.!") for w in query.split()]
+    fixed = [typo_map.get(w, w) for w in words]
+    return " ".join(fixed)
+
+
+def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user_role: str, match_threshold: float = 0.15) -> str:
+    """Generates grounded answer using Gemini API with top retrieved vector chunks."""
+
+    NOT_FOUND_MSG = "This information is not available in the university knowledge base."
 
     query = clean_and_normalize_query(query)
 
     if not retrieved_chunks:
         return NOT_FOUND_MSG
 
-    max_score = max([c.get("score", 0.0) for c in retrieved_chunks], default=0.0)
-    if max_score < 0.15:
-        return NOT_FOUND_MSG
-
-    clean_snippets = []
-    for c in retrieved_chunks:
-        text = c.get("content", "").strip()
-        t_lower = text.lower()
-        if any(b in t_lower for b in [
-            "openstax", "creative commons", "attribution", "licensing", "isbn-13",
-            "table 1.", "rice university", "redistribute", "print format", "openstax.org"
-        ]):
-            continue
-        if len(text) > 15 and text not in clean_snippets:
-            clean_snippets.append(text)
-
+    clean_snippets = [c.get("content", "").strip() for c in retrieved_chunks if c.get("content", "").strip()]
     if not clean_snippets:
         return NOT_FOUND_MSG
 
     formatted_context = "\n\n".join(clean_snippets)
 
-    # Key Target Term Validation: If any primary target subject term (e.g. drones) is missing from context, refuse to hallucinate
+    # Key Subject Term Validation: If specific query terms (e.g. drones) are completely absent in context, refuse
     stopwords = {
-        "does", "campusos", "allow", "allowed", "rules", "policy", "policies", "guideline", "guidelines",
+        "does", "campusos", "allow", "allowed", "rules", "rule", "policy", "policies", "guideline", "guidelines",
         "handbook", "what", "where", "how", "when", "with", "have", "room", "rooms", "building",
         "campus", "student", "students", "faculty", "admin", "university", "college", "hostel",
         "requirement", "requirements", "required", "system", "portal", "summarize", "summary",
         "publish", "many", "much", "explain", "describe", "list", "check", "find", "give", "tell",
-        "show", "timing", "timings", "mark", "marks", "internal", "deadline", "deadlines"
+        "show", "timing", "timings", "mark", "marks", "internal", "deadline", "deadlines", "minimum"
     }
     query_terms = [w.lower().strip("?,.!") for w in query.split() if len(w) >= 4 and w.lower().strip("?,.!") not in stopwords]
     
@@ -502,130 +432,97 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
             if base_term not in ctx_low and term not in ctx_low:
                 return NOT_FOUND_MSG
 
-    sources_text = format_source_citations(retrieved_chunks)
-
-    # Step 5: Strict Grounded System Prompt
     system_prompt = (
-        "You are CampusOS AI.\n\n"
-        "Answer ONLY using the retrieved CampusOS documents.\n\n"
-        "Rules:\n"
-        "- Never use your own knowledge.\n"
-        "- Never guess.\n"
-        "- Never invent policies.\n"
-        "- If the retrieved context is insufficient, say:\n"
-        '  "I couldn\'t find this information in the CampusOS knowledge base."\n'
-        "- Cite the document name and page number.\n"
-        "- Keep answers concise and factual.\n\n"
-        f"Context:\n{formatted_context}\n\n"
-        f"Question:\n{query}"
+        "You are CampusOS AI, the official university grounded academic assistant.\n\n"
+        "Instructions:\n"
+        "- Answer the student's question ONLY using the provided document chunks.\n"
+        "- Do NOT use external knowledge or invent facts.\n"
+        "- If the answer is not contained in the provided chunks, reply EXACTLY:\n"
+        '  "This information is not available in the university knowledge base."\n'
+        "- Keep the response concise, clear, and accurate.\n\n"
+        f"Retrieved Document Chunks:\n{formatted_context}\n\n"
+        f"Student Question:\n{query}"
     )
 
-    # Try OpenAI API
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if openai_key:
-        try:
-            import httpx
-            res = httpx.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {openai_key}"},
-                json={
-                    "model": "gpt-3.5-turbo",
-                    "messages": [{"role": "user", "content": system_prompt}],
-                    "temperature": 0.0,
-                    "max_tokens": 400
-                },
-                timeout=8.0
-            )
-            if res.status_code == 200:
-                answer = res.json()["choices"][0]["message"]["content"].strip()
-                if "couldn't find" in answer.lower():
-                    return NOT_FOUND_MSG
-                return answer + (sources_text if "Sources:" not in answer else "")
-        except Exception as e:
-            print(f"[RAG Service] OpenAI REST call error: {e}")
-
-    # Try Gemini REST API
-    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if gemini_key:
-        try:
+    try:
+        from app.api.v1.ai import resolve_gemini_api_key
+        gemini_key = resolve_gemini_api_key()
+        if gemini_key:
             import httpx
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
             res = httpx.post(
                 url,
                 json={"contents": [{"parts": [{"text": system_prompt}]}]},
-                timeout=8.0
+                timeout=10.0
             )
             if res.status_code == 200:
                 answer = res.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if "couldn't find" in answer.lower():
+                if "not available in the university knowledge base" in answer.lower():
                     return NOT_FOUND_MSG
-                return answer + (sources_text if "Sources:" not in answer else "")
-        except Exception as e:
-            print(f"[RAG Service] Gemini REST call error: {e}")
+                return answer
+    except Exception as e:
+        print(f"[RAG Service] Gemini synthesis call error: {e}")
 
-    # Grounded synthesis directly from retrieved snippets with neat query summary and relevant filtering
-    summary_header = f"### 📌 Query Summary\nYou are inquiring about **{query.title()}** as governed by official CampusOS University regulations.\n\n### 💡 Relevant Official Policy\n"
-
-    relevant_snippets = []
-    for snippet in clean_snippets:
-        for line in snippet.split("\n"):
-            line_clean = line.strip()
-            if not line_clean:
-                continue
-            if any(line_clean.startswith(prefix) for prefix in ["Q1.", "Q2.", "Q3.", "Q4.", "Q5.", "Q6.", "Q7.", "Q8.", "Q9.", "Q10.", "Q11.", "Q12.", "Q13.", "Q14.", "Q15.", "Q16.", "Q17.", "Q18.", "Q19.", "Q20.", "Sample question"]):
-                continue
-            if "procedure for" in line_clean.lower() and "guideline" in line_clean.lower():
-                continue
-            if line_clean not in relevant_snippets:
-                relevant_snippets.append(line_clean)
-
-    if not relevant_snippets:
-        relevant_snippets = [clean_snippets[0].strip()]
-
-    formatted_policy = "\n".join([f"- {s}" for s in relevant_snippets[:4]])
-    return f"{summary_header}{formatted_policy}{sources_text}"
+    # Fallback clean synthesis directly from chunks
+    snippets_summary = "\n".join([f"• {c['content']}" for c in retrieved_chunks[:3]])
+    return f"Based on official university regulations:\n{snippets_summary}"
 
 
 def execute_pgvector_rag_query(
     query: str,
     user_role: str = "student",
-    match_threshold: float = 0.20,
+    match_threshold: float = 0.15,
     k: int = 5
 ) -> Dict[str, Any]:
     """
-    Executes Production Grounded RAG Search (Top K = 5, Configurable Match Threshold = 0.20).
+    Executes Pure Vector Embedding RAG Query (Top K = 5, Cosine Similarity Threshold = 0.15).
     """
     if not _rag_initialized:
         init_rag_service()
 
     retrieved_chunks = GlobalFAISSRetriever.retrieve(query=query, category=user_role, k=k, match_threshold=match_threshold)
+
+    NOT_FOUND_MSG = "This information is not available in the university knowledge base."
+
+    if not retrieved_chunks:
+        return {
+            "answer": NOT_FOUND_MSG,
+            "category": user_role,
+            "source_documents": [],
+            "confidence": 0.0
+        }
+
     answer_text = generate_llm_answer(query=query, retrieved_chunks=retrieved_chunks, user_role=user_role, match_threshold=match_threshold)
 
+    if answer_text == NOT_FOUND_MSG or "not available in the university knowledge base" in answer_text.lower():
+        return {
+            "answer": NOT_FOUND_MSG,
+            "category": user_role,
+            "source_documents": [],
+            "confidence": 0.0
+        }
+
     sources = []
-    if answer_text != "I couldn't find this information in the CampusOS knowledge base.":
-        for chunk in retrieved_chunks:
-            sources.append({
-                "title": f"{chunk['file_name']} (Page {chunk['page_number']})",
-                "file_name": chunk["file_name"],
-                "page_number": chunk["page_number"],
-                "score": chunk["score"],
-                "content": chunk["content"]
-            })
+    for chunk in retrieved_chunks:
+        sources.append({
+            "title": f"{chunk['file_name']} (Page {chunk['page_number']})",
+            "file_name": chunk["file_name"],
+            "page_number": chunk["page_number"],
+            "score": chunk["score"],
+            "content": chunk["content"]
+        })
 
     return {
         "answer": answer_text,
         "category": user_role,
         "source_documents": sources,
-        "confidence": 0.95 if sources else 0.0
+        "confidence": round(max([c["score"] for c in retrieved_chunks], default=0.9), 2)
     }
 
 
-def execute_rag_query(query: str, role_or_category: str = "students", k: int = 3) -> Dict[str, Any]:
+def execute_rag_query(query: str, role_or_category: str = "students", k: int = 5) -> Dict[str, Any]:
     """Compatibility wrapper for execute_pgvector_rag_query."""
     return execute_pgvector_rag_query(query=query, user_role=role_or_category, k=k)
-
-
-
 
 
 def process_and_ingest_document(
@@ -635,8 +532,8 @@ def process_and_ingest_document(
     uploader_id: Optional[str] = None,
     allowed_roles: Optional[List[str]] = None
 ) -> Dict[str, Any]:
-    """Ingests new document into global vector index dynamically."""
-    global _faiss_index, _doc_chunks
+    """Ingests document into vector index dynamically."""
+    global _chunk_embeddings, _vectorizer, _doc_chunks
     ext = Path(file_name).suffix.lower()
     if ext == ".pdf":
         pages = extract_text_from_pdf(file_bytes)
@@ -648,14 +545,9 @@ def process_and_ingest_document(
     if not pages:
         raise ValueError(f"No text extracted from document '{file_name}'.")
 
-    import torch
-    import numpy as np
-    model = get_embedding_model()
-
     new_chunks = []
     new_texts = []
     for page_num, page_text in pages:
-        # Split text into 800-char blocks
         blocks = [page_text[i:i+800] for i in range(0, len(page_text), 600)]
         for block in blocks:
             new_texts.append(block)
@@ -667,19 +559,17 @@ def process_and_ingest_document(
                 "content": block
             })
 
-    if new_texts:
-        with torch.no_grad():
-            embeddings = model.encode(new_texts, convert_to_numpy=True)
-            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-            norms[norms == 0] = 1.0
-            embeddings = (embeddings / norms).astype(np.float32)
+    if new_texts and _vectorizer:
+        new_mat = _vectorizer.transform(new_texts).toarray()
+        norms = np.linalg.norm(new_mat, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        new_embs = (new_mat / norms).astype(np.float32)
 
-        if _faiss_index is not None:
-            index_type, index_obj = _faiss_index
-            if index_type == "faiss":
-                index_obj.add(embeddings)
-            else:
-                _faiss_index = ("numpy", np.vstack([index_obj, embeddings]))
+        if _chunk_embeddings is not None:
+            _chunk_embeddings = np.vstack([_chunk_embeddings, new_embs])
+        else:
+            _chunk_embeddings = new_embs
+
         _doc_chunks.extend(new_chunks)
         gc.collect()
 
@@ -688,6 +578,3 @@ def process_and_ingest_document(
         "category": category,
         "chunks_indexed": len(new_chunks)
     }
-
-
-

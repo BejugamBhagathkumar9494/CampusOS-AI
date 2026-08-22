@@ -24,6 +24,9 @@ from app.models.database_models import (
     Transaction,
     AIChatHistory,
     KnowledgeDocument,
+    Profile,
+    AuthorizedUser,
+    AuditLog,
 )
 
 __all__ = [
@@ -52,4 +55,8 @@ __all__ = [
     "Transaction",
     "AIChatHistory",
     "KnowledgeDocument",
+    "Profile",
+    "AuthorizedUser",
+    "AuditLog",
 ]
+

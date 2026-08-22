@@ -110,6 +110,83 @@ def update_user_status(
     return {"message": f"User status updated to {new_status}", "user_id": user_id, "status": new_status}
 
 
+@router.delete("/users/{user_id}")
+def delete_user(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(check_role(["admin", "super_admin"]))
+):
+    """Permanently delete a user account from database (Super Admin / Admin)."""
+    # Prevent self-deletion
+    if str(current_user.id) == user_id or current_user.email == user_id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account.")
+
+    user = None
+    if user_id.isdigit():
+        user = db.query(User).filter(User.id == int(user_id)).first()
+    
+    profile = None
+    if not user:
+        profile = db.query(Profile).filter((Profile.id == user_id) | (Profile.auth_user_id == user_id) | (Profile.email == user_id)).first()
+        if profile:
+            user = db.query(User).filter((User.id == profile.auth_user_id) | (User.email == profile.email)).first()
+    else:
+        profile = db.query(Profile).filter((Profile.auth_user_id == str(user.id)) | (Profile.email == user.email)).first()
+
+    if not user and not profile:
+        raise HTTPException(status_code=404, detail="User account not found")
+
+    target_email = user.email if user else (profile.email if profile else "unknown")
+    target_id_str = str(user.id) if user else (profile.id if profile else user_id)
+
+    # Security check: Non-superadmin cannot delete super_admin accounts
+    current_user_roles = [r.name.lower() for r in current_user.roles]
+    target_roles = [r.name.lower() for r in user.roles] if user else ([profile.role.lower()] if profile and profile.role else [])
+    if "super_admin" in target_roles and "super_admin" not in current_user_roles:
+        raise HTTPException(status_code=403, detail="Only Super Admin can delete Super Admin accounts.")
+
+    # Delete Profile record
+    if profile:
+        db.delete(profile)
+
+    # Explicitly clean up Student and Faculty records for DB backends without FK CASCADE
+    if user:
+        from app.models import Student, Faculty
+        student_rec = db.query(Student).filter(Student.user_id == user.id).first()
+        if student_rec:
+            db.delete(student_rec)
+        faculty_rec = db.query(Faculty).filter(Faculty.user_id == user.id).first()
+        if faculty_rec:
+            db.delete(faculty_rec)
+        db.delete(user)
+
+    # Also clean up AuthorizedUser record if matching email
+    auth_user = db.query(AuthorizedUser).filter((AuthorizedUser.email == target_email) | (AuthorizedUser.institution_id == user_id)).first()
+    if auth_user:
+        db.delete(auth_user)
+
+    # Try deleting Supabase profile row via Supabase Admin client if configured
+    try:
+        from app.core.supabase import get_supabase_admin_client
+        supa_admin = get_supabase_admin_client()
+        supa_admin.from_("profiles").delete().eq("id", target_id_str).execute()
+    except Exception as supa_err:
+        print(f"Supabase profile delete warning: {supa_err}")
+
+    # Audit logging
+    audit_entry = AuditLog(
+        actor_user_id=str(current_user.id),
+        action="USER_DELETED",
+        target_user_id=target_id_str,
+        metadata_json=json.dumps({"deleted_email": target_email})
+    )
+    db.add(audit_entry)
+    db.commit()
+
+    return {"message": "User account deleted successfully", "user_id": target_id_str, "email": target_email}
+
+
+
 # Security Comment: Creating administrator accounts is strictly restricted to Super Admin.
 @router.post("/create-admin")
 def create_admin_account(

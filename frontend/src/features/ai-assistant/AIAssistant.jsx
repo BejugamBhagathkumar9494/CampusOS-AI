@@ -330,37 +330,30 @@ export default function AIAssistant() {
 
                   {/* Grounded Source Citations for RAG mode */}
                   {!isUser && msg.sources && msg.sources.length > 0 && (
-                    <div className="mt-3.5 pt-3 border-t border-slate-200/80">
-                      <button
-                        onClick={() => toggleSources(msg.id || idx)}
-                        className="text-xs font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1.5 transition-colors"
-                      >
+                    <div className="mt-3.5 pt-3 border-t border-slate-200/80 space-y-2">
+                      <div className="text-xs font-extrabold text-sky-800 flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-                        {msg.sources.length} Grounded Document Citation{msg.sources.length > 1 ? 's' : ''}
-                        {expandedSources[msg.id || idx] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                      </button>
-
-                      {expandedSources[msg.id || idx] && (
-                        <div className="mt-2.5 space-y-2 animate-fade-in">
-                          {msg.sources.map((doc, docIdx) => (
-                            <div key={docIdx} className="p-3 rounded-xl bg-white border border-slate-200/90 text-xs space-y-1">
-                              <div className="flex items-center justify-between font-bold text-slate-800">
-                                <span>📄 {doc.file_name || doc.title || 'CampusOS Document'} (Page {doc.page_number || doc.page || 1})</span>
-                                {doc.score !== undefined && (
-                                  <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-mono">
-                                    Match: {(doc.score * 100).toFixed(0)}%
-                                  </span>
-                                )}
-                              </div>
-                              {doc.content && (
-                                <p className="text-slate-600 line-clamp-3 text-[11px] italic bg-slate-50 p-2 rounded border border-slate-100">
-                                  "{doc.content}"
-                                </p>
+                        Retrieved Sources ({msg.sources.length}):
+                      </div>
+                      <div className="space-y-2">
+                        {msg.sources.map((doc, docIdx) => (
+                          <div key={docIdx} className="p-3 rounded-xl bg-white border border-slate-200/90 text-xs space-y-1 shadow-2xs">
+                            <div className="flex flex-wrap items-center justify-between font-bold text-slate-800 gap-1">
+                              <span>📄 {doc.file_name || doc.title || 'CampusOS Document'} (Page {doc.page_number || doc.page || 1})</span>
+                              {doc.score !== undefined && (
+                                <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 font-mono font-bold">
+                                  Relevance Score: {(doc.score * 100).toFixed(0)}%
+                                </span>
                               )}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                            {doc.content && (
+                              <p className="text-slate-600 line-clamp-3 text-[11px] italic bg-slate-50 p-2 rounded-lg border border-slate-100 mt-1">
+                                "{doc.content}"
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 

@@ -106,6 +106,25 @@ export const UserManagementPage = () => {
     }
   };
 
+  const handleDeleteUser = async (userId, userFullName) => {
+    if (String(profile?.id) === String(userId) || profile?.email === userFullName) {
+      alert('You cannot delete your own account.');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to permanently remove user "${userFullName}" from the database? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await authService.deleteUser(userId);
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      loadData();
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      alert('Failed to delete user account from database.');
+    }
+  };
+
+
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
     setAdminMsg('');
@@ -414,39 +433,44 @@ export const UserManagementPage = () => {
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {u.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() => handleStatusChange(u.id, 'active')}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs"
-                              >
-                                <UserCheck className="w-3.5 h-3.5" /> Approve
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(u.id, 'rejected')}
-                                className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs"
-                              >
-                                <UserX className="w-3.5 h-3.5" /> Reject
-                              </button>
-                            </>
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                          {u.status !== 'active' && (
+                            <button
+                              onClick={() => handleStatusChange(u.id, 'active')}
+                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                              title="Accept / Approve User"
+                            >
+                              <UserCheck className="w-3.5 h-3.5" /> Accept
+                            </button>
+                          )}
+
+                          {u.status !== 'rejected' && u.role !== 'super_admin' && (
+                            <button
+                              onClick={() => handleStatusChange(u.id, 'rejected')}
+                              className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                              title="Reject User"
+                            >
+                              <UserX className="w-3.5 h-3.5" /> Reject
+                            </button>
                           )}
 
                           {u.status === 'active' && u.role !== 'super_admin' && (
                             <button
                               onClick={() => handleStatusChange(u.id, 'suspended')}
-                              className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px]"
+                              className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] transition-colors"
+                              title="Suspend User"
                             >
                               Suspend
                             </button>
                           )}
 
-                          {u.status === 'suspended' && (
+                          {(u.role !== 'super_admin' || isSuperAdmin) && String(u.id) !== String(profile?.id) && u.email !== profile?.email && (
                             <button
-                              onClick={() => handleStatusChange(u.id, 'active')}
-                              className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]"
+                              onClick={() => handleDeleteUser(u.id, u.full_name)}
+                              className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                              title="Remove User from Database"
                             >
-                              Reactivate
+                              <Trash2 className="w-3.5 h-3.5 text-rose-500" /> Remove
                             </button>
                           )}
                         </div>

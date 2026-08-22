@@ -74,7 +74,7 @@ class TestRoleBasedRAGService(unittest.TestCase):
     def test_absent_info_drone_refusal(self):
         """Absent info: Does CampusOS allow drones in hostel rooms?"""
         res = execute_pgvector_rag_query("Does CampusOS allow drones in hostel rooms?", user_role="student", match_threshold=0.20)
-        expected_refusal = "I couldn't find this information in the CampusOS knowledge base."
+        expected_refusal = "This information is not available in the university knowledge base."
         self.assertEqual(res["answer"].strip(), expected_refusal)
         self.assertEqual(len(res["source_documents"]), 0)
 
