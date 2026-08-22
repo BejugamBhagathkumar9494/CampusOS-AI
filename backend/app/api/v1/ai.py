@@ -65,6 +65,15 @@ class SessionMessagePayload(BaseModel):
     sources: Optional[List[Any]] = []
 
 
+class ChatMessagePayload(BaseModel):
+    message: Optional[str] = None
+    question: Optional[str] = None
+    chat_id: Optional[str] = None
+    role: Optional[str] = "student"
+    category: Optional[str] = None
+    mode: Optional[str] = "rag"
+
+
 @router.post("/sessions")
 def create_ai_chat_session(
     payload: Optional[SessionCreatePayload] = None,
