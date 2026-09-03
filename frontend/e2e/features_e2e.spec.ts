@@ -118,8 +118,20 @@ test.describe('CampusOS AI - AI Exam Preparation & RepoDNA E2E Tests', () => {
     // 3. Wait for Analysis or Progress to complete
     await expect(page.getByRole('button', { name: /Overview/i }).first()).toBeVisible({ timeout: 30000 });
 
-    // 4. Test Tab Navigation across intelligence tabs
-    const tabs = ['Architecture', 'Project Structure', 'Tech Stack', 'Database', 'APIs', 'Health & Suggestions', 'Interview Prep', 'Ask RepoDNA'];
+    // 4. Test "Go Visually" Mindmap Visualizer
+    const goVisuallyBtn = page.getByRole('button', { name: /Go Visually/i }).first();
+    if (await goVisuallyBtn.isVisible()) {
+      await goVisuallyBtn.click();
+      await expect(page.getByText('Interactive Repository Mindmap')).toBeVisible();
+      // Test Radial and System Tree modes
+      const treeBtn = page.getByRole('button', { name: /System Tree/i });
+      if (await treeBtn.isVisible()) await treeBtn.click();
+      const radialBtn = page.getByRole('button', { name: /Radial Mindmap/i });
+      if (await radialBtn.isVisible()) await radialBtn.click();
+    }
+
+    // 5. Test Tab Navigation across intelligence tabs
+    const tabs = ['Overview', 'Mindmap', 'Architecture', 'Project Structure', 'Tech Stack', 'Database', 'APIs', 'Health & Suggestions', 'Interview Prep', 'Ask RepoDNA'];
     for (const tabName of tabs) {
       const tabBtn = page.getByRole('button', { name: new RegExp(tabName, 'i') }).first();
       if (await tabBtn.isVisible()) {

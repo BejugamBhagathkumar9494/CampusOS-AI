@@ -7,6 +7,7 @@ import {
   Activity, ExternalLink, Zap, Compass, Info, ArrowUpRight
 } from 'lucide-react';
 import { repoDnaService } from './services/repoDnaService';
+import { RepoMindmapView } from './components/RepoMindmapView';
 import {
   StudyRepository,
   RepositoryAnalysis,
@@ -37,7 +38,7 @@ export default function RepoDNAPage() {
   
   // Navigation
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'architecture' | 'structure' | 'tech' | 'flows' | 'database' | 'apis' | 'auth' | 'files' | 'health' | 'interview' | 'chat'
+    'overview' | 'mindmap' | 'architecture' | 'structure' | 'tech' | 'flows' | 'database' | 'apis' | 'auth' | 'files' | 'health' | 'interview' | 'chat'
   >('overview');
   
   // UI Helpers
@@ -361,6 +362,16 @@ export default function RepoDNAPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveTab('mindmap')}
+                className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95 ${
+                  activeTab === 'mindmap'
+                    ? 'bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white ring-2 ring-indigo-400 shadow-indigo-500/30'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
+                }`}
+              >
+                <Compass className="w-4 h-4" /> Go Visually (Mindmap)
+              </button>
               <a
                 href={activeRepo.github_url}
                 target="_blank"
@@ -381,6 +392,7 @@ export default function RepoDNAPage() {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-slate-200">
             {[
               { id: 'overview', label: 'Overview', icon: BookOpen },
+              { id: 'mindmap', label: 'Mindmap (Visual)', icon: Compass },
               { id: 'architecture', label: 'Architecture', icon: Layers },
               { id: 'structure', label: 'Project Structure', icon: FolderTree },
               { id: 'tech', label: 'Tech Stack', icon: Cpu },
@@ -410,6 +422,36 @@ export default function RepoDNAPage() {
               );
             })}
           </div>
+
+          {/* TAB 0: VISUAL MINDMAP */}
+          {activeTab === 'mindmap' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="space-y-0.5">
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-indigo-600" /> Interactive Repository Mindmap
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    NotebookLM-style visual radial universe. Pan, zoom, click any node to inspect modules, or ask AI about specific components.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-extrabold border border-indigo-200 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Interactive Universe
+                  </span>
+                </div>
+              </div>
+              <RepoMindmapView
+                repository={activeRepo}
+                analysis={analysis}
+                files={files}
+                onAskAI={(question) => {
+                  setActiveTab('chat');
+                  setChatInput(question);
+                }}
+              />
+            </div>
+          )}
 
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
