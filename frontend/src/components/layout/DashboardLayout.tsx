@@ -20,6 +20,7 @@ import {
   Briefcase,
   DollarSign,
   Calendar,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { notificationService } from '../../services/notificationService';
@@ -101,6 +102,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const getSidebarItems = (userRole: UserRole | string) => {
     const studentItems = [
       { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
+      { name: 'AI Exam Prep', path: '/student/exam-prep', icon: GraduationCap },
       { name: 'AI Assistant', path: '/student/ai-assistant', icon: MessageSquare },
       { name: 'Academics', path: '/student/academics', icon: BookOpen },
       { name: 'Attendance', path: '/student/attendance', icon: CalendarCheck },

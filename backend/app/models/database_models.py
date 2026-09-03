@@ -586,3 +586,87 @@ class ClubMembership(Base):
     club = relationship("Club", back_populates="memberships")
     student = relationship("Student")
 
+
+# ==============================================================================
+# AI EXAM PREPARATION PLATFORM MODELS
+# ==============================================================================
+
+class StudyCollection(Base):
+    __tablename__ = "study_collections"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    subject_name = Column(String(150), nullable=False)
+    course_code = Column(String(50), nullable=False)
+    semester = Column(Integer, nullable=False, default=1)
+    branch = Column(String(100), nullable=False, default="CSE")
+    academic_year = Column(String(50), nullable=False, default="2025-2026")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")
+    documents = relationship("StudyDocument", back_populates="collection", cascade="all, delete-orphan")
+    chunks = relationship("StudyChunk", back_populates="collection", cascade="all, delete-orphan")
+    materials = relationship("GeneratedExamMaterial", back_populates="collection", cascade="all, delete-orphan")
+
+
+class StudyDocument(Base):
+    __tablename__ = "study_documents"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    collection_id = Column(String(36), ForeignKey("study_collections.id", ondelete="CASCADE"), nullable=False, index=True)
+    file_name = Column(String(255), nullable=False)
+    file_size_bytes = Column(Integer, default=0)
+    storage_path = Column(String(500), nullable=True)
+    page_count = Column(Integer, default=1)
+    unit_detected = Column(String(50), nullable=True)  # e.g., "Unit 1"
+    processing_status = Column(String(50), default="processed")  # pending, processing, processed, failed
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    collection = relationship("StudyCollection", back_populates="documents")
+    chunks = relationship("StudyChunk", back_populates="document", cascade="all, delete-orphan")
+
+
+class StudyChunk(Base):
+    __tablename__ = "study_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(String(36), ForeignKey("study_documents.id", ondelete="CASCADE"), nullable=False, index=True)
+    collection_id = Column(String(36), ForeignKey("study_collections.id", ondelete="CASCADE"), nullable=False, index=True)
+    content = Column(Text, nullable=False)
+    page_number = Column(Integer, default=1, nullable=False)
+    unit = Column(String(50), default="General", nullable=False)  # e.g. "Unit 1", "Unit 2"
+    topic = Column(String(200), default="General Concepts", nullable=False)
+    chunk_index = Column(Integer, default=1)
+    has_diagram = Column(Boolean, default=False)
+    diagram_caption = Column(String(255), nullable=True)
+    metadata_json = Column(Text, nullable=True)  # Serialized JSON
+    embedding = Column(Vector(1536), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    collection = relationship("StudyCollection", back_populates="chunks")
+    document = relationship("StudyDocument", back_populates="chunks")
+
+
+class GeneratedExamMaterial(Base):
+    __tablename__ = "generated_exam_material"
+
+    id = Column(Integer, primary_key=True, index=True)
+    collection_id = Column(String(36), ForeignKey("study_collections.id", ondelete="CASCADE"), nullable=False, index=True)
+    material_type = Column(String(50), nullable=False)  # summary, 2_mark, 4_mark, 10_mark, important_q, definition, formula, diagram, revision_one_day, revision_last_minute
+    question = Column(Text, nullable=True)
+    answer = Column(Text, nullable=False)
+    marks = Column(Integer, default=0)
+    unit = Column(String(50), default="General")
+    topic = Column(String(200), default="General")
+    keywords = Column(Text, nullable=True)  # JSON or comma-separated keywords
+    diagram_info = Column(Text, nullable=True)  # JSON with diagram type, source page, or flowchart
+    sources = Column(Text, nullable=True)  # JSON array of sources [{file_name, page_number, relevance}]
+    priority_rank = Column(Integer, default=1)
+    grounded_confidence = Column(Float, default=1.0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    collection = relationship("StudyCollection", back_populates="materials")
+
+

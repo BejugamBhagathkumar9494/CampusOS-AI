@@ -698,5 +698,115 @@ INSERT INTO public.transport_routes (route_name, start_point, end_point, stops) 
 ON CONFLICT DO NOTHING;
 
 -- ==============================================================================
+-- 10. AI EXAM PREPARATION PLATFORM TABLES (MULTI-PDF RAG & EXAM NOTES)
+-- ==============================================================================
+
+-- Study Collections Table
+CREATE TABLE IF NOT EXISTS public.study_collections (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    subject_name TEXT NOT NULL,
+    course_code TEXT NOT NULL,
+    semester INT DEFAULT 1,
+    branch TEXT DEFAULT 'CSE',
+    academic_year TEXT DEFAULT '2025-2026',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Study Documents Table
+CREATE TABLE IF NOT EXISTS public.study_documents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    collection_id UUID NOT NULL REFERENCES public.study_collections(id) ON DELETE CASCADE,
+    file_name TEXT NOT NULL,
+    file_size_bytes INT DEFAULT 0,
+    storage_path TEXT,
+    page_count INT DEFAULT 1,
+    unit_detected TEXT,
+    processing_status TEXT DEFAULT 'processed',
+    error_message TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Study Chunks Table (with 1536-dim vector embedding & page citations)
+CREATE TABLE IF NOT EXISTS public.study_chunks (
+    id BIGSERIAL PRIMARY KEY,
+    document_id UUID NOT NULL REFERENCES public.study_documents(id) ON DELETE CASCADE,
+    collection_id UUID NOT NULL REFERENCES public.study_collections(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    page_number INT NOT NULL DEFAULT 1,
+    unit TEXT NOT NULL DEFAULT 'General',
+    topic TEXT NOT NULL DEFAULT 'General Concepts',
+    chunk_index INT DEFAULT 1,
+    has_diagram BOOLEAN DEFAULT FALSE,
+    diagram_caption TEXT,
+    metadata_json JSONB DEFAULT '{}'::jsonb,
+    embedding vector(1536),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Generated Exam Material Table
+CREATE TABLE IF NOT EXISTS public.generated_exam_material (
+    id BIGSERIAL PRIMARY KEY,
+    collection_id UUID NOT NULL REFERENCES public.study_collections(id) ON DELETE CASCADE,
+    material_type TEXT NOT NULL, -- summary, 2_mark, 4_mark, 10_mark, important_q, definition, formula, diagram, revision_one_day, revision_last_minute
+    question TEXT,
+    answer TEXT NOT NULL,
+    marks INT DEFAULT 0,
+    unit TEXT DEFAULT 'General',
+    topic TEXT DEFAULT 'General',
+    keywords TEXT,
+    diagram_info JSONB DEFAULT '{}'::jsonb,
+    sources JSONB DEFAULT '[]'::jsonb,
+    priority_rank INT DEFAULT 1,
+    grounded_confidence NUMERIC(4,3) DEFAULT 1.0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for Fast Retrieval
+CREATE INDEX IF NOT EXISTS idx_study_collections_user ON public.study_collections(user_id);
+CREATE INDEX IF NOT EXISTS idx_study_docs_collection ON public.study_documents(collection_id);
+CREATE INDEX IF NOT EXISTS idx_study_chunks_collection ON public.study_chunks(collection_id);
+CREATE INDEX IF NOT EXISTS idx_study_chunks_unit ON public.study_chunks(unit);
+CREATE INDEX IF NOT EXISTS idx_generated_exam_mat_col ON public.generated_exam_material(collection_id, material_type);
+
+-- RLS for Exam Prep Tables (Strict Student Isolation)
+ALTER TABLE public.study_collections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.study_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.study_chunks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.generated_exam_material ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users access own study collections" ON public.study_collections
+    FOR ALL USING (auth.uid() = user_id OR public.is_admin());
+
+CREATE POLICY "Users access own study documents" ON public.study_documents
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_collections c
+            WHERE c.id = study_documents.collection_id
+            AND (c.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+CREATE POLICY "Users access own study chunks" ON public.study_chunks
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_collections c
+            WHERE c.id = study_chunks.collection_id
+            AND (c.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+CREATE POLICY "Users access own generated exam material" ON public.generated_exam_material
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_collections c
+            WHERE c.id = generated_exam_material.collection_id
+            AND (c.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+-- ==============================================================================
 -- END OF MIGRATION SCRIPT
 -- ==============================================================================
+

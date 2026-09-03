@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Send, Sparkles, Bot, User, BookOpen,
   ChevronDown, ChevronUp, RefreshCw,
-  History, Plus, MessageSquare, X
+  History, Plus, MessageSquare, X, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { chatWithLLM, chatWithRAG, fetchWithAuth } from '../../services/api';
+import { examPrepService } from '../exam-prep/services/examPrepService';
+import { StudyCollection } from '../exam-prep/types';
 
 export default function AIAssistant() {
   const { profile } = useAuth();
@@ -16,12 +18,29 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<any[]>([]);
   const [showHistorySidebar, setShowHistorySidebar] = useState(false);
 
-  // Default mode (LLM or RAG)
+  // Default mode (LLM, RAG, or SUBJECT_RAG)
   const [mode, setMode] = useState(() => localStorage.getItem('campusos_ai_mode') || 'llm');
+  const [studyCollections, setStudyCollections] = useState<StudyCollection[]>([]);
+  const [selectedColId, setSelectedColId] = useState<string>('');
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    async function loadCollections() {
+      try {
+        const cols = await examPrepService.getCollections();
+        setStudyCollections(cols || []);
+        if (cols && cols.length > 0 && !selectedColId) {
+          setSelectedColId(cols[0].id);
+        }
+      } catch (e) {
+        console.warn('Could not load study collections for AI assistant:', e);
+      }
+    }
+    loadCollections();
+  }, [profile?.id]);
 
   // 1. Initialize a brand-new AI chat session on login/mount as per specification
   const startNewChatSession = async () => {
@@ -171,15 +190,26 @@ export default function AIAssistant() {
     }
 
     try {
-      let responseData;
+      let responseData: any;
+      let agentLabel = '✨ Gemini 2.5 Flash';
+
       if (currentMode === 'llm') {
         const historyContext = messages.slice(-6).map(m => ({
           role: m.role || m.sender,
           content: m.content || m.text
         }));
         responseData = await chatWithLLM(query, historyContext, profile?.id);
+        agentLabel = responseData.agent_name || '✨ Gemini 2.5 Flash';
+      } else if (currentMode === 'subject_rag' && selectedColId) {
+        responseData = await examPrepService.querySubject({
+          collection_id: selectedColId,
+          question: query,
+        });
+        const selectedCol = studyCollections.find(c => c.id === selectedColId);
+        agentLabel = `🎓 ${selectedCol?.subject_name || 'Subject Notes'} RAG`;
       } else {
         responseData = await chatWithRAG(query, profile?.role || 'student', profile?.id);
+        agentLabel = responseData.agent_name || '📚 RAG Knowledge Base';
       }
 
       const botMsgText = responseData.answer || responseData.response || (
@@ -195,8 +225,8 @@ export default function AIAssistant() {
         content: botMsgText,
         mode: currentMode,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        agentName: responseData.agent_name || (currentMode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'),
-        confidenceScore: responseData.confidence_score || responseData.confidence || (currentMode === 'llm' ? 0.99 : 0.95),
+        agentName: agentLabel,
+        confidenceScore: responseData.confidence_score || responseData.confidence || 0.95,
         sources: responseData.sources || responseData.source_documents || []
       };
 
@@ -292,23 +322,50 @@ export default function AIAssistant() {
           <div className="bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80 flex items-center gap-1">
             <button
               onClick={() => setMode('llm')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                isLLM ? 'bg-white text-purple-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mode === 'llm' ? 'bg-white text-purple-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              ✨ LLM Mode
+              <span className="hidden sm:inline">✨ LLM Mode</span>
+              <span className="sm:hidden">LLM</span>
             </button>
             <button
               onClick={() => setMode('rag')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                !isLLM ? 'bg-white text-sky-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mode === 'rag' ? 'bg-white text-sky-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-              📚 RAG Mode
+              <span className="hidden sm:inline">📚 Campus RAG</span>
+              <span className="sm:hidden">Campus</span>
+            </button>
+            <button
+              onClick={() => setMode('subject_rag')}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mode === 'subject_rag' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">🎓 My Subject Notes</span>
+              <span className="sm:hidden">Notes</span>
             </button>
           </div>
+
+          {/* Subject Dropdown when in Subject RAG Mode */}
+          {mode === 'subject_rag' && studyCollections.length > 0 && (
+            <select
+              value={selectedColId}
+              onChange={(e) => setSelectedColId(e.target.value)}
+              className="px-3 py-2 rounded-xl border border-indigo-200 bg-indigo-50/50 text-indigo-900 text-xs font-bold outline-none"
+            >
+              {studyCollections.map((col) => (
+                <option key={col.id} value={col.id}>
+                  {col.course_code}: {col.subject_name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 

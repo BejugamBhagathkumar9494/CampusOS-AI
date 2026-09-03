@@ -28,6 +28,7 @@ import Notices from './features/notices/NoticesPage';
 import AIInsights from './features/ai-insights/AIInsightsPage';
 import Settings from './features/settings/SettingsPage';
 import Profile from './features/profile/ProfilePage';
+import ExamPrepPage from './features/exam-prep/ExamPrepPage';
 import { UserRole } from './types';
 
 const DashboardRedirect: React.FC = () => {
@@ -88,6 +89,7 @@ export default function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="exam-prep" element={<ExamPrepPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="academics" element={<Academics />} />
                     <Route path="attendance" element={<Attendance />} />
