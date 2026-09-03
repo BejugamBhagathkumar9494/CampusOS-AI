@@ -273,7 +273,7 @@ def get_repository_files(
 
 
 @router.post("/query", status_code=status.HTTP_200_OK)
-def query_repository(
+async def query_repository(
     payload: RepoQueryRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -287,7 +287,7 @@ def query_repository(
     if not repo:
         raise HTTPException(status_code=404, detail="Repository not found or unauthorized.")
 
-    result = answer_repository_query(db, repo, payload.question)
+    result = await answer_repository_query(db, repo, payload.question)
     return result
 
 
