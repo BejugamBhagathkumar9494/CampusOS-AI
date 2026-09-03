@@ -43,7 +43,7 @@ PRIORITY_MANIFEST_NAMES = {
 
 def parse_github_url(url: str) -> Tuple[str, str]:
     """
-    Parses and validates a GitHub repository URL.
+    Parses and validates a GitHub repository URL or shorthand (e.g. 'owner/repo').
     Returns (owner, repo_name).
     Raises ValueError on invalid formats.
     """
@@ -51,24 +51,34 @@ def parse_github_url(url: str) -> Tuple[str, str]:
     if not cleaned:
         raise ValueError("GitHub repository URL cannot be empty.")
 
-    # Match patterns like:
-    # https://github.com/owner/repo
-    # http://github.com/owner/repo.git
-    # github.com/owner/repo/
-    match = re.search(r'github\.com/([a-zA-Z0-9_\-\.]+)/([a-zA-Z0-9_\-\.]+)', cleaned)
-    if not match:
-        raise ValueError("Invalid GitHub URL. Must be in the format 'https://github.com/owner/repository'.")
+    # Remove query params & hashes (e.g. ?tab=readme)
+    cleaned = cleaned.split('?')[0].split('#')[0].rstrip('/')
 
-    owner = match.group(1).strip()
-    repo = match.group(2).strip()
-    if repo.endswith('.git'):
-        repo = repo[:-4]
-    repo = repo.rstrip('/')
+    # Handle SSH git@github.com:owner/repo.git
+    if cleaned.startswith('git@github.com:'):
+        cleaned = 'https://github.com/' + cleaned[len('git@github.com:'):]
 
-    if not owner or not repo:
-        raise ValueError("Could not extract valid GitHub repository owner and name.")
+    # Handle standard URLs or paths:
+    # https://github.com/owner/repo/...
+    # github.com/owner/repo/...
+    match = re.search(r'github\.com/([a-zA-Z0-9_\-\.]+)/([a-zA-Z0-9_\-\.]+)', cleaned, re.IGNORECASE)
+    if match:
+        owner = match.group(1).strip()
+        repo = match.group(2).strip()
+        if repo.endswith('.git'):
+            repo = repo[:-4]
+        return owner, repo
 
-    return owner, repo
+    # Handle shorthand format: "owner/repo"
+    shorthand = re.match(r'^([a-zA-Z0-9_\-\.]+)/([a-zA-Z0-9_\-\.]+)$', cleaned)
+    if shorthand:
+        owner = shorthand.group(1).strip()
+        repo = shorthand.group(2).strip()
+        if repo.endswith('.git'):
+            repo = repo[:-4]
+        return owner, repo
+
+    raise ValueError("Invalid GitHub URL. Must be in the format 'https://github.com/owner/repository' or 'owner/repository'.")
 
 
 def is_ignored_file(file_path: str) -> bool:
