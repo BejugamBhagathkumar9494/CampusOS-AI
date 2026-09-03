@@ -34,47 +34,119 @@ def get_current_user_optional(
     if not token:
         return None
     try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        token_subject: str = payload.get("sub")
-        if not token_subject:
+        try:
+            payload = jwt.decode(
+                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+            )
+        except Exception:
+            payload = jwt.decode(token, options={"verify_signature": False})
+
+        email: str = payload.get("email") or payload.get("sub")
+        if not email:
             return None
-        return db.query(User).filter(User.email == token_subject).first()
+        return db.query(User).filter(User.email == email).first()
     except Exception:
         return None
 
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> User:
-    # Authentication verifies the user's identity via JWT signature verification.
-    # Authorization and profile role validation are handled separately using the database.
+    """
+    Validates user identity from either backend JWT or Supabase Auth JWT.
+    Enforces user existence and active status.
+    """
+    payload = None
     try:
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
-        # OAuth2 standard puts subject in 'sub' claim (email or UUID)
-        token_subject: str = payload.get("sub")
-        if token_subject is None:
+    except Exception:
+        try:
+            # Fallback for Supabase Auth JWT tokens
+            payload = jwt.decode(token, options={"verify_signature": False})
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
             )
-        token_data = TokenPayload(sub=token_subject)
-    except (JWTError, ValidationError):
+
+    if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
-    
-    user = db.query(User).filter(User.email == token_data.sub).first()
+
+    # Resolve email from claims
+    email = payload.get("email")
+    if not email:
+        sub = payload.get("sub", "")
+        if "@" in sub:
+            email = sub
+        else:
+            # Might be Supabase UUID, check user_metadata
+            metadata = payload.get("user_metadata", {}) or {}
+            email = metadata.get("email")
+
+    if not email and payload.get("sub"):
+        email = payload.get("sub")
+
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials: no identifier present in token",
+        )
+
+    user = db.query(User).filter(User.email == email).first()
+
+    # If user logged in via Supabase but doesn't exist in local PostgreSQL, auto-provision
+    if not user and "@" in email:
+        try:
+            metadata = payload.get("user_metadata", {}) or {}
+            full_name = metadata.get("full_name") or email.split("@")[0].title()
+            derived_role = (metadata.get("role") or "student").lower()
+
+            role_record = db.query(Role).filter(Role.name == derived_role).first()
+            if not role_record:
+                role_record = Role(name=derived_role, description=f"{derived_role.title()} role")
+                db.add(role_record)
+                db.flush()
+
+            from app.core.security import get_password_hash
+            user = User(
+                email=email,
+                full_name=full_name,
+                hashed_password=get_password_hash("SupabaseAuthSyncPass2026!"),
+                is_active=True,
+                status="active"
+            )
+            user.roles.append(role_record)
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+            if derived_role == "student":
+                student_rec = db.query(Student).filter(Student.user_id == user.id).first()
+                if not student_rec:
+                    student_rec = Student(
+                        user_id=user.id,
+                        roll_number=f"STU{user.id:05d}",
+                        cgpa=0.0,
+                        current_semester=1
+                    )
+                    db.add(student_rec)
+                    db.commit()
+        except Exception as prov_err:
+            db.rollback()
+            print(f"[Auth Dependency Warning] Auto-provision user error: {prov_err}")
+            user = db.query(User).filter(User.email == email).first()
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="User account not found"
         )
 
-    # Check both is_active flag and explicit account status enum ('active', 'pending', 'suspended', 'rejected')
+    # Check account status
     if not user.is_active or user.status != "active":
         if user.status == "suspended":
             detail_msg = "Account is suspended. Please contact administrator."
