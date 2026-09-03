@@ -204,30 +204,6 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-800 space-y-2">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Demo Quick Access Accounts:</span>
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                { label: 'Bhagath (Student)', email: 'bhagath.student@campus.edu', pass: 'bhagath123' },
-                { label: 'Rahul (Student)', email: 'rahul.student@campus.edu', pass: 'rahul123' },
-                { label: 'Faculty', email: 'arun.faculty@campus.edu', pass: 'arun123' }
-              ].map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => {
-                    setEmail(acc.email);
-                    setPassword(acc.pass);
-                    setErrorMsg('');
-                  }}
-                  className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-slate-800/80 hover:bg-slate-800 text-indigo-300 hover:text-indigo-200 border border-slate-700/60 transition-all"
-                >
-                  {acc.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <p className="mt-8 text-center text-xs sm:text-sm font-medium text-slate-400">
             Don't have an account?{' '}
             <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-semibold hover:underline">
