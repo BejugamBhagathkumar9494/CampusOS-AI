@@ -19,7 +19,11 @@ export default function AIAssistant() {
   const [showHistorySidebar, setShowHistorySidebar] = useState(false);
 
   // Default mode (LLM, RAG, or SUBJECT_RAG)
-  const [mode, setMode] = useState(() => localStorage.getItem('campusos_ai_mode') || 'llm');
+  const isStudent = profile?.role === 'student';
+  const [mode, setMode] = useState(() => {
+    const saved = localStorage.getItem('campusos_ai_mode') || 'llm';
+    return (saved === 'subject_rag' && profile?.role !== 'student') ? 'llm' : saved;
+  });
   const [studyCollections, setStudyCollections] = useState<StudyCollection[]>([]);
   const [selectedColId, setSelectedColId] = useState<string>('');
   const [inputValue, setInputValue] = useState('');
@@ -29,6 +33,14 @@ export default function AIAssistant() {
 
   useEffect(() => {
     async function loadCollections() {
+      if (!isStudent) {
+        setStudyCollections([]);
+        if (mode === 'subject_rag') {
+          setMode('llm');
+          localStorage.setItem('campusos_ai_mode', 'llm');
+        }
+        return;
+      }
       try {
         const cols = await examPrepService.getCollections();
         setStudyCollections(cols || []);
@@ -40,7 +52,7 @@ export default function AIAssistant() {
       }
     }
     loadCollections();
-  }, [profile?.id]);
+  }, [profile?.id, isStudent]);
 
   // 1. Initialize a brand-new AI chat session on login/mount as per specification
   const startNewChatSession = async () => {
