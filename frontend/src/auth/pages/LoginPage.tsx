@@ -202,8 +202,7 @@ export const LoginPage: React.FC = () => {
               {[
                 { label: 'Bhagath (Student)', email: 'bhagath.student@campus.edu', pass: 'bhagath123' },
                 { label: 'Rahul (Student)', email: 'rahul.student@campus.edu', pass: 'rahul123' },
-                { label: 'Faculty', email: 'arun.faculty@campus.edu', pass: 'arun123' },
-                { label: 'Super Admin', email: 'superadmin@campus.edu', pass: 'superadmin123' }
+                { label: 'Faculty', email: 'arun.faculty@campus.edu', pass: 'arun123' }
               ].map((acc) => (
                 <button
                   key={acc.email}
