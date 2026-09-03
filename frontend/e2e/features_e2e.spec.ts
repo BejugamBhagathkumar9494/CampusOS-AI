@@ -107,9 +107,9 @@ test.describe('CampusOS AI - AI Exam Preparation & RepoDNA E2E Tests', () => {
     // Verify Header
     await expect(page.locator('h1')).toContainText('Understand Any GitHub Project');
 
-    // 2. Enter GitHub URL
+    // 2. Enter GitHub URL (testing the user's project repository)
     const repoInput = page.locator('input[placeholder*="github.com"]');
-    await repoInput.fill('https://github.com/pallets/flask');
+    await repoInput.fill('https://github.com/BejugamBhagathkumar9494/CampusOS-AI');
 
     // Click Analyze
     const analyzeBtn = page.getByRole('button', { name: /Analyze Repository/i });

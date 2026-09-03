@@ -36,7 +36,17 @@ export async function fetchWithAuth<T = any>(endpoint: string, options: RequestI
   });
 
   if (!response.ok) {
-    throw new Error(`API Error ${response.status}: ${response.statusText}`);
+    let errorDetail = response.statusText || '';
+    try {
+      const errJson = await response.json();
+      errorDetail = errJson.detail || errJson.message || JSON.stringify(errJson);
+    } catch {
+      try {
+        const text = await response.text();
+        if (text) errorDetail = text;
+      } catch {}
+    }
+    throw new Error(`API Error ${response.status}: ${errorDetail || 'Request failed'}`);
   }
 
   return response.json();
