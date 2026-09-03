@@ -915,16 +915,16 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                   e.stopPropagation();
                   setSelectedNode(node);
                 }}
-                className={`interactive-node cursor-pointer transition-transform duration-200 ${
+                className={`interactive-node cursor-pointer group transition-opacity duration-200 ${
                   isDimmed ? 'opacity-20' : 'opacity-100'
-                } hover:scale-110`}
+                }`}
               >
-                {/* Node Outer Halo / Pulsator */}
+                {/* Node Outer Halo / Pulsator (pointer-events none to prevent hover jitter) */}
                 {isRoot && (
                   <circle
-                    r="50"
+                    r="52"
                     fill={node.color}
-                    className="opacity-20 animate-ping"
+                    className="opacity-25 pointer-events-none"
                   />
                 )}
                 {isSelected && (
@@ -932,19 +932,20 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                     r={radius + 8}
                     fill="none"
                     stroke="#ffffff"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                     strokeDasharray="4 2"
-                    className="animate-spin-slow"
+                    className="pointer-events-none"
                   />
                 )}
 
-                {/* Node Bubble */}
+                {/* Node Bubble with Smooth Brightness Glow on Hover (No Jitter) */}
                 <circle
                   r={radius}
                   fill={node.bgColor}
-                  stroke={node.borderColor}
+                  stroke={isSelected ? '#ffffff' : node.borderColor}
                   strokeWidth={isRoot ? '3.5' : isBranch ? '2.8' : '2'}
-                  style={{ filter: `drop-shadow(0 0 14px ${node.color}66)` }}
+                  className="transition-all duration-200 group-hover:brightness-135 group-hover:stroke-white"
+                  style={{ filter: `drop-shadow(0 0 ${isSelected ? '18px' : '10px'} ${node.color}88)` }}
                 />
 
                 {/* Node Icon */}
@@ -960,9 +961,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                 {/* Expand/Collapse Badge on Branch Nodes */}
                 {isBranch && node.children && node.children.length > 0 && (
                   <g
-                    transform={`translate(${radius - 4}, ${-radius + 4})`}
+                    transform={`translate(${radius - 3}, ${-radius + 3})`}
                     onClick={(e) => toggleExpand(node.id, e)}
-                    className="cursor-pointer hover:scale-125 transition-transform"
+                    className="cursor-pointer hover:opacity-80 transition-opacity"
                   >
                     <circle r="8" fill="#1e293b" stroke={node.borderColor} strokeWidth="1.5" />
                     <text
@@ -971,14 +972,15 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                       fill="#ffffff"
                       fontSize="9"
                       fontWeight="bold"
+                      className="pointer-events-none select-none"
                     >
                       {node.isExpanded ? '−' : '+'}
                     </text>
                   </g>
                 )}
 
-                {/* Node Label Card */}
-                <g transform={`translate(0, ${radius + 14})`}>
+                {/* Node Label Card (pointer-events none) */}
+                <g transform={`translate(0, ${radius + 14})`} className="pointer-events-none">
                   <rect
                     x={-Math.min(90, (node.name.length * 4.2) + 12)}
                     y="-10"
@@ -988,7 +990,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                     fill="#090d16"
                     stroke={isSelected ? '#ffffff' : '#334155'}
                     strokeWidth="1"
-                    className="opacity-90 drop-shadow-md"
+                    className="opacity-95 drop-shadow-md group-hover:stroke-indigo-400 transition-colors"
                   />
                   <text
                     textAnchor="middle"
@@ -996,7 +998,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                     fill={isSelected ? '#ffffff' : '#e2e8f0'}
                     fontSize={isRoot ? '12' : isBranch ? '11' : '10'}
                     fontWeight={isRoot ? '800' : isBranch ? '700' : '600'}
-                    className="pointer-events-none drop-shadow-sm"
+                    className="select-none drop-shadow-sm"
                   >
                     {node.name.length > 24 ? `${node.name.slice(0, 22)}...` : node.name}
                   </text>
