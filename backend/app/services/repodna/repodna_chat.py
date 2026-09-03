@@ -49,9 +49,21 @@ def answer_repository_query(
     try:
         api_key = resolve_gemini_api_key()
         if api_key:
-            answer_text = call_gemini_llm(prompt, system_instruction=REPODNA_SYSTEM_INSTRUCTION)
+            full_prompt = f"{REPODNA_SYSTEM_INSTRUCTION}\n\n{prompt}"
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as pool:
+                        answer_text = pool.submit(asyncio.run, call_gemini_llm(full_prompt)).result()
+                else:
+                    answer_text = asyncio.run(call_gemini_llm(full_prompt))
+            except Exception:
+                from app.services.exam_prep.generator import call_gemini_prompt
+                answer_text = asyncio.run(call_gemini_prompt(full_prompt))
     except Exception as e:
-        print(f"[RepoDNA Chat] LLM query error: {e}")
+        print(f"[RepoDNA Chat] LLM query warning: {e}")
 
     if not answer_text or not answer_text.strip():
         # Fallback to direct chunk quote

@@ -212,11 +212,25 @@ def analyze_repository_pipeline(
     try:
         api_key = resolve_gemini_api_key()
         if api_key:
-            response_text = call_gemini_llm(prompt, system_instruction=REPODNA_SYSTEM_INSTRUCTION)
+            full_prompt = f"{REPODNA_SYSTEM_INSTRUCTION}\n\n{prompt}"
+            # Use call_gemini_llm (async or sync)
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as pool:
+                        response_text = pool.submit(asyncio.run, call_gemini_llm(full_prompt)).result()
+                else:
+                    response_text = asyncio.run(call_gemini_llm(full_prompt))
+            except Exception:
+                from app.services.exam_prep.generator import call_gemini_prompt
+                response_text = asyncio.run(call_gemini_prompt(full_prompt))
+
             cleaned = clean_json_text(response_text)
             analysis_data = json.loads(cleaned)
     except Exception as llm_err:
-        print(f"[RepoDNA Generator] LLM generation error: {llm_err}. Using deterministic fallback.")
+        print(f"[RepoDNA Generator] LLM generation warning: {llm_err}. Using deterministic fallback.")
 
     if not analysis_data or not isinstance(analysis_data, dict):
         analysis_data = build_fallback_analysis(repository, detected_tech, file_metadata_map, tree_structure)

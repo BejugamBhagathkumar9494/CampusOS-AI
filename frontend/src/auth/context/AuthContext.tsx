@@ -96,10 +96,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_IN') {
           if (session?.user) {
-            setLoading(true);
             await fetchProfileAndSetState(session.user);
+          }
+        } else if (event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            // Refresh in background without setting full-page loading spinner
+            setUser(session.user);
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
