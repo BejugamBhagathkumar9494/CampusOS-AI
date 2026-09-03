@@ -340,16 +340,18 @@ export default function AIAssistant() {
               <span className="hidden sm:inline">📚 Campus RAG</span>
               <span className="sm:hidden">Campus</span>
             </button>
-            <button
-              onClick={() => setMode('subject_rag')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mode === 'subject_rag' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">🎓 My Subject Notes</span>
-              <span className="sm:hidden">Notes</span>
-            </button>
+            {profile?.role === 'student' && (
+              <button
+                onClick={() => setMode('subject_rag')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  mode === 'subject_rag' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="hidden sm:inline">🎓 My Subject Notes</span>
+                <span className="sm:hidden">Notes</span>
+              </button>
+            )}
           </div>
 
           {/* Subject Dropdown when in Subject RAG Mode */}

@@ -22,13 +22,18 @@ export default function Dashboard() {
       return <FacultyDashboard name={name} profileId={profile?.id} />;
     case 'admin':
       return <AdminDashboard name={name} />;
+    case 'super_admin':
+      return <SuperAdminDashboard name={name} />;
     case 'hostel_warden':
       return <HostelWardenDashboard name={name} />;
     case 'placement_officer':
       return <PlacementOfficerDashboard name={name} />;
+    case 'librarian':
+      return <LibrarianDashboard name={name} />;
     case 'student':
-    default:
       return <StudentDashboard name={name} profileId={profile?.id} />;
+    default:
+      return <AdminDashboard name={name} />;
   }
 }
 
@@ -977,6 +982,110 @@ function AdminDashboard({ name }: { name?: string }) {
           <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
             <AlertTriangle className="w-5 h-5" />
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SuperAdminDashboard({ name }: { name?: string }) {
+  return (
+    <div className="space-y-7 animate-fade-in font-sans pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-950 via-indigo-950 to-purple-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+        <div className="space-y-2 max-w-xl z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30">
+            <ShieldCheck className="w-3.5 h-3.5 text-purple-400" /> Super Admin Global Control
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-white">{name}</span> 👑
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+            Full system governance, institutional user & role control, database security, and audit logs.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 z-10">
+          <Link
+            to="/super-admin/users"
+            className="px-5 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2"
+          >
+            <Users className="w-4 h-4" /> User & Role Governance
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Users</span>
+            <span className="text-2xl font-extrabold text-purple-600">512</span>
+            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Across All Roles</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+            <Users className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Members</span>
+            <span className="text-2xl font-extrabold text-indigo-600">32</span>
+            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Active Staff</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+            <BookOpen className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">System Health</span>
+            <span className="text-2xl font-extrabold text-emerald-600">99.9%</span>
+            <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">FastAPI & DB Live</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+            <Activity className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Security Audits</span>
+            <span className="text-2xl font-extrabold text-slate-900">0</span>
+            <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">No Active Alerts</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-50 text-slate-600">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LibrarianDashboard({ name }: { name?: string }) {
+  return (
+    <div className="space-y-7 animate-fade-in font-sans pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+        <div className="space-y-2 max-w-xl z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> Library Operations
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Library Desk, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 📚
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+            Manage catalog records, issue/return textbooks, and track student lending history.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 z-10">
+          <Link
+            to="/library/library"
+            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+          >
+            <BookOpen className="w-4 h-4" /> Open Library Catalog
+          </Link>
         </div>
       </div>
     </div>
