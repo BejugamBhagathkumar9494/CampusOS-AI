@@ -20,23 +20,81 @@ def get_all_users(
     db: Session = Depends(get_db),
     current_user: User = Depends(check_role(["admin", "super_admin"]))
 ):
-    """Retrieve campus users with optional status and role filters."""
-    query = db.query(Profile)
-    if status_filter:
-        query = query.filter(Profile.status == status_filter.lower())
-    if role_filter:
-        query = query.filter(Profile.role == role_filter.lower())
-    
-    profiles = query.all()
-    return [{
-        "id": p.id,
-        "full_name": p.full_name,
-        "email": p.email,
-        "role": p.role,
-        "institution_id": p.institution_id,
-        "status": p.status,
-        "created_at": p.created_at
-    } for p in profiles]
+    """Retrieve campus users with real-time status, role filters, and last login timestamp."""
+    # Query all users from User table
+    users = db.query(User).all()
+    user_map = {u.email.lower(): u for u in users}
+
+    # Query all profiles
+    profiles = db.query(Profile).all()
+    profile_map = {p.email.lower(): p for p in profiles}
+
+    # Query latest LOGIN audit logs for each user
+    latest_logins = {}
+    audit_logs = db.query(AuditLog).filter(AuditLog.action == "LOGIN").order_by(AuditLog.timestamp.desc()).all()
+    for log in audit_logs:
+        actor_id = log.actor_user_id
+        target_id = log.target_user_id
+        email_in_meta = None
+        if log.metadata_json:
+            try:
+                meta = json.loads(log.metadata_json)
+                email_in_meta = meta.get("email", "").lower()
+            except Exception:
+                pass
+
+        if email_in_meta and email_in_meta not in latest_logins:
+            latest_logins[email_in_meta] = log.timestamp
+        if actor_id and actor_id not in latest_logins:
+            latest_logins[actor_id] = log.timestamp
+        if target_id and target_id not in latest_logins:
+            latest_logins[target_id] = log.timestamp
+
+    # Collect unique emails
+    all_emails = set(user_map.keys()).union(set(profile_map.keys()))
+
+    result = []
+    for email in all_emails:
+        u = user_map.get(email)
+        p = profile_map.get(email)
+
+        user_id = str(u.id) if u else (p.id if p else email)
+        full_name = u.full_name if u else (p.full_name if p else email.split("@")[0].title())
+        inst_id = (u.institution_id if u else None) or (p.institution_id if p else None) or "N/A"
+
+        # Determine role
+        role = "student"
+        if u and u.roles:
+            role = u.roles[0].name.lower()
+        elif p and p.role:
+            role = p.role.lower()
+
+        status_val = (u.status if u else (p.status if p else "active")).lower()
+        created_at = (u.created_at if u else (p.created_at if p else None))
+
+        # Determine last login
+        last_login = latest_logins.get(email) or latest_logins.get(user_id) or (u.updated_at if u else None)
+
+        if status_filter and status_filter.lower() != "all" and status_val != status_filter.lower():
+            continue
+        if role_filter and role_filter.lower() != "all" and role != role_filter.lower():
+            continue
+
+        result.append({
+            "id": user_id,
+            "full_name": full_name,
+            "email": email,
+            "role": role,
+            "institution_id": inst_id,
+            "status": status_val,
+            "is_active": u.is_active if u else (status_val == "active"),
+            "created_at": created_at.isoformat() if created_at else None,
+            "last_login": last_login.isoformat() if last_login else None
+        })
+
+    # Sort so most recent / latest activity appears first
+    result.sort(key=lambda x: x.get("last_login") or x.get("created_at") or "", reverse=True)
+    return result
 
 
 @router.patch("/users/{user_id}/status")

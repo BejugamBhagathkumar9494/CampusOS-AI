@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
+from datetime import datetime
 import json
 
 from app.core.config import settings
@@ -207,6 +208,62 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
                 prof.role = "super_admin"
             db.commit()
 
+    # Auto-provision pre-authorized / demo users if not present in DB
+    if not user:
+        demo_accounts = {
+            "bhagath.student@campus.edu": ("Bhagath Kumar", "student", "STU003", "bhagath123"),
+            "rahul.student@campus.edu": ("Rahul Kumar", "student", "STU001", "rahul123"),
+            "priya.student@campus.edu": ("Priya Kumar", "student", "STU002", "priya123"),
+            "arun.faculty@campus.edu": ("Dr. Arun Kumar", "faculty", "FAC001", "arun123"),
+            "ramesh.warden@campus.edu": ("Ramesh Kumar", "hostel_warden", "WAR001", "ramesh123"),
+            "suresh.placement@campus.edu": ("Suresh Kumar", "placement_officer", "PO001", "suresh123"),
+            "admin1@campus.edu": ("Admin One", "admin", "ADM001", "admin123"),
+        }
+        if email_clean in demo_accounts:
+            name, role_name, inst_id, demo_pass = demo_accounts[email_clean]
+            if form_data.password == demo_pass:
+                db_role = db.query(Role).filter(Role.name == role_name).first()
+                if not db_role:
+                    db_role = Role(name=role_name, description=f"{role_name} role")
+                    db.add(db_role)
+                    db.commit()
+                    db.refresh(db_role)
+
+                user = User(
+                    email=email_clean,
+                    hashed_password=get_password_hash(demo_pass),
+                    full_name=name,
+                    institution_id=inst_id,
+                    status="active",
+                    is_active=True
+                )
+                user.roles.append(db_role)
+                db.add(user)
+                db.flush()
+
+                prof = Profile(
+                    id=str(user.id),
+                    auth_user_id=str(user.id),
+                    full_name=name,
+                    email=email_clean,
+                    role=role_name,
+                    institution_id=inst_id,
+                    status="active",
+                    email_verified=True
+                )
+                db.add(prof)
+
+                if role_name == "student":
+                    stu = Student(
+                        user_id=user.id,
+                        roll_number=inst_id,
+                        cgpa=8.5,
+                        current_semester=5
+                    )
+                    db.add(stu)
+                db.commit()
+                db.refresh(user)
+
     # First-time login auto-request flow if user does not exist in DB yet
     if not user:
         allowed_domains = ["@campus.edu", "@campusos.edu"]
@@ -298,12 +355,31 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
             detail="Account is suspended. Please contact campus administrator."
         )
 
+    # Update activity and ensure profile exists
+    user.updated_at = datetime.utcnow()
+    roles = [r.name.lower() for r in user.roles]
+    primary_role = roles[0] if roles else "student"
+    
+    prof = db.query(Profile).filter(Profile.email == user.email).first()
+    if not prof:
+        prof = Profile(
+            id=str(user.id),
+            auth_user_id=str(user.id),
+            full_name=user.full_name,
+            email=user.email,
+            role=primary_role,
+            institution_id=user.institution_id,
+            status=user.status,
+            email_verified=True
+        )
+        db.add(prof)
+
     # Audit Logging: Log successful sign-in
     audit_entry = AuditLog(
         actor_user_id=str(user.id),
         action="LOGIN",
         target_user_id=str(user.id),
-        metadata_json=json.dumps({"email": user.email})
+        metadata_json=json.dumps({"email": user.email, "role": primary_role})
     )
     db.add(audit_entry)
     db.commit()
@@ -313,6 +389,77 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         "refresh_token": create_refresh_token(subject=user.email),
         "token_type": "bearer",
     }
+
+
+@router.post("/sync-login")
+def sync_login_record(
+    payload: dict = Body(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Ensure user details and login session are stored in the database.
+    Called on any user sign-in to guarantee real-time persistence.
+    """
+    email = payload.get("email", "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+        
+    full_name = payload.get("full_name") or email.split("@")[0].title()
+    role = (payload.get("role") or "student").lower()
+    institution_id = payload.get("institution_id")
+    
+    user = db.query(User).filter(User.email == email).first()
+    db_role = db.query(Role).filter(Role.name == role).first()
+    if not db_role:
+        db_role = Role(name=role, description=f"{role} role")
+        db.add(db_role)
+        db.commit()
+        db.refresh(db_role)
+        
+    if not user:
+        user = User(
+            email=email,
+            hashed_password=get_password_hash("default123"),
+            full_name=full_name,
+            institution_id=institution_id,
+            status="active",
+            is_active=True
+        )
+        user.roles.append(db_role)
+        db.add(user)
+        db.flush()
+    else:
+        user.updated_at = datetime.utcnow()
+        if db_role not in user.roles:
+            user.roles.append(db_role)
+            
+    prof = db.query(Profile).filter(Profile.email == email).first()
+    if not prof:
+        prof = Profile(
+            id=str(user.id),
+            auth_user_id=str(user.id),
+            full_name=full_name,
+            email=email,
+            role=role,
+            institution_id=institution_id,
+            status=user.status,
+            email_verified=True
+        )
+        db.add(prof)
+    else:
+        prof.full_name = full_name
+        prof.role = role
+        prof.status = user.status
+        
+    audit_entry = AuditLog(
+        actor_user_id=str(user.id),
+        action="LOGIN",
+        target_user_id=str(user.id),
+        metadata_json=json.dumps({"email": user.email, "role": role, "source": "sync"})
+    )
+    db.add(audit_entry)
+    db.commit()
+    return {"status": "success", "user_id": user.id, "email": email}
 
 
 @router.get("/me")

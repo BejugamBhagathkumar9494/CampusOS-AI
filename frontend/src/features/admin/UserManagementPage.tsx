@@ -55,10 +55,12 @@ export const UserManagementPage = () => {
   const [courseErr, setCourseErr] = useState('');
   const [submittingCourse, setSubmittingCourse] = useState(false);
 
+  const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
+
   const isSuperAdmin = profile?.role === 'super_admin';
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const fetchedUsers = await authService.fetchUsers();
       setUsers(fetchedUsers);
@@ -82,15 +84,66 @@ export const UserManagementPage = () => {
           }));
       }
       setFacultyList(faculties);
+      setLastSyncTime(new Date());
     } catch (err) {
       console.error('Error loading management data:', err);
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
+
+    // 1. Polling interval for continuous live updates
+    const pollInterval = setInterval(() => {
+      loadData(false);
+    }, 3500);
+
+    // 2. Cross-tab real-time event synchronization
+    let channel: BroadcastChannel | null = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('campusos_auth_sync');
+      channel.onmessage = () => {
+        loadData(false);
+      };
+    }
+
+    // 3. Storage event listener for cross-tab login detection
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'campusos_auth_event' || e.key === 'campusos_token' || e.key === 'campusos_mock_user') {
+        loadData(false);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // 4. Focus & visibility change listener
+    const handleFocus = () => {
+      if (!document.hidden) {
+        loadData(false);
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    // 5. Supabase Realtime channel if available
+    let supaChannel: any = null;
+    try {
+      supaChannel = supabase
+        .channel('admin-user-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => loadData(false))
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_logs' }, () => loadData(false))
+        .subscribe();
+    } catch (e) {}
+
+    return () => {
+      clearInterval(pollInterval);
+      if (channel) channel.close();
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+      if (supaChannel) supabase.removeChannel(supaChannel);
+    };
   }, []);
 
   const handleStatusChange = async (userId: any, newStatus: string) => {
@@ -258,6 +311,28 @@ export const UserManagementPage = () => {
     }
   };
 
+  const formatLastLogin = (lastLoginStr?: string | null) => {
+    if (!lastLoginStr) return { text: 'Never logged in', isRecent: false };
+    try {
+      const d = new Date(lastLoginStr);
+      if (isNaN(d.getTime())) return { text: 'Never', isRecent: false };
+      const diffMs = Date.now() - d.getTime();
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHours = Math.floor(diffMin / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffSec < 60) return { text: 'Just now (Active)', isRecent: true };
+      if (diffMin < 60) return { text: `${diffMin}m ago`, isRecent: true };
+      if (diffHours < 24) return { text: `${diffHours}h ago`, isRecent: false };
+      if (diffDays === 1) return { text: 'Yesterday', isRecent: false };
+      if (diffDays < 7) return { text: `${diffDays}d ago`, isRecent: false };
+      return { text: d.toLocaleDateString(), isRecent: false };
+    } catch {
+      return { text: 'Never', isRecent: false };
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -285,14 +360,23 @@ export const UserManagementPage = () => {
             Admin Control & Curriculum Management
           </h1>
           <p className="text-sm text-slate-500 font-medium mt-1">
-            Manage campus users, design semester subjects, assign faculty leads, and inspect security logs.
+            Manage campus users, design semester subjects, assign faculty leads, and inspect security logs in real-time.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-xs font-bold shadow-xs">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Live Sync Active</span>
+          </div>
+
           <button
-            onClick={loadData}
+            onClick={() => loadData(true)}
             className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold flex items-center gap-1.5 shadow-xs"
+            title="Force refresh data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -319,6 +403,28 @@ export const UserManagementPage = () => {
           )}
         </div>
       </div>
+
+      {/* User Statistics Row */}
+      {activeTab === 'users' && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Users</div>
+            <div className="text-2xl font-black text-slate-900 mt-1">{users.length}</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
+            <div className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Active Accounts</div>
+            <div className="text-2xl font-black text-emerald-700 mt-1">{users.filter(u => u.status === 'active').length}</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
+            <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Pending Approvals</div>
+            <div className="text-2xl font-black text-amber-700 mt-1">{users.filter(u => u.status === 'pending').length}</div>
+          </div>
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
+            <div className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Suspended / Other</div>
+            <div className="text-2xl font-black text-rose-700 mt-1">{users.filter(u => u.status !== 'active' && u.status !== 'pending').length}</div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-1">
         <button
@@ -396,94 +502,108 @@ export const UserManagementPage = () => {
                   <th className="py-3 px-4">Institution ID</th>
                   <th className="py-3 px-4">Role</th>
                   <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Last Activity / Login</th>
                   <th className="py-3 px-4">Created Date</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                 {filteredUsers.length > 0 ? (
-                  filteredUsers.map((u) => (
-                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <div>
-                          <p className="font-bold text-slate-900">{u.full_name}</p>
-                          <p className="text-[11px] text-slate-400">{u.email}</p>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-600 font-semibold">
-                        {u.institution_id || 'N/A'}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wide">
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold capitalize ${
-                            u.status === 'active'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : u.status === 'pending'
-                              ? 'bg-amber-100 text-amber-700'
-                              : u.status === 'suspended'
-                              ? 'bg-rose-100 text-rose-700'
-                              : 'bg-slate-200 text-slate-600'
-                          }`}
-                        >
-                          {u.status}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
-                        {new Date(u.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                          {u.status !== 'active' && (
-                            <button
-                              onClick={() => handleStatusChange(u.id, 'active')}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
-                              title="Accept / Approve User"
-                            >
-                              <UserCheck className="w-3.5 h-3.5" /> Accept
-                            </button>
-                          )}
+                  filteredUsers.map((u) => {
+                    const loginInfo = formatLastLogin(u.last_login);
+                    return (
+                      <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div>
+                            <p className="font-bold text-slate-900">{u.full_name}</p>
+                            <p className="text-[11px] text-slate-400">{u.email}</p>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 font-semibold">
+                          {u.institution_id || 'N/A'}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wide">
+                            {u.role}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold capitalize ${
+                              u.status === 'active'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : u.status === 'pending'
+                                ? 'bg-amber-100 text-amber-700'
+                                : u.status === 'suspended'
+                                ? 'bg-rose-100 text-rose-700'
+                                : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {u.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-1.5">
+                            {loginInfo.isRecent && (
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            )}
+                            <span className={`text-[11px] font-semibold ${loginInfo.isRecent ? 'text-emerald-700 font-bold' : 'text-slate-500'}`}>
+                              {loginInfo.text}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                          {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                            {u.status !== 'active' && (
+                              <button
+                                onClick={() => handleStatusChange(u.id, 'active')}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                                title="Accept / Approve User"
+                              >
+                                <UserCheck className="w-3.5 h-3.5" /> Accept
+                              </button>
+                            )}
 
-                          {u.status !== 'rejected' && u.role !== 'super_admin' && (
-                            <button
-                              onClick={() => handleStatusChange(u.id, 'rejected')}
-                              className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
-                              title="Reject User"
-                            >
-                              <UserX className="w-3.5 h-3.5" /> Reject
-                            </button>
-                          )}
+                            {u.status !== 'rejected' && u.role !== 'super_admin' && (
+                              <button
+                                onClick={() => handleStatusChange(u.id, 'rejected')}
+                                className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                                title="Reject User"
+                              >
+                                <UserX className="w-3.5 h-3.5" /> Reject
+                              </button>
+                            )}
 
-                          {u.status === 'active' && u.role !== 'super_admin' && (
-                            <button
-                              onClick={() => handleStatusChange(u.id, 'suspended')}
-                              className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] transition-colors"
-                              title="Suspend User"
-                            >
-                              Suspend
-                            </button>
-                          )}
+                            {u.status === 'active' && u.role !== 'super_admin' && (
+                              <button
+                                onClick={() => handleStatusChange(u.id, 'suspended')}
+                                className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] transition-colors"
+                                title="Suspend User"
+                              >
+                                Suspend
+                              </button>
+                            )}
 
-                          {(u.role !== 'super_admin' || isSuperAdmin) && String(u.id) !== String(profile?.id) && u.email !== profile?.email && (
-                            <button
-                              onClick={() => handleDeleteUser(u.id, u.full_name)}
-                              className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-bold text-[11px] flex items-center gap-1 transition-colors"
-                              title="Remove User from Database"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-rose-500" /> Remove
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                            {(u.role !== 'super_admin' || isSuperAdmin) && String(u.id) !== String(profile?.id) && u.email !== profile?.email && (
+                              <button
+                                onClick={() => handleDeleteUser(u.id, u.full_name)}
+                                className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                                title="Remove User from Database"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-rose-500" /> Remove
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
+                    <td colSpan={7} className="py-8 text-center text-slate-400 font-medium">
                       No matching user accounts found.
                     </td>
                   </tr>

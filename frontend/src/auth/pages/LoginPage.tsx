@@ -127,15 +127,23 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {infoMsg && !errorMsg && (
-            <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-medium animate-fade-in">
-              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
+            <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium animate-fade-in">
+              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-400" />
               <span>{infoMsg}</span>
             </div>
           )}
 
           {errorMsg && (
-            <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium animate-fade-in">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className={`mb-6 flex items-start gap-2.5 p-4 rounded-xl text-sm font-medium animate-fade-in ${
+              errorMsg.toLowerCase().includes('pending superadmin approval') || errorMsg.toLowerCase().includes('successfully sent')
+                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+            }`}>
+              {errorMsg.toLowerCase().includes('pending superadmin approval') || errorMsg.toLowerCase().includes('successfully sent') ? (
+                <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-400" />
+              ) : (
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-400" />
+              )}
               <span>{errorMsg}</span>
             </div>
           )}

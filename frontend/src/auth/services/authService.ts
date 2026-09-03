@@ -2,6 +2,18 @@ import { supabase } from '../../services/supabaseClient';
 import { getApiBaseUrl } from '../../services/api';
 import { UserProfile, UserRole, UserStatus, AuditLog } from '../../types';
 
+export const broadcastAuthEvent = (data: any) => {
+  try {
+    if (typeof window !== 'undefined') {
+      if ('BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('campusos_auth_sync');
+        channel.postMessage(data);
+      }
+      localStorage.setItem('campusos_auth_event', JSON.stringify({ ...data, _ts: Date.now() }));
+    }
+  } catch (e) {}
+};
+
 export const authService = {
   async getProfile(userId: string): Promise<UserProfile | null> {
     if (userId && userId !== 'me' && userId !== 'current_token_user') {
@@ -119,6 +131,7 @@ export const authService = {
   },
 
   async signIn(email: string, password: string): Promise<any> {
+    const API_URL = getApiBaseUrl();
     let supaErrorMsg: string | null = null;
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -129,6 +142,20 @@ export const authService = {
       if (!error && data?.session) {
         localStorage.removeItem('campusos_token');
         localStorage.removeItem('campusos_mock_user');
+        
+        // Sync login to database in background
+        fetch(`${API_URL}/auth/sync-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            full_name: data.user?.user_metadata?.full_name,
+            role: data.user?.user_metadata?.role || 'student',
+            institution_id: data.user?.user_metadata?.institution_id
+          })
+        }).catch(() => {});
+
+        broadcastAuthEvent({ type: 'LOGIN', email, timestamp: new Date().toISOString() });
         return data;
       }
       if (error) {
@@ -139,7 +166,6 @@ export const authService = {
       console.warn('Supabase auth failed, trying backend API login fallback:', supaErr);
     }
 
-    const API_URL = getApiBaseUrl();
     const params = new URLSearchParams();
     params.append('username', email);
     params.append('password', password);
@@ -157,6 +183,7 @@ export const authService = {
           localStorage.setItem('campusos_token', tokenData.access_token);
           localStorage.removeItem('campusos_mock_user');
         }
+        broadcastAuthEvent({ type: 'LOGIN', email, timestamp: new Date().toISOString() });
         return tokenData;
       }
 
@@ -209,6 +236,20 @@ export const authService = {
         };
         localStorage.setItem('campusos_mock_user', JSON.stringify(mockProfile));
         localStorage.setItem('campusos_token', 'demo-local-access-token');
+        
+        // Background sync to DB
+        fetch(`${API_URL}/auth/sync-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            full_name: matched.name,
+            role: matched.role,
+            institution_id: 'DEMO001'
+          })
+        }).catch(() => {});
+
+        broadcastAuthEvent({ type: 'LOGIN', email, timestamp: new Date().toISOString() });
         return { access_token: 'demo-local-access-token', token_type: 'bearer' };
       }
 
@@ -324,6 +365,7 @@ export const authService = {
       localStorage.setItem('campusos_token', 'demo-local-access-token');
     }
 
+    broadcastAuthEvent({ type: 'SIGNUP', email, timestamp: new Date().toISOString() });
     return supaData || { user: { email } };
   },
 
@@ -355,6 +397,8 @@ export const authService = {
     } catch (supaErr) {
       console.warn('Supabase status update warning:', supaErr);
     }
+
+    broadcastAuthEvent({ type: 'STATUS_UPDATED', userId, newStatus, timestamp: new Date().toISOString() });
   },
 
   async deleteUser(userId: string): Promise<boolean> {
@@ -390,6 +434,7 @@ export const authService = {
       }
     } catch (e) {}
 
+    broadcastAuthEvent({ type: 'USER_DELETED', userId, timestamp: new Date().toISOString() });
     return true;
   },
 
@@ -435,7 +480,9 @@ export const authService = {
           institution_id: u.institution_id,
           status: u.status,
           created_at: u.created_at || new Date().toISOString(),
-          updated_at: u.updated_at || new Date().toISOString()
+          updated_at: u.updated_at || new Date().toISOString(),
+          last_login: u.last_login || u.updated_at || u.created_at || null,
+          is_active: u.is_active !== undefined ? u.is_active : (u.status === 'active')
         }));
       }
     } catch (apiErr) {}

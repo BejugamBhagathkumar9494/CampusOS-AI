@@ -21,6 +21,8 @@ export interface UserProfile {
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;
+  last_login?: string;
+  is_active?: boolean;
 }
 
 export interface AuthContextType {

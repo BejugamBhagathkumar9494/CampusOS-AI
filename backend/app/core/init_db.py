@@ -75,6 +75,7 @@ def init_db():
         authorized_records = [
             {"institution_id": "STU001", "email": "rahul.student@campus.edu", "full_name": "Rahul Kumar", "role": "student"},
             {"institution_id": "STU002", "email": "priya.student@campus.edu", "full_name": "Priya Kumar", "role": "student"},
+            {"institution_id": "STU003", "email": "bhagath.student@campus.edu", "full_name": "Bhagath Kumar", "role": "student"},
             {"institution_id": "FAC001", "email": "arun.faculty@campus.edu", "full_name": "Dr. Arun Kumar", "role": "faculty"},
             {"institution_id": "FAC002", "email": "meena.faculty@campus.edu", "full_name": "Dr. Meena Kumar", "role": "faculty"},
             {"institution_id": "WAR001", "email": "ramesh.warden@campus.edu", "full_name": "Ramesh Kumar", "role": "hostel_warden"},

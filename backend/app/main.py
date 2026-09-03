@@ -36,8 +36,10 @@ async def lifespan(app: FastAPI):
         from app.core.database import Base, engine
         import app.models.database_models
         Base.metadata.create_all(bind=engine)
+        from app.core.init_db import init_db
+        init_db()
     except Exception as db_init_err:
-        print(f"[CampusOS AI Startup Warning] Table creation warning: {db_init_err}")
+        print(f"[CampusOS AI Startup Warning] Database init warning: {db_init_err}")
 
     try:
         asyncio.create_task(asyncio.to_thread(init_rag_service))
