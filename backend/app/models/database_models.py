@@ -670,3 +670,97 @@ class GeneratedExamMaterial(Base):
     collection = relationship("StudyCollection", back_populates="materials")
 
 
+# ==============================================================================
+# REPODNA — AI-POWERED GITHUB REPOSITORY INTELLIGENCE MODELS
+# ==============================================================================
+
+class StudyRepository(Base):
+    __tablename__ = "study_repositories"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    github_url = Column(String(500), nullable=False)
+    owner = Column(String(150), nullable=False)
+    repo_name = Column(String(150), nullable=False)
+    default_branch = Column(String(100), default="main")
+    description = Column(Text, nullable=True)
+    stars_count = Column(Integer, default=0)
+    forks_count = Column(Integer, default=0)
+    primary_language = Column(String(100), default="Unknown")
+    commit_sha = Column(String(100), nullable=True)
+    file_count = Column(Integer, default=0)
+    status = Column(String(50), default="pending")  # pending, scanning, analyzed, failed
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")
+    files = relationship("RepositoryFile", back_populates="repository", cascade="all, delete-orphan")
+    chunks = relationship("RepositoryChunk", back_populates="repository", cascade="all, delete-orphan")
+    analysis = relationship("RepositoryAnalysis", uselist=False, back_populates="repository", cascade="all, delete-orphan")
+
+
+class RepositoryFile(Base):
+    __tablename__ = "repository_files"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    repository_id = Column(String(36), ForeignKey("study_repositories.id", ondelete="CASCADE"), nullable=False, index=True)
+    file_path = Column(String(500), nullable=False)
+    file_type = Column(String(50), default="source")  # controller, model, route, component, service, config, manifest
+    language = Column(String(50), default="text")
+    file_size_bytes = Column(Integer, default=0)
+    purpose_summary = Column(Text, nullable=True)
+    content_excerpt = Column(Text, nullable=True)
+    content_hash = Column(String(64), nullable=True)
+    imports_json = Column(Text, nullable=True)
+    exports_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    repository = relationship("StudyRepository", back_populates="files")
+    chunks = relationship("RepositoryChunk", back_populates="file", cascade="all, delete-orphan")
+
+
+class RepositoryChunk(Base):
+    __tablename__ = "repository_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    repository_id = Column(String(36), ForeignKey("study_repositories.id", ondelete="CASCADE"), nullable=False, index=True)
+    file_id = Column(String(36), ForeignKey("repository_files.id", ondelete="CASCADE"), nullable=False, index=True)
+    file_path = Column(String(500), nullable=False)
+    chunk_index = Column(Integer, default=1)
+    content = Column(Text, nullable=False)
+    embedding = Column(Vector(1536), nullable=True)
+    metadata_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    repository = relationship("StudyRepository", back_populates="chunks")
+    file = relationship("RepositoryFile", back_populates="chunks")
+
+
+class RepositoryAnalysis(Base):
+    __tablename__ = "repository_analysis"
+
+    id = Column(Integer, primary_key=True, index=True)
+    repository_id = Column(String(36), ForeignKey("study_repositories.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
+    one_line_desc = Column(String(255), nullable=True)
+    short_summary = Column(Text, nullable=True)
+    detailed_overview = Column(Text, nullable=True)
+    beginner_explanation = Column(Text, nullable=True)
+    interview_pitch = Column(Text, nullable=True)
+    architecture_json = Column(Text, nullable=True)
+    tech_stack_json = Column(Text, nullable=True)
+    project_structure_json = Column(Text, nullable=True)
+    application_flows_json = Column(Text, nullable=True)
+    database_analysis_json = Column(Text, nullable=True)
+    api_analysis_json = Column(Text, nullable=True)
+    authentication_analysis_json = Column(Text, nullable=True)
+    project_health_json = Column(Text, nullable=True)
+    improvements_json = Column(Text, nullable=True)
+    interview_questions_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    repository = relationship("StudyRepository", back_populates="analysis")
+
+
+

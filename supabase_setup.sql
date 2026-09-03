@@ -807,6 +807,124 @@ CREATE POLICY "Users access own generated exam material" ON public.generated_exa
     );
 
 -- ==============================================================================
+-- 11. REPODNA — AI-POWERED GITHUB REPOSITORY INTELLIGENCE
+-- ==============================================================================
+
+-- Repositories Table
+CREATE TABLE IF NOT EXISTS public.study_repositories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    github_url TEXT NOT NULL,
+    owner TEXT NOT NULL,
+    repo_name TEXT NOT NULL,
+    default_branch TEXT DEFAULT 'main',
+    description TEXT,
+    stars_count INT DEFAULT 0,
+    forks_count INT DEFAULT 0,
+    primary_language TEXT DEFAULT 'Unknown',
+    commit_sha TEXT,
+    file_count INT DEFAULT 0,
+    status TEXT DEFAULT 'pending',
+    error_message TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Repository Files Table
+CREATE TABLE IF NOT EXISTS public.repository_files (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    repository_id UUID NOT NULL REFERENCES public.study_repositories(id) ON DELETE CASCADE,
+    file_path TEXT NOT NULL,
+    file_type TEXT DEFAULT 'source',
+    language TEXT DEFAULT 'text',
+    file_size_bytes INT DEFAULT 0,
+    purpose_summary TEXT,
+    content_excerpt TEXT,
+    content_hash TEXT,
+    imports_json JSONB DEFAULT '[]'::jsonb,
+    exports_json JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Repository Chunks Table
+CREATE TABLE IF NOT EXISTS public.repository_chunks (
+    id BIGSERIAL PRIMARY KEY,
+    repository_id UUID NOT NULL REFERENCES public.study_repositories(id) ON DELETE CASCADE,
+    file_id UUID NOT NULL REFERENCES public.repository_files(id) ON DELETE CASCADE,
+    file_path TEXT NOT NULL,
+    chunk_index INT DEFAULT 1,
+    content TEXT NOT NULL,
+    embedding vector(1536),
+    metadata_json JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Repository Analysis Report Table
+CREATE TABLE IF NOT EXISTS public.repository_analysis (
+    id BIGSERIAL PRIMARY KEY,
+    repository_id UUID NOT NULL UNIQUE REFERENCES public.study_repositories(id) ON DELETE CASCADE,
+    one_line_desc TEXT,
+    short_summary TEXT,
+    detailed_overview TEXT,
+    beginner_explanation TEXT,
+    interview_pitch TEXT,
+    architecture_json JSONB DEFAULT '{}'::jsonb,
+    tech_stack_json JSONB DEFAULT '{}'::jsonb,
+    project_structure_json JSONB DEFAULT '{}'::jsonb,
+    application_flows_json JSONB DEFAULT '[]'::jsonb,
+    database_analysis_json JSONB DEFAULT '{}'::jsonb,
+    api_analysis_json JSONB DEFAULT '[]'::jsonb,
+    authentication_analysis_json JSONB DEFAULT '{}'::jsonb,
+    project_health_json JSONB DEFAULT '{}'::jsonb,
+    improvements_json JSONB DEFAULT '[]'::jsonb,
+    interview_questions_json JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for Fast Scoped Retrieval
+CREATE INDEX IF NOT EXISTS idx_study_repos_user ON public.study_repositories(user_id);
+CREATE INDEX IF NOT EXISTS idx_repo_files_repo ON public.repository_files(repository_id);
+CREATE INDEX IF NOT EXISTS idx_repo_chunks_repo ON public.repository_chunks(repository_id);
+CREATE INDEX IF NOT EXISTS idx_repo_chunks_file ON public.repository_chunks(file_id);
+
+-- RLS for RepoDNA Tables (Strict Student Isolation)
+ALTER TABLE public.study_repositories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.repository_files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.repository_chunks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.repository_analysis ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users access own study repositories" ON public.study_repositories
+    FOR ALL USING (auth.uid() = user_id OR public.is_admin());
+
+CREATE POLICY "Users access own repository files" ON public.repository_files
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_repositories r
+            WHERE r.id = repository_files.repository_id
+            AND (r.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+CREATE POLICY "Users access own repository chunks" ON public.repository_chunks
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_repositories r
+            WHERE r.id = repository_chunks.repository_id
+            AND (r.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+CREATE POLICY "Users access own repository analysis" ON public.repository_analysis
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.study_repositories r
+            WHERE r.id = repository_analysis.repository_id
+            AND (r.user_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+-- ==============================================================================
 -- END OF MIGRATION SCRIPT
 -- ==============================================================================
 

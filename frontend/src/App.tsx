@@ -29,6 +29,7 @@ import AIInsights from './features/ai-insights/AIInsightsPage';
 import Settings from './features/settings/SettingsPage';
 import Profile from './features/profile/ProfilePage';
 import ExamPrepPage from './features/exam-prep/ExamPrepPage';
+import RepoDNAPage from './features/repodna/RepoDNAPage';
 import { UserRole } from './types';
 
 const DashboardRedirect: React.FC = () => {
@@ -89,6 +90,7 @@ export default function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="repodna" element={<RepoDNAPage />} />
                     <Route path="exam-prep" element={<ExamPrepPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="academics" element={<Academics />} />

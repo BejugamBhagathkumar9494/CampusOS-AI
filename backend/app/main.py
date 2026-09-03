@@ -19,6 +19,7 @@ from app.api.v1 import (
     academics,
     academics_extended,
     exam_prep,
+    repodna,
 )
 
 
@@ -86,6 +87,7 @@ app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(notifications.router, prefix=settings.API_V1_STR)
 app.include_router(academics_extended.router, prefix=f"{settings.API_V1_STR}/academic-ext")
 app.include_router(exam_prep.router, prefix=settings.API_V1_STR)
+app.include_router(repodna.router, prefix=f"{settings.API_V1_STR}/repodna", tags=["RepoDNA"])
 
 # Direct aliases for /api/chat/llm and /api/chat/rag as per specification
 from app.api.v1.ai import chat_llm_endpoint, chat_rag_endpoint, LLMChatRequest, RAGChatRequest
