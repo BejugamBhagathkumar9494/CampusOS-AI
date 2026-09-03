@@ -75,23 +75,35 @@ export default function ExamPrepPage() {
   const [isAiAnswering, setIsAiAnswering] = useState(false);
   const [aiAnswerResult, setAiAnswerResult] = useState<QuerySubjectResponse | null>(null);
 
-  // Load user collections on mount
+  // Load user collections on mount silently without screen flash
   useEffect(() => {
-    loadCollections();
+    let isMounted = true;
+    async function init() {
+      try {
+        const list = await examPrepService.getCollections();
+        if (isMounted) {
+          setCollections(list || []);
+          if (list && list.length > 0 && !selectedCollection) {
+            handleSelectCollection(list[0]);
+          }
+        }
+      } catch (err: any) {
+        console.warn('Silent collections load warning:', err);
+      }
+    }
+    init();
+    return () => { isMounted = false; };
   }, [profile?.id]);
 
   const loadCollections = async () => {
     try {
-      setIsLoading(true);
       const list = await examPrepService.getCollections();
       setCollections(list || []);
       if (list && list.length > 0 && !selectedCollection) {
         handleSelectCollection(list[0]);
       }
     } catch (err: any) {
-      console.error('Error loading collections:', err);
-    } finally {
-      setIsLoading(false);
+      console.warn('Error loading collections:', err);
     }
   };
 
@@ -127,7 +139,7 @@ export default function ExamPrepPage() {
       setActiveTab('upload');
       setStatusMessage({
         type: 'success',
-        text: `Created study collection for '${newCol.subject_name}'. Please upload your PDF notes now.`
+        text: `Created study collection for '${newCol.subject_name}'. Please upload your unit PDF notes now.`
       });
     } catch (err: any) {
       alert(`Failed to create collection: ${err.message}`);
@@ -140,14 +152,42 @@ export default function ExamPrepPage() {
     if (!selectedCollection) return;
     try {
       setIsUploading(true);
-      const res = await examPrepService.uploadPDFs(selectedCollection.id, files);
       setStatusMessage({
         type: 'success',
-        text: `Successfully processed ${res.files_uploaded_count} PDFs (${res.total_chunks_indexed} indexed chunks) for ${selectedCollection.subject_name}!`
+        text: `Uploading & chunking ${files.length} PDF notes into knowledge vector index...`
       });
-      // Refresh collection detail
+      const res = await examPrepService.uploadPDFs(selectedCollection.id, files);
+      
+      // Auto-generate complete exam prep suite (2-mark, 4-mark, 10-mark, summary & revision)
+      setIsGenerating(true);
+      setStatusMessage({
+        type: 'success',
+        text: `Uploaded ${res.files_uploaded_count} PDFs! AI is now generating 2-mark, 4-mark, 10-mark answers and chapter summaries...`
+      });
+      
+      try {
+        await examPrepService.generateExamNotes(selectedCollection.id);
+        const matRes = await examPrepService.getMaterials(selectedCollection.id);
+        if (matRes && matRes.materials) {
+          setMaterials(matRes.materials);
+        }
+        setStatusMessage({
+          type: 'success',
+          text: `Success! Complete exam preparation notes (2-mark, 4-mark, 10-mark, summary) generated for ${selectedCollection.subject_name}!`
+        });
+        setActiveTab('summary');
+      } catch (genErr) {
+        console.warn('Auto-generation warning:', genErr);
+        setStatusMessage({
+          type: 'success',
+          text: `Uploaded ${res.files_uploaded_count} PDFs (${res.total_chunks_indexed} indexed chunks)! Click 'Generate Exam Notes' to generate questions.`
+        });
+        setActiveTab('subjects');
+      } finally {
+        setIsGenerating(false);
+      }
+
       await handleSelectCollection(selectedCollection);
-      setActiveTab('subjects');
     } catch (err: any) {
       setStatusMessage({ type: 'error', text: err.message || 'Upload failed.' });
     } finally {

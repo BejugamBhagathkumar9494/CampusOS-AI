@@ -76,7 +76,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       isMounted = false;
       supabase.removeChannel(channel);
     };
-  }, [profile]);
+  }, [profile?.id]);
 
   const unreadCount = notifs.filter((n) => !n.is_read).length;
 

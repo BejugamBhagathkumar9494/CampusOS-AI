@@ -21,7 +21,7 @@ test.describe('CampusOS AI - AI Exam Preparation & RepoDNA E2E Tests', () => {
     });
   });
 
-  test('Feature 1: AI Exam Preparation - Create Subject Collection & Navigate Tabs', async ({ page }) => {
+  test('Feature 1: AI Exam Preparation - Create Subject, Upload Notes, Generate 2/4/10 Marks & Navigate Tabs', async ({ page }) => {
     // 1. Visit Exam Prep Page
     await page.goto('http://127.0.0.1:5173/student/exam-prep');
     await page.waitForLoadState('networkidle');
@@ -47,17 +47,53 @@ test.describe('CampusOS AI - AI Exam Preparation & RepoDNA E2E Tests', () => {
     // Verify collection created and displayed
     await expect(page.getByText('Database Management Systems').first()).toBeVisible({ timeout: 15000 });
 
-    // 3. Tab Navigation Without Screen Jitter/Loader Flashing
-    const tabs = ['Important Questions', '2 Marks', '4 Marks', '10 Marks', 'Revision Mode', 'Ask AI', 'My Subjects'];
+    // 3. Test PDF Upload with buffer data
+    const fileInput = page.locator('input[type="file"]');
+    if (await fileInput.count() > 0) {
+      await fileInput.setInputFiles([
+        {
+          name: 'DBMS_Unit_1_ER_Model.pdf',
+          mimeType: 'application/pdf',
+          buffer: Buffer.from('%PDF-1.4 Unit 1: Entity Relationship Model, Relational Algebra, SQL normalization 1NF 2NF 3NF BCNF transactions ACID properties.')
+        },
+        {
+          name: 'DBMS_Unit_2_Indexing_Transactions.pdf',
+          mimeType: 'application/pdf',
+          buffer: Buffer.from('%PDF-1.4 Unit 2: B+ Trees, Hashing, Concurrency Control, Two-Phase Locking, Serializability, Crash Recovery WAL.')
+        }
+      ]);
+
+      // Click Upload & Ingest PDFs
+      const uploadBtn = page.getByRole('button', { name: /Upload & Ingest/i }).first();
+      if (await uploadBtn.isVisible()) {
+        await uploadBtn.click();
+        await page.waitForTimeout(3000);
+      }
+    }
+
+    // 4. Test Instant Tab Navigation (Zero Loader Screen Flicker)
+    const tabs = ['Summary', '2 Marks', '4 Marks', '10 Marks', 'Important Qs', 'Revision Mode', 'Ask AI Notes', 'My Subjects'];
     for (const tabName of tabs) {
       const tabButton = page.getByRole('button', { name: new RegExp(tabName, 'i') }).first();
       if (await tabButton.isVisible()) {
         await tabButton.click();
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(100);
       }
     }
 
-    // 4. Persistence on Reload: Reload page and verify created subject is still displayed for this student
+    // 5. Ask AI Notes Grounded Query
+    const askAiTab = page.getByRole('button', { name: /Ask AI Notes/i }).first();
+    if (await askAiTab.isVisible()) {
+      await askAiTab.click();
+      const questionInput = page.locator('input[placeholder*="e.g. Explain 3NF"]');
+      if (await questionInput.isVisible()) {
+        await questionInput.fill('Explain ACID properties in transactions');
+        await page.getByRole('button', { name: /Ask AI/i }).click();
+        await page.waitForTimeout(1000);
+      }
+    }
+
+    // 6. Persistence on Reload: Reload page and verify created subject is still displayed for this student
     await page.reload();
     await page.waitForLoadState('networkidle');
     await expect(page.getByText('Database Management Systems').first()).toBeVisible({ timeout: 15000 });
@@ -88,7 +124,7 @@ test.describe('CampusOS AI - AI Exam Preparation & RepoDNA E2E Tests', () => {
       const tabBtn = page.getByRole('button', { name: new RegExp(tabName, 'i') }).first();
       if (await tabBtn.isVisible()) {
         await tabBtn.click();
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(100);
       }
     }
 

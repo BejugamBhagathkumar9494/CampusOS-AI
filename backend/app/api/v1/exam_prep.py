@@ -204,11 +204,13 @@ async def upload_multiple_study_pdfs(
 
     parsed_docs = []
     for file in files:
-        if not file.filename.lower().endswith(".pdf"):
+        if not file.filename:
             continue
 
         doc_id = str(uuid.uuid4())
         content_bytes = await file.read()
+        if not content_bytes:
+            continue
         
         parsed_doc = process_study_pdf(file.filename, content_bytes)
         parsed_doc["id"] = doc_id
@@ -216,7 +218,7 @@ async def upload_multiple_study_pdfs(
         parsed_docs.append(parsed_doc)
 
     if not parsed_docs:
-        raise HTTPException(status_code=400, detail="Please upload valid PDF files.")
+        raise HTTPException(status_code=400, detail="Please upload valid PDF or document study notes.")
 
     indexed_chunks = index_collection_documents(db, collection, parsed_docs)
 
