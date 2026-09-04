@@ -14,6 +14,7 @@ export interface AuthContextType {
   signUp: (email: string, pass: string, fullName: string, role: UserRole, institutionId?: string) => Promise<any>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  loginAsDemoStudent: () => Promise<UserProfile>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -167,6 +168,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginAsDemoStudent = async (): Promise<UserProfile> => {
+    setLoading(true);
+    try {
+      const demoProfile = await authService.loginAsDemoStudent();
+      const mockUser = {
+        id: demoProfile.id,
+        email: demoProfile.email,
+        user_metadata: {
+          full_name: demoProfile.full_name,
+          role: demoProfile.role,
+          institution_id: demoProfile.institution_id
+        },
+        created_at: demoProfile.created_at
+      };
+      setUser(mockUser);
+      setProfile(demoProfile);
+      return demoProfile;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const role = profile ? profile.role : null;
   const status = profile ? profile.status : 'active';
   const isAuthenticated = !!user;
@@ -184,6 +207,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         signUp,
         signOut,
         refreshProfile,
+        loginAsDemoStudent,
       }}
     >
       {children}

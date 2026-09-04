@@ -262,6 +262,23 @@ export const authService = {
     }
   },
 
+  async loginAsDemoStudent(): Promise<UserProfile> {
+    const demoStudent: UserProfile = {
+      id: '3',
+      full_name: 'Bhagath Kumar',
+      email: 'bhagath.student@campus.edu',
+      role: 'student',
+      institution_id: 'DEMO001',
+      status: 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    localStorage.setItem('campusos_mock_user', JSON.stringify(demoStudent));
+    localStorage.setItem('campusos_token', 'demo-local-access-token');
+    broadcastAuthEvent({ type: 'LOGIN', email: demoStudent.email, timestamp: new Date().toISOString() });
+    return demoStudent;
+  },
+
   async signUp(email: string, password: string, fullName: string, role: UserRole, institutionId?: string): Promise<any> {
     if (role === 'admin' || role === 'super_admin') {
       throw new Error('Administrative accounts cannot be created via public registration. Contact Super Admin.');

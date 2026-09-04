@@ -25,6 +25,7 @@ class StartInterviewRequest(BaseModel):
     focus_areas: Optional[List[str]] = None
     student_notes: Optional[str] = None
     total_rounds: int = 5
+    model: Optional[str] = "auto"
 
 
 class InterviewTurnRequest(BaseModel):
@@ -54,22 +55,24 @@ def list_supported_voices():
 
 
 @router.post("/start")
-def start_interview_endpoint(
+async def start_interview_endpoint(
     payload: StartInterviewRequest,
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """
     Initializes a new real-time AI Voice Mock Interview session
-    powered by the Student Success Agent.
+    powered by the Student Success Agent with dynamic questions generated
+    by Google Model or Kimi-K3 (Featherless AI) based on candidate role.
     """
     student_id = current_user.id if current_user else "student_guest"
-    result = start_mock_interview_session(
+    result = await start_mock_interview_session(
         student_id=student_id,
         role=payload.role,
         seniority=payload.seniority,
         focus_areas=payload.focus_areas,
         student_notes=payload.student_notes,
-        total_rounds=payload.total_rounds
+        total_rounds=payload.total_rounds,
+        preferred_model=payload.model or "auto"
     )
     return result
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/hooks/useAuth'
 import {
   Sparkles,
@@ -20,8 +20,24 @@ const institutionsList = [
 ]
 
 export default function LandingPage() {
-  const { isAuthenticated, role } = useAuth()
+  const navigate = useNavigate()
+  const { isAuthenticated, role, loginAsDemoStudent } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
+
+  const handleDemoClick = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault()
+    try {
+      setIsDemoLoading(true)
+      await loginAsDemoStudent()
+      navigate('/student/dashboard')
+    } catch (err) {
+      console.error('Demo student login error:', err)
+      navigate('/student/dashboard')
+    } finally {
+      setIsDemoLoading(false)
+    }
+  }
 
   const getDashboardLink = () => {
     if (!isAuthenticated || !role) return '/login';
@@ -143,6 +159,16 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
+                <button
+                  type="button"
+                  onClick={handleDemoClick}
+                  disabled={isDemoLoading}
+                  className="text-xs font-semibold tracking-wide bg-gradient-to-r from-blue-600/30 to-indigo-600/30 hover:bg-blue-600/50 text-blue-300 hover:text-white px-3.5 py-1.5 rounded-full border border-blue-500/30 hover:border-blue-400/60 transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                  title="Test student portal instantly without credentials"
+                >
+                  <Play className="w-3 h-3 fill-blue-400 text-blue-400" />
+                  <span>{isDemoLoading ? 'Opening...' : 'Live Demo'}</span>
+                </button>
                 <Link to="/register" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
                   Register
                 </Link>
@@ -175,6 +201,18 @@ export default function LandingPage() {
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">FAQ</a>
             <hr className="border-slate-100" />
             <div className="flex flex-col gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleDemoClick();
+                }}
+                disabled={isDemoLoading}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 via-sky-600 to-blue-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-sky-500/20 active:scale-95"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                <span>{isDemoLoading ? 'Opening Demo...' : 'Live Demo (Student)'}</span>
+              </button>
               {isAuthenticated ? (
                 <Link
                   to={dashboardLink}
@@ -269,13 +307,15 @@ export default function LandingPage() {
               Get Started
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a
-              href="#copilot"
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95"
+            <button
+              type="button"
+              onClick={handleDemoClick}
+              disabled={isDemoLoading}
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95 cursor-pointer disabled:opacity-60"
             >
               <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
-              Watch Demo
-            </a>
+              {isDemoLoading ? 'Launching Demo...' : 'Watch Demo'}
+            </button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 pt-2 text-xs font-semibold text-slate-300">

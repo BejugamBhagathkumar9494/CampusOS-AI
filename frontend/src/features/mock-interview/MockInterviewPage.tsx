@@ -36,6 +36,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { getApiBaseUrl } from '../../services/api';
 
 // Types for Interview Session
 interface InterviewRole {
@@ -110,6 +111,8 @@ export default function MockInterviewPage() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [studentNotes, setStudentNotes] = useState<string>('');
   const [totalRounds, setTotalRounds] = useState<number>(5);
+  const [aiEngine, setAiEngine] = useState<'google' | 'kimi' | 'auto'>('auto');
+  const [activeModel, setActiveModel] = useState<string>('Google Model / Kimi');
 
   // Live Interview State
   const [sessionId, setSessionId] = useState<string>('');
@@ -164,7 +167,7 @@ export default function MockInterviewPage() {
   useEffect(() => {
     async function fetchRoles() {
       try {
-        const res = await fetch('/api/v1/mock-interview/roles');
+        const res = await fetch(`${getApiBaseUrl()}/mock-interview/roles`);
         if (res.ok) {
           const data = await res.json();
           if (data.roles && data.roles.length > 0) {
@@ -378,10 +381,11 @@ export default function MockInterviewPage() {
         seniority: seniority,
         focus_areas: selectedTopics,
         student_notes: studentNotes,
-        total_rounds: totalRounds
+        total_rounds: totalRounds,
+        model: aiEngine
       };
 
-      const res = await fetch('/api/v1/mock-interview/start', {
+      const res = await fetch(`${getApiBaseUrl()}/mock-interview/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -392,6 +396,11 @@ export default function MockInterviewPage() {
         setSessionId(data.session_id);
         setCurrentRound(data.current_round || 1);
         setActiveQuestion(data.first_question);
+        if (data.model_used) {
+          setActiveModel(data.model_used);
+        } else {
+          setActiveModel(aiEngine === 'google' ? 'Google Model (Gemma)' : aiEngine === 'kimi' ? 'Kimi-K3 (Featherless AI)' : 'Auto-Adaptive');
+        }
         setTranscript([
           {
             role: 'interviewer',
@@ -407,16 +416,22 @@ export default function MockInterviewPage() {
       }
     } catch (e) {
       console.warn('Using local interview session starter:', e);
-      const initialQ =
-        selectedRole === 'backend'
-          ? "Welcome to your Backend Engineering interview. Let's start with system architecture: How would you design a distributed rate limiter that handles 50k requests per second across multiple regions?"
-          : selectedRole === 'frontend'
-          ? "Welcome to your Frontend interview! To start off, how do you handle state synchronization across deeply nested components and prevent unnecessary re-renders in React?"
-          : "Hello! Welcome to your technical mock interview. To begin, could you walk me through the architecture of a complex full-stack project you've built, explaining your choice of data stores and state management?";
+      const fallbackQuestions: Record<string, string> = {
+        backend: `Welcome to your ${seniority} Backend Systems interview. Let's start with distributed systems: Imagine you need to guarantee that a message produced to a Kafka topic and a corresponding database update happen atomically. How would you design a solution to prevent data inconsistency?`,
+        frontend: `Welcome to your ${seniority} Frontend Engineering interview! To start off: When architecting a high-traffic React application, how do you diagnose and eliminate unnecessary re-renders, and how does React's reconciliation algorithm function under the hood?`,
+        aiml: `Hello! Welcome to your ${seniority} AI & Machine Learning interview. Let's dive into RAG architectures: In a production pipeline with millions of documents, how do you mitigate embedding drift, hallucination, and optimize hybrid vector search latency?`,
+        datascience: `Welcome to your ${seniority} Data Science interview. Suppose an e-commerce platform ran an A/B test showing a 6% boost in conversions but a 7% drop in average order value. How would you statistically determine whether to ship the feature?`,
+        devops: `Welcome to your ${seniority} DevOps & Cloud interview. Could you walk me through how an Ingress controller and Kubernetes readiness probes coordinate to guarantee zero request drops during a zero-downtime RollingUpdate?`,
+        product: `Hello! Welcome to your Technical Product Manager interview. Imagine university students need an automated AI-assisted study workspace. How would you define the target user persona, North Star metric, and Phase 1 MVP scope?`,
+        hr: `Welcome! It's great to speak with you today. Could you share a time when you encountered a major technical disagreement or roadblock on a project? How did you resolve it and what was the outcome?`,
+        fullstack: `Hello! Welcome to your ${seniority} Full Stack Engineering interview. Could you walk me through the end-to-end architecture of a complex production application you engineered, explaining your decisions regarding client-side state, API design, and database normalization?`
+      };
+      const initialQ = fallbackQuestions[selectedRole] || fallbackQuestions.fullstack;
 
       setSessionId(`session_${Date.now()}`);
       setCurrentRound(1);
       setActiveQuestion(initialQ);
+      setActiveModel(aiEngine === 'google' ? 'Google Model (Gemma)' : aiEngine === 'kimi' ? 'Kimi-K3 (Featherless AI)' : 'Auto-Adaptive');
       setTranscript([
         {
           role: 'interviewer',
@@ -458,7 +473,7 @@ export default function MockInterviewPage() {
     setIsProcessingTurn(true);
 
     try {
-      const res = await fetch('/api/v1/mock-interview/turn', {
+      const res = await fetch(`${getApiBaseUrl()}/mock-interview/turn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -543,7 +558,7 @@ export default function MockInterviewPage() {
     setStage('evaluating');
 
     try {
-      const res = await fetch('/api/v1/mock-interview/evaluate', {
+      const res = await fetch(`${getApiBaseUrl()}/mock-interview/evaluate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId })
@@ -837,6 +852,71 @@ export default function MockInterviewPage() {
 
                 <div className="mt-4 space-y-4">
                   <div>
+                    <label className="text-xs font-semibold text-[#5E6763] block mb-1.5 flex items-center justify-between">
+                      <span>AI Model Engine</span>
+                      <span className="text-[10px] text-[#C85A32] font-semibold">Role-Tailored Generation</span>
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAiEngine('google')}
+                        className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-medium border transition-all text-left ${
+                          aiEngine === 'google'
+                            ? 'bg-[#FDF2ED] text-[#C85A32] border-[#C85A32] font-semibold shadow-xs'
+                            : 'bg-[#FAF7F2] text-[#5E6763] border-[#EAE3D8] hover:border-[#C85A32]/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Cpu className="w-4 h-4 text-[#C85A32] shrink-0" />
+                          <div>
+                            <span className="block font-semibold">Google Model (Gemma / Gemini)</span>
+                            <span className="text-[10px] text-[#8E9893] block">High reasoning depth for technical roles</span>
+                          </div>
+                        </div>
+                        {aiEngine === 'google' && <Check className="w-4 h-4 text-[#C85A32] shrink-0" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAiEngine('kimi')}
+                        className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-medium border transition-all text-left ${
+                          aiEngine === 'kimi'
+                            ? 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71] font-semibold shadow-xs'
+                            : 'bg-[#FAF7F2] text-[#5E6763] border-[#EAE3D8] hover:border-[#5E8C71]/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-[#5E8C71] shrink-0" />
+                          <div>
+                            <span className="block font-semibold">Kimi-K3 (Featherless AI)</span>
+                            <span className="text-[10px] text-[#8E9893] block">Moonshot Kimi-K3 conversational engine</span>
+                          </div>
+                        </div>
+                        {aiEngine === 'kimi' && <Check className="w-4 h-4 text-[#5E8C71] shrink-0" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAiEngine('auto')}
+                        className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-medium border transition-all text-left ${
+                          aiEngine === 'auto'
+                            ? 'bg-gradient-to-r from-[#FDF2ED] via-white to-[#F0F6F2] text-[#1C211F] border-[#1C211F]/40 font-semibold shadow-xs'
+                            : 'bg-[#FAF7F2] text-[#5E6763] border-[#EAE3D8] hover:border-[#1C211F]/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
+                          <div>
+                            <span className="block font-semibold">⚡ Auto Dual-Engine</span>
+                            <span className="text-[10px] text-[#8E9893] block">Google + Kimi with seamless failover</span>
+                          </div>
+                        </div>
+                        {aiEngine === 'auto' && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
                     <label className="text-xs font-semibold text-[#5E6763] block mb-1.5">
                       Session Length
                     </label>
@@ -1058,10 +1138,16 @@ export default function MockInterviewPage() {
 
               {/* Question Text & Controls */}
               <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-[#C85A32]">
-                    Senior Staff Tech Interviewer
-                  </span>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#C85A32]">
+                      Senior Staff Tech Interviewer
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FAF0E9] text-[#C85A32] border border-[#C85A32]/25">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      {activeModel || (aiEngine === 'google' ? 'Google Model (Gemma)' : aiEngine === 'kimi' ? 'Kimi-K3 (Featherless AI)' : 'Auto Dual-Engine')}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={() => speakText(activeQuestion)}

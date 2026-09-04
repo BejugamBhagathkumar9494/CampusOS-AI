@@ -94,8 +94,53 @@ def get_all_roles() -> List[Dict[str, Any]]:
     return result
 
 
-async def call_gemini_for_interview(prompt_messages: List[Dict[str, str]], system_instruction: str) -> str:
-    """Invokes Featherless AI (32K context & 4 concurrent units) for technical mock interview interactions."""
+async def call_google_llm(prompt: str, system_instruction: str = "") -> str:
+    """Invokes Google Model (Gemma / Gemini) via Google Generative Language API."""
+    import httpx
+    from app.api.v1.ai import resolve_gemini_api_key
+    key = resolve_gemini_api_key()
+    if not key:
+        return ""
+
+    models_to_try = ["models/gemma-4-26b-a4b-it", "models/gemini-2.5-flash"]
+    async with httpx.AsyncClient(timeout=25.0) as client:
+        for m in models_to_try:
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/{m}:generateContent?key={key}"
+                contents = []
+                if system_instruction:
+                    contents.append({"role": "user", "parts": [{"text": f"System Instructions:\n{system_instruction}"}]})
+                    contents.append({"role": "model", "parts": [{"text": "Understood. I will strictly follow these instructions."}]})
+                contents.append({"role": "user", "parts": [{"text": prompt}]})
+                res = await client.post(url, json={"contents": contents})
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        raw_text = "".join(p.get("text", "") for p in parts).strip()
+                        if raw_text:
+                            quotes = re.findall(r'"([^"\n]{25,})"', raw_text)
+                            if quotes:
+                                return quotes[-1].strip()
+
+                            clean_text = raw_text
+                            if "\n\n" in raw_text:
+                                paragraphs = [p.strip() for p in raw_text.split("\n\n") if p.strip()]
+                                for p in reversed(paragraphs):
+                                    if p.startswith("*") or p.startswith("-"):
+                                        continue
+                                    if any(g in p.lower() for g in ["welcome", "hello", "hi", "could you", "to begin", "let's dive", "can you"]):
+                                        clean_text = p.strip('"\n ')
+                                        break
+                            return clean_text.strip('"\n ')
+            except Exception as e:
+                print(f"[Google Model {m} Error] {e}")
+    return ""
+
+
+async def call_featherless_interview(prompt_messages: List[Dict[str, str]], system_instruction: str) -> str:
+    """Invokes Kimi-K3 via Featherless AI under 32K context and 4 concurrent units."""
     try:
         from app.api.v1.ai import call_featherless_llm
         formatted_messages = [{"role": "system", "content": system_instruction}]
@@ -111,32 +156,157 @@ async def call_gemini_for_interview(prompt_messages: List[Dict[str, str]], syste
         if res and res.strip():
             return res.strip()
     except Exception as e:
-        print(f"[Interview LLM Featherless Error] {e}")
+        print(f"[Featherless Kimi Error] {e}")
+    return ""
 
-    # High quality fallback response if external API is unreachable
+
+async def call_dual_model_for_interview(
+    prompt: str,
+    prompt_messages: Optional[List[Dict[str, str]]] = None,
+    system_instruction: str = "",
+    preferred_model: str = "auto"
+) -> Dict[str, Any]:
+    """
+    Executes interview generation using the requested model (Google Model or Kimi via Featherless),
+    with seamless automatic failover between them if rate-limited or busy.
+    """
+    messages = prompt_messages or [{"role": "user", "content": prompt}]
+    single_prompt = prompt if prompt else "\n".join(m.get("content", "") for m in messages if m.get("role") in ["user", "student"])
+
+    preferred = (preferred_model or "auto").lower()
+
+    # If Google model preferred:
+    if "google" in preferred or "gemini" in preferred or "gemma" in preferred:
+        res = await call_google_llm(single_prompt, system_instruction)
+        if res and len(res.strip()) > 10:
+            return {"text": res.strip(), "model_used": "Google Model (Gemma/Gemini)"}
+        # Fallback to Kimi Featherless
+        res_kimi = await call_featherless_interview(messages, system_instruction)
+        if res_kimi and len(res_kimi.strip()) > 10:
+            return {"text": res_kimi.strip(), "model_used": "Kimi-K3 (Featherless AI)"}
+
+    # If Kimi / Featherless preferred:
+    elif "kimi" in preferred or "featherless" in preferred:
+        res = await call_featherless_interview(messages, system_instruction)
+        if res and len(res.strip()) > 10:
+            return {"text": res.strip(), "model_used": "Kimi-K3 (Featherless AI)"}
+        # Fallback to Google Model
+        res_google = await call_google_llm(single_prompt, system_instruction)
+        if res_google and len(res_google.strip()) > 10:
+            return {"text": res_google.strip(), "model_used": "Google Model (Gemma/Gemini)"}
+
+    # Auto mode: try Google Model first (high throughput), then Kimi (Featherless)
+    else:
+        res = await call_google_llm(single_prompt, system_instruction)
+        if res and len(res.strip()) > 10:
+            return {"text": res.strip(), "model_used": "Google Model (Gemma/Gemini)"}
+        res_kimi = await call_featherless_interview(messages, system_instruction)
+        if res_kimi and len(res_kimi.strip()) > 10:
+            return {"text": res_kimi.strip(), "model_used": "Kimi-K3 (Featherless AI)"}
+
+    return {"text": "", "model_used": "none"}
+
+
+async def call_gemini_for_interview(
+    prompt_messages: List[Dict[str, str]],
+    system_instruction: str,
+    preferred_model: str = "auto"
+) -> str:
+    """Backward-compatible wrapper routing to dual model engine."""
+    res = await call_dual_model_for_interview(
+        prompt="",
+        prompt_messages=prompt_messages,
+        system_instruction=system_instruction,
+        preferred_model=preferred_model
+    )
+    if res.get("text"):
+        return res["text"]
+
+    # High quality fallback response if both models are unreachable
     return "Thank you for that explanation. You touched on the core concepts nicely. Let's drill into the implementation details: How would you handle race conditions or failure recovery when scaling this across multiple nodes?"
 
 
-def start_mock_interview_session(
+async def generate_interview_starter_question(
+    role: str,
+    seniority: str,
+    focus_areas: Optional[List[str]],
+    student_notes: Optional[str],
+    preferred_model: str = "auto"
+) -> Dict[str, str]:
+    """
+    Dynamically generates a realistic, tailored opening interview question
+    using the Google Model or Kimi-K3 (Featherless AI) based on the candidate's specific role.
+    """
+    role_info = ROLE_CONFIGS.get(role.lower(), ROLE_CONFIGS["fullstack"])
+    role_title = role_info["title"]
+    topics = ", ".join(focus_areas or role_info["default_topics"])
+    notes = student_notes.strip() if student_notes else "Standard academic preparation."
+
+    system_instruction = (
+        f"You are a Senior Staff Tech Interviewer conducting a real-time voice mock interview for a '{role_title}' role.\n"
+        "Generate ONLY the spoken opening greeting and interview question (2 to 3 sentences maximum).\n"
+        "Rules:\n"
+        "- Welcome the candidate briefly and professionally.\n"
+        f"- Ask a realistic, challenging, technical question specifically testing foundational skills for the '{role_title}' role at '{seniority}' level.\n"
+        "- Do NOT use markdown, bullet points, headers, or internal monologue.\n"
+        "- Output strictly the exact words the interviewer speaks to the candidate."
+    )
+
+    user_prompt = (
+        f"Candidate Role: {role_title}\n"
+        f"Seniority Level: {seniority}\n"
+        f"Key Focus Topics: {topics}\n"
+        f"Candidate Background/Notes: {notes}\n\n"
+        f"Speak directly to the candidate: Greet them and ask a challenging opening question tailored to {role_title}."
+    )
+
+    llm_res = await call_dual_model_for_interview(
+        prompt=user_prompt,
+        system_instruction=system_instruction,
+        preferred_model=preferred_model
+    )
+
+    question = llm_res.get("text", "").strip()
+    model_used = llm_res.get("model_used", "Google / Kimi AI Engine")
+
+    # Clean any surrounding quotes or markdown
+    if question.startswith('"') and question.endswith('"'):
+        question = question[1:-1].strip()
+    if question.startswith("```") and question.endswith("```"):
+        question = question.strip("`").strip()
+
+    if not question or len(question) < 20:
+        # High quality role-specific fallback if network fails
+        question = role_info.get("starter_question", "Hello! Welcome to your technical mock interview. To begin, could you walk me through an end-to-end technical project you designed and explain your key architectural trade-offs?")
+
+    return {
+        "question": question,
+        "model_used": model_used
+    }
+
+
+async def start_mock_interview_session(
     student_id: str,
     role: str = "fullstack",
     seniority: str = "Junior (1-2 YoE)",
     focus_areas: Optional[List[str]] = None,
     student_notes: Optional[str] = None,
-    total_rounds: int = 5
+    total_rounds: int = 5,
+    preferred_model: str = "auto"
 ) -> Dict[str, Any]:
-    """Initializes a new Mock Interview session in the Student Success Agent."""
+    """Initializes a new Mock Interview session with dynamic AI generation by Google Model or Kimi."""
     session_id = f"interview_{uuid.uuid4().hex[:12]}"
-    
     role_info = ROLE_CONFIGS.get(role.lower(), ROLE_CONFIGS["fullstack"])
-    first_question = role_info["starter_question"]
 
-    if student_notes and len(student_notes.strip()) > 5:
-        first_question = (
-            f"Hello! Welcome to your {role_info['title']} mock interview session. "
-            f"I reviewed your profile notes regarding {student_notes.strip()[:60]}... "
-            f"Let's dive right in. Could you walk me through your hands-on experience in this area and explain a key engineering challenge you solved?"
-        )
+    starter = await generate_interview_starter_question(
+        role=role,
+        seniority=seniority,
+        focus_areas=focus_areas,
+        student_notes=student_notes,
+        preferred_model=preferred_model
+    )
+    first_question = starter["question"]
+    model_used = starter["model_used"]
 
     session_data = {
         "session_id": session_id,
@@ -146,6 +316,8 @@ def start_mock_interview_session(
         "seniority": seniority,
         "focus_areas": focus_areas or role_info["default_topics"],
         "student_notes": student_notes or "",
+        "preferred_model": preferred_model,
+        "model_used": model_used,
         "created_at": time.time(),
         "status": "in_progress",
         "current_round": 1,
@@ -169,6 +341,7 @@ def start_mock_interview_session(
         "current_round": 1,
         "total_rounds": total_rounds,
         "first_question": first_question,
+        "model_used": model_used,
         "status": "in_progress"
     }
 
@@ -252,7 +425,8 @@ Return STRICTLY a valid JSON object matching this schema (no markdown fences or 
             "content": turn["content"]
         })
 
-    interviewer_reply_raw = await call_gemini_for_interview(prompt_history, system_instruction)
+    preferred_model = session.get("preferred_model", "auto")
+    interviewer_reply_raw = await call_gemini_for_interview(prompt_history, system_instruction, preferred_model=preferred_model)
 
     # Parse JSON or fallback
     verification_data = None
@@ -434,7 +608,8 @@ Provide a comprehensive, objective, highly actionable evaluation in STRICT JSON 
 """
 
     try:
-        raw_response = await call_gemini_for_interview([{"role": "user", "content": eval_prompt}], "You are an automated evaluation engine. Output strictly valid JSON with no markdown wrapping.")
+        preferred_model = session.get("preferred_model", "auto")
+        raw_response = await call_gemini_for_interview([{"role": "user", "content": eval_prompt}], "You are an automated evaluation engine. Output strictly valid JSON with no markdown wrapping.", preferred_model=preferred_model)
         
         # Strip potential markdown json formatting
         clean_json = raw_response.strip()
