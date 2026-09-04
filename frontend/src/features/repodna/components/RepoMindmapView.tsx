@@ -238,7 +238,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             role: 'Manages multi-unit PDF uploads, automatic 2/4/10 marks model answer generation, chapter summaries, and revision sheets.',
             path: 'backend/app/api/v1/exam_prep.py',
             endpoints: ['POST /api/v1/exam-prep/collections', 'POST /api/v1/exam-prep/upload-multiple', 'POST /api/v1/exam-prep/generate'],
-            tech: ['FastAPI', 'SQLAlchemy', 'Gemini LLM']
+            tech: ['FastAPI', 'SQLAlchemy', 'Featherless AI (Kimi-K3)']
           }
         },
         {
@@ -345,8 +345,8 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       icon: 'RAG',
       details: {
         title: 'CampusOS AI & RAG Engine',
-        role: 'Semantic vector retrieval, Gemini LLM prompt orchestration, anti-hallucination verification, and codebase AST extraction.',
-        tech: ['Google Gemini API', 'LangChain', 'pgvector', 'NumPy'],
+        role: 'Semantic vector retrieval, Featherless LLM (Kimi-K3) prompt orchestration, anti-hallucination verification, and codebase AST extraction.',
+        tech: ['Featherless AI (Kimi-K3)', 'LangChain', 'pgvector', 'NumPy'],
         connections: ['branch-backend', 'branch-frontend']
       },
       children: [
@@ -363,7 +363,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             title: 'Exam Note & Question Orchestrator',
             role: 'Generates 5 distinct 2-mark, 5 distinct 4-mark, and 5 distinct 10-mark model answers strictly grounded in student notes without duplicates.',
             path: 'backend/app/services/exam_prep/generator.py',
-            tech: ['Gemini 1.5 / 2.0', 'Prompt Templates', 'Anti-Hallucination']
+            tech: ['Featherless AI (Kimi-K3)', 'Prompt Templates', 'Anti-Hallucination']
           }
         },
         {
@@ -379,7 +379,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             title: 'RepoDNA Intelligence Pipeline',
             role: 'Analyzes architecture, detected tech stacks, application flows, database schemas, and powers grounded codebase chat.',
             path: 'backend/app/services/repodna/repodna_generator.py',
-            tech: ['AST Parser', 'Semantic Chunker', 'Gemini LLM']
+            tech: ['AST Parser', 'Semantic Chunker', 'Featherless AI (Kimi-K3)']
           }
         },
         {

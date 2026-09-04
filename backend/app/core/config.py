@@ -62,11 +62,14 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_BUCKET_NAME: str = "campusos-media"
 
+    # Featherless AI Settings (moonshotai/Kimi-K3)
+    FEATHERLESS_API_KEY: str = "rc_2ad9d3190e4c19a93dc9ecb0d4fc7d10659ed7773c5b6bf72a6c0036a99bda02"
+    FEATHERLESS_BASE_URL: str = "https://api.featherless.ai/v1"
+    FEATHERLESS_MODEL: str = "moonshotai/Kimi-K3"
+
     # AI & Vector RAG Settings
     GEMINI_API_KEY: str = "QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE="
     GOOGLE_API_KEY: str = "QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE="
-
-
 
     OPENAI_API_KEY: str = ""
     DEFAULT_EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"

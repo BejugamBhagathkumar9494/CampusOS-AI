@@ -445,23 +445,39 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
     )
 
     try:
-        from app.api.v1.ai import resolve_gemini_api_key
-        gemini_key = resolve_gemini_api_key()
-        if gemini_key:
+        from app.api.v1.ai import resolve_featherless_api_key
+        from app.core.config import settings
+        featherless_key = resolve_featherless_api_key()
+        if featherless_key:
             import httpx
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+            base_url = (getattr(settings, "FEATHERLESS_BASE_URL", "https://api.featherless.ai/v1") or "https://api.featherless.ai/v1").rstrip("/")
+            model_name = getattr(settings, "FEATHERLESS_MODEL", "moonshotai/Kimi-K3") or "moonshotai/Kimi-K3"
             res = httpx.post(
-                url,
-                json={"contents": [{"parts": [{"text": system_prompt}]}]},
-                timeout=10.0
+                f"{base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {featherless_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": model_name,
+                    "messages": [
+                        {"role": "user", "content": system_prompt}
+                    ],
+                    "temperature": 0.2,
+                    "max_tokens": 1024,
+                },
+                timeout=25.0
             )
             if res.status_code == 200:
-                answer = res.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if "not available in the university knowledge base" in answer.lower():
-                    return NOT_FOUND_MSG
-                return answer
+                data = res.json()
+                choice_msg = data.get("choices", [{}])[0].get("message", {})
+                answer = (choice_msg.get("content") or choice_msg.get("reasoning") or "").strip()
+                if answer:
+                    if "not available in the university knowledge base" in answer.lower():
+                        return NOT_FOUND_MSG
+                    return answer
     except Exception as e:
-        print(f"[RAG Service] Gemini synthesis call error: {e}")
+        print(f"[RAG Service] Featherless synthesis call error: {e}")
 
     # Fallback clean synthesis directly from chunks
     snippets_summary = "\n".join([f"• {c['content']}" for c in retrieved_chunks[:3]])

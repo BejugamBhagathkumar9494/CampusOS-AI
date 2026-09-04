@@ -95,57 +95,23 @@ def get_all_roles() -> List[Dict[str, Any]]:
 
 
 async def call_gemini_for_interview(prompt_messages: List[Dict[str, str]], system_instruction: str) -> str:
-    """Invokes Gemini 2.5 Flash LLM with fallback support."""
+    """Invokes Featherless AI (moonshotai/Kimi-K3) for technical mock interview interactions."""
     try:
-        from google import genai
-        from google.genai import types
-        from app.api.v1.ai import resolve_gemini_api_key
-        import base64
+        from app.api.v1.ai import call_featherless_llm
+        formatted_messages = [{"role": "system", "content": system_instruction}]
+        for msg in prompt_messages:
+            r = "user" if msg.get("role") in ["user", "student"] else "assistant"
+            formatted_messages.append({"role": r, "content": msg.get("content", "")})
 
-        primary_key = resolve_gemini_api_key()
-        fallback_working_key = base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
-        candidate_keys = [primary_key, fallback_working_key]
-
-        for key in candidate_keys:
-            if not key or not key.strip():
-                continue
-            try:
-                client = genai.Client(api_key=key.strip())
-                contents = [
-                    types.Content(
-                        role="user",
-                        parts=[types.Part.from_text(text=f"[System Directive: {system_instruction}]\n\nSession Initialized.")]
-                    ),
-                    types.Content(
-                        role="model",
-                        parts=[types.Part.from_text(text="Understood. I am ready to conduct the technical interview.")]
-                    )
-                ]
-
-                for msg in prompt_messages:
-                    r = "user" if msg.get("role") in ["user", "student"] else "model"
-                    contents.append(types.Content(
-                        role=r,
-                        parts=[types.Part.from_text(text=msg.get("content", ""))]
-                    ))
-
-                for model_name in ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"]:
-                    try:
-                        response = client.models.generate_content(
-                            model=model_name,
-                            contents=contents
-                        )
-                        if response and hasattr(response, "text") and response.text:
-                            return response.text.strip()
-                    except Exception as model_err:
-                        print(f"[Interview LLM Warning] {model_name} error: {model_err}")
-                        continue
-            except Exception as client_err:
-                print(f"[Interview LLM Client Warning] {client_err}")
-                continue
-
+        res = await call_featherless_llm(
+            messages=formatted_messages,
+            temperature=0.3,
+            max_tokens=2048
+        )
+        if res and res.strip():
+            return res.strip()
     except Exception as e:
-        print(f"[Interview LLM Critical Warning] {e}")
+        print(f"[Interview LLM Featherless Error] {e}")
 
     # High quality fallback response if external API is unreachable
     return "Thank you for that explanation. You touched on the core concepts nicely. Let's drill into the implementation details: How would you handle race conditions or failure recovery when scaling this across multiple nodes?"

@@ -8,38 +8,27 @@ from app.models.database_models import StudyRepository
 from app.services.repodna.repodna_indexer import retrieve_repository_chunks
 from app.services.repodna.prompts import REPODNA_CHAT_PROMPT_TEMPLATE, REPODNA_SYSTEM_INSTRUCTION
 from app.services.repodna.validator import validate_repository_grounding
-from app.api.v1.ai import resolve_gemini_api_key
+from app.api.v1.ai import call_featherless_llm, resolve_featherless_api_key
 
 
 async def _call_gemini_chat(prompt_text: str, system_instruction: str) -> str:
     """
-    Invokes Gemini with fallback keys and working candidate models.
+    Invokes Featherless AI running moonshotai/Kimi-K3 for RepoDNA chat.
     """
-    primary_key = resolve_gemini_api_key()
-    fallback_key = base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
-    candidate_keys = [primary_key, fallback_key]
-    candidate_models = ["gemini-2.5-flash", "gemini-flash-latest"]
-
-    full_contents = f"[SYSTEM INSTRUCTION]\n{system_instruction}\n\n[TASK]\n{prompt_text}"
-
-    for key in candidate_keys:
-        if not key or not key.strip():
-            continue
-        try:
-            from google import genai
-            client = genai.Client(api_key=key.strip())
-            for model in candidate_models:
-                try:
-                    res = client.models.generate_content(
-                        model=model,
-                        contents=full_contents
-                    )
-                    if res and hasattr(res, "text") and res.text:
-                        return res.text.strip()
-                except Exception as model_err:
-                    print(f"[RepoDNA Chat] Model {model} attempt error: {model_err}")
-        except Exception as client_err:
-            print(f"[RepoDNA Chat] Client error: {client_err}")
+    try:
+        messages = [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": prompt_text}
+        ]
+        result = await call_featherless_llm(
+            messages=messages,
+            temperature=0.2,
+            max_tokens=3000
+        )
+        if result and result.strip():
+            return result.strip()
+    except Exception as err:
+        print(f"[RepoDNA Chat] Featherless error: {err}")
 
     return ""
 

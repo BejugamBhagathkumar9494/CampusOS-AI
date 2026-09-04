@@ -1,7 +1,8 @@
-from typing import List, Optional, Dict, Any
+import os
 import asyncio
 import uuid
 import json
+from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -27,6 +28,7 @@ from app.services.ai_agents import (
 )
 from app.services.ai_agents.agentic_supervisor import AgenticSupervisor
 from app.services.rag_service import execute_pgvector_rag_query, process_and_ingest_document
+from app.core.config import settings
 
 router = APIRouter(prefix="/ai", tags=["AI & Agents"])
 
@@ -266,20 +268,33 @@ def resolve_gemini_api_key() -> str:
     return base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
 
 
-async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
-    from google import genai
-    from google.genai import types
+def resolve_featherless_api_key() -> str:
+    """Resolves Featherless AI key from environment or settings."""
+    env_key = (os.environ.get("FEATHERLESS_API_KEY") or getattr(settings, "FEATHERLESS_API_KEY", "") or "").strip()
+    if env_key:
+        return env_key
+    return "rc_2ad9d3190e4c19a93dc9ecb0d4fc7d10659ed7773c5b6bf72a6c0036a99bda02"
 
-    primary_key = resolve_gemini_api_key()
-    
-    import base64
-    fallback_working_key = base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
-    
-    candidate_keys = list(dict.fromkeys([k for k in [primary_key, fallback_working_key] if k and k.strip()]))
-    candidate_models = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"]
 
-    system_prompt = (
-        "You are CampusOS AI, an intelligent academic assistant for university students.\n\n"
+async def call_featherless_llm(
+    message: Optional[str] = None,
+    history: Optional[List[Dict[str, Any]]] = None,
+    system_prompt: Optional[str] = None,
+    max_tokens: int = 2048,
+    temperature: float = 0.3,
+    messages: Optional[List[Dict[str, Any]]] = None
+) -> str:
+    """
+    Invokes Featherless AI running moonshotai/Kimi-K3 via OpenAI-compatible endpoint.
+    Handles reasoning and text content seamlessly with robust fallback.
+    """
+    import httpx
+    api_key = resolve_featherless_api_key()
+    base_url = (getattr(settings, "FEATHERLESS_BASE_URL", "https://api.featherless.ai/v1") or "https://api.featherless.ai/v1").rstrip('/')
+    model_name = getattr(settings, "FEATHERLESS_MODEL", "moonshotai/Kimi-K3") or "moonshotai/Kimi-K3"
+
+    sys_instruction = system_prompt or (
+        "You are CampusOS AI, an intelligent academic assistant powered by moonshotai/Kimi-K3 for university students.\n\n"
         "Answer every question directly using clear and simple English.\n\n"
         "You can:\n"
         "- Explain academic subjects\n"
@@ -289,80 +304,131 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
         "- Teach concepts step by step\n"
         "- Solve SQL, React, Node.js, DSA, OS, DBMS, CN, AI and general technical questions\n\n"
         "Rules:\n"
-        "- Never use fixed headings unless the user requests them.\n"
+        "- Never use fixed headings unless requested.\n"
         "- Never invent facts or citations.\n"
         "- If uncertain, say you don't know.\n"
         "- Keep answers concise but complete.\n"
         "- Format with Markdown when useful."
     )
 
+    if messages is not None:
+        payload_messages = list(messages)
+    else:
+        payload_messages = [{"role": "system", "content": sys_instruction}]
+        if history:
+            for item in history:
+                role = "user" if item.get("role") in ["user", "human"] or item.get("sender") == "user" else "assistant"
+                content = item.get("content") or item.get("text") or ""
+                if content:
+                    payload_messages.append({"role": role, "content": content})
+
+        if message:
+            payload_messages.append({"role": "user", "content": message})
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": model_name,
+        "messages": payload_messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens
+    }
+
     last_error = None
+    try:
+        async with httpx.AsyncClient(timeout=45.0) as client:
+            res = await client.post(f"{base_url}/chat/completions", headers=headers, json=payload)
+            if res.status_code == 200:
+                data = res.json()
+                choice = data.get("choices", [{}])[0].get("message", {})
+                content = (choice.get("content") or "").strip()
+                if not content:
+                    content = (choice.get("reasoning") or "").strip()
+                if content:
+                    return content
+            else:
+                last_error = f"Featherless HTTP {res.status_code}: {res.text[:200]}"
+                print(f"[Featherless Error] {last_error}")
+    except Exception as e:
+        last_error = str(e)
+        print(f"[Featherless Exception] {e}")
 
-    for key_candidate in candidate_keys:
-        if not key_candidate or not key_candidate.strip():
-            continue
-        try:
-            client = genai.Client(api_key=key_candidate.strip())
-
-            contents = [
-                types.Content(
-                    role="user",
-                    parts=[types.Part.from_text(text=f"[System Prompt: {system_prompt}]\n\nHello!")]
-                ),
-                types.Content(
-                    role="model",
-                    parts=[types.Part.from_text(text="Hello! I am CampusOS AI. How can I help you today?")]
-                )
-            ]
-
-            if history:
-                for item in history:
-                    role = "user" if item.get("role") == "user" or item.get("sender") == "user" else "model"
-                    text_content = item.get("content") or item.get("text") or ""
-                    if text_content:
-                        contents.append(types.Content(role=role, parts=[types.Part.from_text(text=text_content)]))
-
-            contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
-
-            for model_name in candidate_models:
-                try:
-                    response = await asyncio.to_thread(
-                        client.models.generate_content,
-                        model=model_name,
-                        contents=contents
-                    )
-                    if response and hasattr(response, "text") and response.text:
-                        return response.text.strip()
-                except Exception as model_err:
-                    last_error = str(model_err)
-                    print(f"[Gemini Model Warning] Model {model_name} warning: {model_err}")
-        except Exception as key_err:
-            last_error = str(key_err)
-            print(f"[Gemini Key Warning] Key warning: {key_err}")
+    # Fallback to Gemini if Featherless endpoint is unreachable
+    try:
+        gemini_fallback = await _call_gemini_internal(message, history, sys_instruction)
+        if gemini_fallback:
+            return gemini_fallback
+    except Exception as gem_err:
+        print(f"[Fallback Warning] Gemini fallback also failed: {gem_err}")
 
     raise HTTPException(
         status_code=status.HTTP_502_BAD_GATEWAY,
-        detail={"success": False, "error": f"Gemini API authentication failed: {last_error or 'Service unavailable'}"}
+        detail={"success": False, "error": f"Featherless AI (Kimi-K3) service unavailable: {last_error}"}
     )
+
+
+async def _call_gemini_internal(message: str, history: Optional[List[Dict[str, Any]]] = None, system_prompt: Optional[str] = None) -> str:
+    """Internal fallback to Gemini if needed."""
+    from google import genai
+    from google.genai import types
+
+    primary_key = resolve_gemini_api_key()
+    if not primary_key:
+        return ""
+    
+    client = genai.Client(api_key=primary_key)
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=f"[System Prompt: {system_prompt or 'You are CampusOS AI.'}]\n\nHello!")]
+        ),
+        types.Content(
+            role="model",
+            parts=[types.Part.from_text(text="Hello! I am CampusOS AI.")]
+        )
+    ]
+    if history:
+        for item in history:
+            role = "user" if item.get("role") == "user" or item.get("sender") == "user" else "model"
+            text_content = item.get("content") or item.get("text") or ""
+            if text_content:
+                contents.append(types.Content(role=role, parts=[types.Part.from_text(text=text_content)]))
+    contents.append(types.Content(role="user", parts=[types.Part.from_text(text=message)]))
+
+    for model_name in ["gemini-2.5-flash", "gemini-flash-latest"]:
+        try:
+            response = await asyncio.to_thread(client.models.generate_content, model=model_name, contents=contents)
+            if response and hasattr(response, "text") and response.text:
+                return response.text.strip()
+        except Exception:
+            continue
+    return ""
+
+
+async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
+    """Delegates to Featherless AI moonshotai/Kimi-K3 as primary model across the system."""
+    return await call_featherless_llm(message, history)
 
 
 @router.post("/chat/llm")
 async def chat_llm_endpoint(payload: LLMChatRequest):
     """
-    ✨ LLM Chat Endpoint powered by Gemini (gemini-2.5-flash).
+    ✨ LLM Chat Endpoint powered by Featherless AI (moonshotai/Kimi-K3).
     Answers general knowledge, programming, academics, and reasoning.
     """
     msg = payload.message.strip()
     if not msg:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
-    answer = await call_gemini_llm(msg, payload.history)
+    answer = await call_featherless_llm(msg, payload.history)
     return {
         "mode": "llm",
         "role": "assistant",
         "answer": answer,
         "response": answer,
-        "agent_name": "✨ Gemini 2.5 Flash",
+        "agent_name": "✨ Kimi-K3 (Featherless AI)",
         "confidence_score": 0.99
     }
 

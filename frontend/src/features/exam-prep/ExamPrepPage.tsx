@@ -214,7 +214,7 @@ export default function ExamPrepPage() {
     } catch (err: any) {
       setStatusMessage({
         type: 'error',
-        text: err.message || 'Failed to generate exam notes. Verify Gemini API key.'
+        text: err.message || 'Failed to generate exam notes. Verify Featherless API key.'
       });
     } finally {
       setIsGenerating(false);

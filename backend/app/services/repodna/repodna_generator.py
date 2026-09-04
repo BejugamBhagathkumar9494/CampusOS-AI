@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.database_models import StudyRepository, RepositoryFile, RepositoryAnalysis
 from app.services.repodna.prompts import REPODNA_ANALYSIS_PROMPT_TEMPLATE, REPODNA_SYSTEM_INSTRUCTION
-from app.api.v1.ai import call_gemini_llm, resolve_gemini_api_key
+from app.api.v1.ai import call_featherless_llm, resolve_featherless_api_key
 
 
 def clean_json_text(raw_text: str) -> str:
@@ -210,15 +210,24 @@ async def analyze_repository_pipeline(
 
     analysis_data = None
     try:
-        api_key = resolve_gemini_api_key()
+        api_key = resolve_featherless_api_key()
         if api_key:
             import asyncio
-            full_prompt = f"{REPODNA_SYSTEM_INSTRUCTION}\n\n{prompt}"
             response_text = ""
             try:
-                response_text = await asyncio.wait_for(call_gemini_llm(full_prompt), timeout=12.0)
+                response_text = await asyncio.wait_for(
+                    call_featherless_llm(
+                        messages=[
+                            {"role": "system", "content": REPODNA_SYSTEM_INSTRUCTION},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.2,
+                        max_tokens=4096
+                    ),
+                    timeout=30.0
+                )
             except Exception as e1:
-                print(f"[RepoDNA Generator] LLM generation warning: {e1}")
+                print(f"[RepoDNA Generator] Featherless generation warning: {e1}")
 
             if response_text and response_text.strip():
                 cleaned = clean_json_text(response_text)

@@ -20,33 +20,27 @@ from .prompts import (
 
 
 def get_gemini_api_key() -> str:
-    from app.api.v1.ai import resolve_gemini_api_key
-    return resolve_gemini_api_key()
+    from app.api.v1.ai import resolve_featherless_api_key
+    return resolve_featherless_api_key()
 
 
 async def call_gemini_prompt(prompt_text: str, temperature: float = 0.2) -> str:
-    """Invokes Gemini LLM with robust retry and model fallbacks."""
+    """Invokes Featherless AI (moonshotai/Kimi-K3) LLM with robust fallback."""
+    from app.api.v1.ai import call_featherless_llm
+    try:
+        res = await call_featherless_llm(
+            message=prompt_text,
+            temperature=temperature,
+            max_tokens=4096
+        )
+        if res and res.strip():
+            return res.strip()
+    except Exception as e:
+        print(f"[ExamPrep Featherless Error] {e}")
+
+    # Fallback to direct HTTP endpoint if Featherless fails
     key = get_gemini_api_key()
     candidate_models = ["gemini-2.5-flash", "gemini-flash-latest"]
-    
-    # Try official google-genai SDK first
-    try:
-        from google import genai
-        client = genai.Client(api_key=key)
-        for model in candidate_models:
-            try:
-                res = client.models.generate_content(
-                    model=model,
-                    contents=prompt_text,
-                )
-                if res and hasattr(res, "text") and res.text:
-                    return res.text.strip()
-            except Exception as e:
-                print(f"[Gemini SDK] Model {model} attempt error: {e}")
-    except Exception:
-        pass
-
-    # Fallback to direct HTTP endpoint
     async with httpx.AsyncClient(timeout=25.0) as http_client:
         for model in candidate_models:
             try:
@@ -66,9 +60,9 @@ async def call_gemini_prompt(prompt_text: str, temperature: float = 0.2) -> str:
                         if parts and "text" in parts[0]:
                             return parts[0]["text"].strip()
             except Exception as http_err:
-                print(f"[Gemini HTTP] Model {model} attempt error: {http_err}")
+                print(f"[ExamPrep HTTP Fallback] Model {model} attempt error: {http_err}")
 
-    raise RuntimeError("Failed to generate content from Gemini API.")
+    raise RuntimeError("Failed to generate content from AI API.")
 
 
 def clean_json_response(raw_text: str) -> str:
