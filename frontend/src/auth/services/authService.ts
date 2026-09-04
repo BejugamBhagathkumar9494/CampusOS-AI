@@ -22,7 +22,8 @@ export const authService = {
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
+
 
         if (!error && data) {
           return data as UserProfile;

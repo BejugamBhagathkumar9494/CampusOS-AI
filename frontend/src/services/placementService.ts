@@ -35,7 +35,7 @@ export const placementService = {
           .from('companies')
           .insert([{ name: payload.company_name, location: payload.location || 'Bengaluru', industry: 'Technology' }])
           .select()
-          .single();
+          .maybeSingle();
         companyId = newComp?.id;
       }
     }
@@ -53,7 +53,7 @@ export const placementService = {
       .from('placements')
       .insert([driveRecord])
       .select('*, companies(*)')
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -61,7 +61,7 @@ export const placementService = {
       const companyName = data?.companies?.name || 'Recruiter';
       await notificationService.notifyAllStudents(
         'New Placement Drive Created',
-        `Drive for ${data.job_title} at ${companyName} (${data.package_ctc} LPA) is now open! Min CGPA: ${data.min_cgpa}.`,
+        `Drive for ${data?.job_title || 'Position'} at ${companyName} (${data?.package_ctc || 10} LPA) is now open! Min CGPA: ${data?.min_cgpa || 6.0}.`,
         'success'
       );
     } catch (nErr) {
@@ -77,7 +77,7 @@ export const placementService = {
       .update(payload)
       .eq('id', driveId)
       .select('*, companies(*)')
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -94,11 +94,13 @@ export const placementService = {
   },
 
   async getEligibleDrivesForStudent(studentProfileId: string) {
+    if (!studentProfileId) return [];
     const { data: student } = await supabase
       .from('students')
       .select('id, cgpa, batch_year, current_semester')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
+
 
     const studentCgpa = Number(student?.cgpa || 8.0);
     const { data: drives } = await supabase
@@ -123,11 +125,13 @@ export const placementService = {
   },
 
   async applyDrive(studentProfileId: string, placementId: string | number) {
+    if (!studentProfileId) throw new Error('Student profile ID is required.');
+
     const { data: student } = await supabase
       .from('students')
       .select('id, cgpa')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
 
     const studentId = student?.id;
     if (!studentId) throw new Error('Student profile record not found.');
@@ -136,7 +140,7 @@ export const placementService = {
       .from('placements')
       .select('min_cgpa, job_title, companies(name)')
       .eq('id', placementId)
-      .single();
+      .maybeSingle();
 
     if (drive && student && Number(student.cgpa) < Number(drive.min_cgpa)) {
       throw new Error(`Ineligible: Your CGPA (${student.cgpa}) is below required minimum (${drive.min_cgpa}).`);
@@ -146,7 +150,7 @@ export const placementService = {
       .from('placement_applications')
       .upsert({ placement_id: placementId, student_id: studentId, status: 'applied', applied_at: new Date().toISOString() })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -166,11 +170,13 @@ export const placementService = {
   },
 
   async getStudentApplications(studentProfileId: string) {
+    if (!studentProfileId) return [];
+
     const { data: student } = await supabase
       .from('students')
       .select('id')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
 
     if (!student) return [];
 
@@ -216,7 +222,7 @@ export const placementService = {
       .update({ status: newStatus })
       .eq('id', applicationId)
       .select('*, students(profile_id), placements(job_title, companies(name))')
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -239,3 +245,4 @@ export const placementService = {
     return data;
   }
 };
+

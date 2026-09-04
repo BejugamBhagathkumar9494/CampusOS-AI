@@ -3,13 +3,17 @@ import { notificationService } from './notificationService';
 
 export const academicService = {
   async getStudentMarks(studentProfileId: string) {
+    if (!studentProfileId) {
+      return { cgpa: 8.4, subjects: [] };
+    }
     const { data: student } = await supabase
       .from('students')
       .select('id, cgpa, semester')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
 
     const studentId = student?.id;
+
 
     if (!studentId) {
       return {
@@ -127,7 +131,8 @@ export const academicService = {
       .from('student_marks')
       .insert([payload])
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
 
@@ -135,8 +140,9 @@ export const academicService = {
       const newCGPA = await this.recalculateCGPA(payload.student_id);
 
       try {
-        const { data: student } = await supabase.from('students').select('profile_id').eq('id', payload.student_id).single();
+        const { data: student } = await supabase.from('students').select('profile_id').eq('id', payload.student_id).maybeSingle();
         if (student?.profile_id) {
+
           await notificationService.notifyUser(
             student.profile_id,
             'New Marks Uploaded',

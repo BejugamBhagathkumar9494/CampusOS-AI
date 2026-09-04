@@ -17,7 +17,7 @@ export const transportService = {
       .from('transport_routes')
       .insert([payload])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -36,7 +36,8 @@ export const transportService = {
       .from('buses')
       .upsert(busRecord, { onConflict: 'bus_number' })
       .select('*, transport_routes(*)')
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
 

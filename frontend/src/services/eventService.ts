@@ -17,7 +17,8 @@ export const eventService = {
       .from('events')
       .insert([payload])
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
     return data;

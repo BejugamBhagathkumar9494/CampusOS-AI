@@ -21,7 +21,8 @@ export const announcementService = {
       .from('announcements')
       .insert([payload])
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
     return data;

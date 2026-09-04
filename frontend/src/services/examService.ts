@@ -15,7 +15,7 @@ export const examService = {
   async createExam(payload: any) {
     let courseId = payload.course_id;
     if (!courseId) {
-      const { data: firstCourse } = await supabase.from('courses').select('id').limit(1).single();
+      const { data: firstCourse } = await supabase.from('courses').select('id').limit(1).maybeSingle();
       courseId = firstCourse?.id;
     }
 
@@ -30,7 +30,8 @@ export const examService = {
       .from('examinations')
       .insert([minimalRecord])
       .select('*, courses(code, title)')
-      .single();
+      .maybeSingle();
+
 
     if (error) {
       console.error('Exam schedule creation error:', error);

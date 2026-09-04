@@ -48,12 +48,12 @@ export const financeService = {
         .from('students')
         .select('id')
         .eq('profile_id', payload.student_profile_id)
-        .single();
+        .maybeSingle();
       studentId = student?.id;
     }
 
     if (!studentId) {
-      const { data: firstStudent } = await supabase.from('students').select('id').limit(1).single();
+      const { data: firstStudent } = await supabase.from('students').select('id').limit(1).maybeSingle();
       studentId = firstStudent?.id;
     }
 
@@ -69,7 +69,7 @@ export const financeService = {
       .from('fee_payments')
       .insert([record])
       .select('*, students(profile_id)')
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -79,7 +79,7 @@ export const financeService = {
         await notificationService.notifyUser(
           studentProfileId,
           'New Fee Invoice Generated',
-          `An invoice of ₹${data.amount} for "${data.term}" has been generated. Status: PENDING.`,
+          `An invoice of ₹${data?.amount || 25000} for "${data?.term || 'Fall Semester'}" has been generated. Status: PENDING.`,
           'warning'
         );
       }
@@ -100,7 +100,8 @@ export const financeService = {
       })
       .eq('id', paymentId)
       .select('*, students(profile_id)')
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
 

@@ -44,19 +44,22 @@ export const libraryService = {
   },
 
   async issueBook(studentProfileId: string, bookId: string | number, dueDays: number = 14) {
-    const { data: student } = await supabase
-      .from('students')
-      .select('id')
-      .eq('profile_id', studentProfileId)
-      .single();
+    let studentId = studentProfileId;
 
-    const studentId = student?.id || studentProfileId;
+    if (studentProfileId) {
+      const { data: student } = await supabase
+        .from('students')
+        .select('id')
+        .eq('profile_id', studentProfileId)
+        .maybeSingle();
+      if (student?.id) studentId = student.id;
+    }
 
     const { data: book } = await supabase
       .from('library_books')
       .select('title, copies_available')
       .eq('id', bookId)
-      .single();
+      .maybeSingle();
 
     if (!book || book.copies_available <= 0) {
       throw new Error('Book is currently unavailable for borrowing.');
@@ -74,7 +77,7 @@ export const libraryService = {
         due_date: dueDate.toISOString().split('T')[0]
       }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -104,7 +107,7 @@ export const libraryService = {
       .from('issued_books')
       .select('*, library_books(title, copies_available), students(profile_id)')
       .eq('id', issuedBookId)
-      .single();
+      .maybeSingle();
 
     if (!issued) throw new Error('Issued record not found.');
 
@@ -127,7 +130,8 @@ export const libraryService = {
       })
       .eq('id', issuedBookId)
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
 
@@ -167,7 +171,8 @@ export const libraryService = {
         .from('students')
         .select('id')
         .eq('profile_id', studentProfileId)
-        .single();
+        .maybeSingle();
+
 
       if (student) {
         query = query.eq('student_id', student.id);
@@ -292,7 +297,8 @@ export const libraryService = {
         .update({ status: 'approved' })
         .eq('id', requestId)
         .select()
-        .single();
+        .maybeSingle();
+
       if (data) reqObj = data;
     } catch (e) {}
 

@@ -15,7 +15,7 @@ export const assignmentService = {
   async createAssignment(course_id: string | number, title: string, description: string, due_date: string, total_points: number = 100) {
     let finalCourseId = course_id;
     if (!finalCourseId) {
-      const { data: firstCourse } = await supabase.from('courses').select('id').limit(1).single();
+      const { data: firstCourse } = await supabase.from('courses').select('id').limit(1).maybeSingle();
       finalCourseId = firstCourse?.id;
     }
 
@@ -25,7 +25,8 @@ export const assignmentService = {
       .from('assignments')
       .insert([payload])
       .select('*, courses(code, title)')
-      .single();
+      .maybeSingle();
+
 
     if (error) {
       console.error('Assignment creation error:', error);

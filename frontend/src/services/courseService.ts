@@ -2,16 +2,22 @@ import { supabase } from './supabaseClient';
 
 export const courseService = {
   async getStudentCourses(studentProfileId: string) {
+    if (!studentProfileId) {
+      const { data: courses } = await supabase.from('courses').select('*').order('code');
+      return courses || [];
+    }
+
     const { data: student } = await supabase
       .from('students')
       .select('id, current_semester')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
 
     if (!student) {
       const { data: courses } = await supabase.from('courses').select('*').order('code');
       return courses || [];
     }
+
 
     const { data: enrollments } = await supabase
       .from('course_enrollments')
@@ -45,16 +51,22 @@ export const courseService = {
   },
 
   async getFacultyCourses(facultyProfileId: string) {
+    if (!facultyProfileId) {
+      const { data: courses } = await supabase.from('courses').select('*').order('code');
+      return courses || [];
+    }
+
     const { data: faculty } = await supabase
       .from('faculty')
       .select('id, profiles(full_name)')
       .eq('profile_id', facultyProfileId)
-      .single();
+      .maybeSingle();
 
     if (!faculty) {
       const { data: courses } = await supabase.from('courses').select('*').order('code');
       return courses || [];
     }
+
 
     const { data: courses } = await supabase
       .from('courses')
@@ -101,7 +113,7 @@ export const courseService = {
               employee_id: prof.institution_id || `FAC-${prof.id.slice(0, 6).toUpperCase()}`
             }])
             .select()
-            .single();
+            .maybeSingle();
           if (newFac) facRecord = newFac;
         } catch (e) {
           console.warn('Auto-create faculty row warning:', e);
@@ -147,7 +159,8 @@ export const courseService = {
       .from('courses')
       .insert([minimalPayload])
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) {
       console.error('Core course creation error:', error);
@@ -196,11 +209,14 @@ export const courseService = {
   },
 
   async enrollCourse(studentProfileId: string, courseId: string | number) {
+    if (!studentProfileId) throw new Error('Student profile ID is required');
+
     const { data: student } = await supabase
       .from('students')
       .select('id')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
+
 
     if (!student) throw new Error('Student profile record not found');
 
@@ -208,7 +224,8 @@ export const courseService = {
       .from('course_enrollments')
       .upsert({ course_id: courseId, student_id: student.id })
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
     return data;

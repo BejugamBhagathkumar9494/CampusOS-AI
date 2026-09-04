@@ -2,13 +2,17 @@ import { supabase } from './supabaseClient';
 
 export const analyticsService = {
   async getStudentAnalytics(studentProfileId: string) {
+    if (!studentProfileId) {
+      return { attendance_percentage: 100.0, cgpa: 8.0, issued_books: 0, open_complaints: 0 };
+    }
     const { data: student } = await supabase
       .from('students')
       .select('id, cgpa')
       .eq('profile_id', studentProfileId)
-      .single();
+      .maybeSingle();
 
     const studentId = student?.id;
+
 
     let attendanceRate = 100.0;
     if (studentId) {
@@ -43,13 +47,17 @@ export const analyticsService = {
   },
 
   async getFacultyAnalytics(facultyProfileId: string) {
+    if (!facultyProfileId) {
+      return { courses_handled: 3, total_students: 0, pending_grading: 0, overall_attendance: 100.0 };
+    }
     const { data: faculty } = await supabase
       .from('faculty')
       .select('id')
       .eq('profile_id', facultyProfileId)
-      .single();
+      .maybeSingle();
 
     const facultyId = faculty?.id;
+
 
     let coursesCount = 0;
     if (facultyId) {

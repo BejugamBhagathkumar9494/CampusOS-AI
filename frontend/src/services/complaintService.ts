@@ -27,7 +27,7 @@ export const complaintService = {
       .from('complaints')
       .insert([{ complainant_id, title, description, category, priority, status: 'pending' }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -46,7 +46,8 @@ export const complaintService = {
       .update(updateData)
       .eq('id', complaintId)
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) throw error;
     return data;

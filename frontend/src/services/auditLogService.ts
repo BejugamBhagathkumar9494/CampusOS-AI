@@ -12,7 +12,8 @@ export const auditLogService = {
         metadata: metadata || {}
       }])
       .select()
-      .single();
+      .maybeSingle();
+
 
     if (error) {
       console.warn('Failed to record audit log entry:', error);

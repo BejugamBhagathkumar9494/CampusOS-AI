@@ -49,7 +49,7 @@ export default function PlacementsPage() {
           .from('students')
           .select('cgpa')
           .eq('profile_id', profile.id)
-          .single();
+          .maybeSingle();
 
         if (student?.cgpa) {
           setCgpa(String(student.cgpa));
