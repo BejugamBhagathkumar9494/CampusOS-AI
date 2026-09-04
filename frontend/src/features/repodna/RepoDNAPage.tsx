@@ -130,7 +130,12 @@ export default function RepoDNAPage() {
       ]);
       setGithubUrl('');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to analyze repository. Ensure it is public and accessible.');
+      const msg = err?.message || '';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
+        setErrorMessage('Cannot connect to the backend server. Please verify the FastAPI server is running on http://localhost:8000 (run: uvicorn app.main:app --port 8000).');
+      } else {
+        setErrorMessage(msg || 'Failed to analyze repository. Ensure it is public and accessible.');
+      }
     } finally {
       setIsScanning(false);
     }
@@ -249,6 +254,32 @@ export default function RepoDNAPage() {
             )}
           </button>
         </form>
+
+        {/* Quick Repository Presets */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 z-10 relative">
+          <span className="text-[11px] font-bold text-[#5E6763]">Quick presets:</span>
+          <button
+            type="button"
+            onClick={() => setGithubUrl('https://github.com/BejugamBhagathkumar9494/CampusOS-AI')}
+            className="px-2.5 py-1 rounded-lg bg-[#FAF0E9] hover:bg-[#FDF2ED] text-[#C85A32] text-[11px] font-bold border border-[#C85A32]/30 transition-all active:scale-95"
+          >
+            CampusOS AI (Current Workspace)
+          </button>
+          <button
+            type="button"
+            onClick={() => setGithubUrl('https://github.com/pallets/flask')}
+            className="px-2.5 py-1 rounded-lg bg-white hover:bg-[#FAF7F2] text-[#5E6763] text-[11px] font-semibold border border-[#EAE3D8] transition-all active:scale-95"
+          >
+            Flask
+          </button>
+          <button
+            type="button"
+            onClick={() => setGithubUrl('https://github.com/facebook/react')}
+            className="px-2.5 py-1 rounded-lg bg-white hover:bg-[#FAF7F2] text-[#5E6763] text-[11px] font-semibold border border-[#EAE3D8] transition-all active:scale-95"
+          >
+            React
+          </button>
+        </div>
 
         {errorMessage && (
           <div className="mt-4 p-3.5 rounded-xl bg-[#FEF7ED] border border-[#D9822B]/30 text-[#D9822B] text-xs font-medium flex items-center gap-2 z-10 relative animate-fade-in">

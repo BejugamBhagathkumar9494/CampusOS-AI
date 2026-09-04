@@ -7,32 +7,38 @@ from typing import Dict, Any, List, Optional, Tuple
 import httpx
 
 IGNORED_DIR_PATTERNS = [
-    r'^\.git(?:/|$)',
-    r'node_modules(?:/|$)',
-    r'\.next(?:/|$)',
-    r'\.nuxt(?:/|$)',
-    r'dist(?:/|$)',
-    r'build(?:/|$)',
-    r'out(?:/|$)',
-    r'target(?:/|$)',
-    r'bin(?:/|$)',
-    r'obj(?:/|$)',
-    r'__pycache__(?:/|$)',
-    r'\.pytest_cache(?:/|$)',
-    r'\.venv(?:/|$)',
-    r'venv(?:/|$)',
-    r'env(?:/|$)',
-    r'\.idea(?:/|$)',
-    r'\.vscode(?:/|$)',
-    r'coverage(?:/|$)',
-    r'\.gradle(?:/|$)',
+    r'(?:^|/)\.git(?:/|$)',
+    r'(?:^|/)node_modules(?:/|$)',
+    r'(?:^|/)\.next(?:/|$)',
+    r'(?:^|/)\.nuxt(?:/|$)',
+    r'(?:^|/)dist(?:/|$)',
+    r'(?:^|/)build(?:/|$)',
+    r'(?:^|/)out(?:/|$)',
+    r'(?:^|/)target(?:/|$)',
+    r'(?:^|/)bin(?:/|$)',
+    r'(?:^|/)obj(?:/|$)',
+    r'(?:^|/)__pycache__(?:/|$)',
+    r'(?:^|/)\.pytest_cache(?:/|$)',
+    r'(?:^|/)\.venv(?:/|$)',
+    r'(?:^|/)venv(?:/|$)',
+    r'(?:^|/)env(?:/|$)',
+    r'(?:^|/)\.idea(?:/|$)',
+    r'(?:^|/)\.vscode(?:/|$)',
+    r'(?:^|/)coverage(?:/|$)',
+    r'(?:^|/)\.gradle(?:/|$)',
+    r'(?:^|/)rag documents(?:/|$)',
+    r'(?:^|/)campusos datasets(?:/|$)',
+    r'(?:^|/)datasets(?:/|$)',
+    r'(?:^|/)test-results(?:/|$)',
 ]
 
 IGNORED_FILE_EXTENSIONS = {
     '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.bmp',
     '.mp4', '.mov', '.avi', '.mp3', '.wav', '.pdf', '.zip', '.tar', '.gz',
     '.exe', '.dll', '.so', '.dylib', '.class', '.jar', '.pyc', '.wasm',
-    '.ttf', '.woff', '.woff2', '.eot', '.map', '.min.js', '.min.css'
+    '.ttf', '.woff', '.woff2', '.eot', '.map', '.min.js', '.min.css',
+    '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.csv', '.tsv',
+    '.parquet', '.db', '.sqlite', '.sqlite3', '.bin', '.dat'
 }
 
 PRIORITY_MANIFEST_NAMES = {
@@ -238,49 +244,55 @@ async def fetch_github_repository(
     """
     meta = await fetch_github_metadata(owner, repo)
 
-    branches_to_try = [meta.get("default_branch", "main"), "main", "master", "develop"]
-    # De-duplicate while preserving order
-    branches_to_try = list(dict.fromkeys([b for b in branches_to_try if b]))
+    # If analyzing current workspace project, use local files directly to avoid 200MB network timeouts
+    is_local_match = "campusos" in repo.lower() or "campusos" in owner.lower() or "bejugam" in owner.lower()
+    if is_local_match:
+        print(f"[GitHub Scanner] Local project detected for '{owner}/{repo}'. Using workspace scanner directly.")
+        files, tree = scan_local_workspace_fallback(max_files, max_file_size_bytes)
+        return {
+            "owner": owner,
+            "repo_name": repo,
+            "default_branch": meta.get("default_branch", "main"),
+            "description": meta.get("description", "CampusOS Full-Stack Application"),
+            "stars_count": meta.get("stars_count", 0),
+            "forks_count": meta.get("forks_count", 0),
+            "primary_language": meta.get("primary_language", "TypeScript / Python"),
+            "files": files,
+            "tree_structure": tree
+        }
+
+    # Candidate archive download URLs prioritizing HEAD (default branch)
+    default_b = meta.get("default_branch") or "main"
+    candidate_zip_urls = [
+        f"https://github.com/{owner}/{repo}/archive/HEAD.zip",
+        f"https://codeload.github.com/{owner}/{repo}/zip/HEAD",
+        f"https://codeload.github.com/{owner}/{repo}/zip/refs/heads/{default_b}",
+        f"https://api.github.com/repos/{owner}/{repo}/zipball"
+    ]
+    # Remove duplicates while preserving order
+    candidate_zip_urls = list(dict.fromkeys(candidate_zip_urls))
 
     zip_bytes = None
-    successful_branch = "main"
-
-    headers = {"User-Agent": "CampusOS-RepoDNA-Scanner/1.0"}
+    headers = {"User-Agent": "CampusOS-RepoDNA-Scanner/1.0", "Accept": "*/*"}
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
-    async with httpx.AsyncClient(follow_redirects=True, timeout=25.0) as client:
-        for branch in branches_to_try:
-            zip_url = f"https://codeload.github.com/{owner}/{repo}/zip/refs/heads/{branch}"
+    async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
+        for zip_url in candidate_zip_urls:
             try:
                 res = await client.get(zip_url, headers=headers)
                 if res.status_code == 200 and len(res.content) > 100:
                     zip_bytes = res.content
-                    successful_branch = branch
                     break
-            except Exception as branch_err:
-                print(f"[GitHub Scanner] Branch {branch} attempt warning: {branch_err}")
-
-    # Fallback to local workspace if downloading local project repo (e.g. private repo)
-    is_local_match = "campusos" in repo.lower() or "campusos" in owner.lower() or "bejugam" in owner.lower()
+            except Exception as zip_err:
+                print(f"[GitHub Scanner] Zip attempt warning ({zip_url}): {zip_err}")
 
     if not zip_bytes:
-        if is_local_match:
-            print(f"[GitHub Scanner] Using local workspace scanner for '{owner}/{repo}'.")
-            files, tree = scan_local_workspace_fallback(max_files, max_file_size_bytes)
-            return {
-                "owner": owner,
-                "repo_name": repo,
-                "default_branch": "main",
-                "description": meta.get("description", "CampusOS Full-Stack Application"),
-                "stars_count": meta.get("stars_count", 0),
-                "forks_count": meta.get("forks_count", 0),
-                "primary_language": "TypeScript / Python",
-                "files": files,
-                "tree_structure": tree
-            }
-        raise ValueError(f"Unable to download repository content for '{owner}/{repo}'. Ensure the repository is public and accessible on GitHub.")
+        raise ValueError(
+            f"Unable to download repository content for '{owner}/{repo}'. "
+            f"Ensure the repository is public, accessible, and not exceeding GitHub size/rate limits."
+        )
 
     # Extract files in-memory
     extracted_files: List[Dict[str, Any]] = []
@@ -355,7 +367,7 @@ async def fetch_github_repository(
     return {
         "owner": owner,
         "repo_name": repo,
-        "default_branch": successful_branch,
+        "default_branch": meta.get("default_branch", "main"),
         "description": meta.get("description", ""),
         "stars_count": meta.get("stars_count", 0),
         "forks_count": meta.get("forks_count", 0),

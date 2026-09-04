@@ -157,7 +157,7 @@ def build_fallback_analysis(
     }
 
 
-def analyze_repository_pipeline(
+async def analyze_repository_pipeline(
     db: Session,
     repository: StudyRepository,
     files: List[Dict[str, Any]],
@@ -212,23 +212,17 @@ def analyze_repository_pipeline(
     try:
         api_key = resolve_gemini_api_key()
         if api_key:
+            import asyncio
             full_prompt = f"{REPODNA_SYSTEM_INSTRUCTION}\n\n{prompt}"
-            # Use call_gemini_llm (async or sync)
+            response_text = ""
             try:
-                import asyncio
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    import concurrent.futures
-                    with concurrent.futures.ThreadPoolExecutor() as pool:
-                        response_text = pool.submit(asyncio.run, call_gemini_llm(full_prompt)).result()
-                else:
-                    response_text = asyncio.run(call_gemini_llm(full_prompt))
-            except Exception:
-                from app.services.exam_prep.generator import call_gemini_prompt
-                response_text = asyncio.run(call_gemini_prompt(full_prompt))
+                response_text = await asyncio.wait_for(call_gemini_llm(full_prompt), timeout=12.0)
+            except Exception as e1:
+                print(f"[RepoDNA Generator] LLM generation warning: {e1}")
 
-            cleaned = clean_json_text(response_text)
-            analysis_data = json.loads(cleaned)
+            if response_text and response_text.strip():
+                cleaned = clean_json_text(response_text)
+                analysis_data = json.loads(cleaned)
     except Exception as llm_err:
         print(f"[RepoDNA Generator] LLM generation warning: {llm_err}. Using deterministic fallback.")
 

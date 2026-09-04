@@ -19,6 +19,7 @@ router = APIRouter()
 
 class RepoAnalyzeRequest(BaseModel):
     github_url: str
+    force_refresh: Optional[bool] = False
 
 
 class RepoQueryRequest(BaseModel):
@@ -48,7 +49,7 @@ async def analyze_github_repository(
         StudyRepository.github_url.ilike(f"%github.com/{owner}/{repo_name}%")
     ).first()
 
-    if existing_repo and existing_repo.status == "analyzed" and existing_repo.analysis:
+    if not payload.force_refresh and existing_repo and existing_repo.status == "analyzed" and existing_repo.analysis:
         return {
             "message": "Repository intelligence retrieved from cache.",
             "repository": {
@@ -123,7 +124,7 @@ async def analyze_github_repository(
     index_repository_files(db, study_repo, raw_files, file_metadata_map)
 
     # Generate RepoDNA Report
-    analysis_record = analyze_repository_pipeline(
+    analysis_record = await analyze_repository_pipeline(
         db=db,
         repository=study_repo,
         files=raw_files,

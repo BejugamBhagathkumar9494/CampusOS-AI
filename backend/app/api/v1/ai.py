@@ -275,7 +275,7 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
     import base64
     fallback_working_key = base64.b64decode("QVEuQWI4Uk42S013Nk14d2lDVlh2M01LMUVsS0wxdno2NmJaYm9sQjkyZUNEazF6M0QzckE=").decode("utf-8")
     
-    candidate_keys = [primary_key, fallback_working_key]
+    candidate_keys = list(dict.fromkeys([k for k in [primary_key, fallback_working_key] if k and k.strip()]))
     candidate_models = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"]
 
     system_prompt = (
@@ -326,7 +326,8 @@ async def call_gemini_llm(message: str, history: Optional[List[Dict[str, Any]]] 
 
             for model_name in candidate_models:
                 try:
-                    response = client.models.generate_content(
+                    response = await asyncio.to_thread(
+                        client.models.generate_content,
                         model=model_name,
                         contents=contents
                     )
