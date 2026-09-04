@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { repoDnaService } from './services/repoDnaService';
 import { RepoMindmapView } from './components/RepoMindmapView';
+import { MermaidDiagram } from './components/MermaidDiagram';
 import {
   StudyRepository,
   RepositoryAnalysis,
@@ -511,9 +512,11 @@ export default function RepoDNAPage() {
                 </p>
 
                 {analysis.architecture?.mermaid && (
-                  <div className="p-4 rounded-2xl bg-[#1C211F] text-[#FAF7F2] font-mono text-xs overflow-x-auto border border-[#2D3330] shadow-inner">
-                    <div className="text-[10px] uppercase text-[#8E9893] font-bold mb-2">Mermaid System Diagram Code:</div>
-                    <pre className="text-[#FDF2ED]">{analysis.architecture.mermaid}</pre>
+                  <div className="mt-4">
+                    <div className="text-xs uppercase text-[#5E6763] font-bold mb-2 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#C85A32]" /> Interactive Architecture Diagram
+                    </div>
+                    <MermaidDiagram chart={analysis.architecture.mermaid} />
                   </div>
                 )}
               </div>

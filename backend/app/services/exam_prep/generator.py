@@ -27,7 +27,7 @@ def get_gemini_api_key() -> str:
 async def call_gemini_prompt(prompt_text: str, temperature: float = 0.2) -> str:
     """Invokes Gemini LLM with robust retry and model fallbacks."""
     key = get_gemini_api_key()
-    candidate_models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]
+    candidate_models = ["gemini-2.5-flash", "gemini-flash-latest"]
     
     # Try official google-genai SDK first
     try:
