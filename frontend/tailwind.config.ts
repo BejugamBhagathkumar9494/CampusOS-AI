@@ -42,6 +42,53 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // 1. Primary Brand Accents (Terracotta)
+        terracotta: {
+          DEFAULT: "#C85A32",
+          hover: "#B44E27",
+          light: "#FDF2ED",
+          subtle: "#FAF0E9",
+          glow: "rgba(200, 90, 50, 0.16)",
+        },
+        // 2. Neutral Backgrounds (Warm Cream & White)
+        cream: {
+          warm: "#FAF7F2",
+          alt: "#F4EFEA",
+          darker: "#EFE8DF",
+          card: "#FFFFFF",
+          cardSubtle: "#FDFBF8",
+        },
+        // 3. Typography & Text Hierarchy (Charcoal & Warm Greys)
+        charcoal: {
+          DEFAULT: "#1C211F",
+          body: "#2D3330",
+          secondary: "#5E6763",
+          muted: "#8E9893",
+        },
+        // 4. Secondary & Functional Accents
+        sage: {
+          DEFAULT: "#5E8C71",
+          light: "#F0F6F2",
+        },
+        amberAccent: {
+          DEFAULT: "#D9822B",
+          light: "#FEF7ED",
+        },
+        navy: {
+          DEFAULT: "#3D5A80",
+          light: "#EEF3F8",
+        },
+        purpleAccent: {
+          DEFAULT: "#786498",
+          light: "#F4F1F8",
+        },
+        // 5. Borders & Dividers (Warm Beige)
+        beige: {
+          DEFAULT: "#EAE3D8",
+          light: "#F3ECE2",
+          dark: "#DCD2C3",
+          accent: "rgba(200, 90, 50, 0.3)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -75,15 +75,15 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Student Intelligence Workspace
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> Student Intelligence Workspace
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 👋
+            Welcome back, <span className="text-[#C85A32]">{name}</span> 👋
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Your classes, real-time database attendance metrics, and AI assistant insights are ready for today.
           </p>
         </div>
@@ -91,70 +91,70 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/student/repodna"
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2 border border-emerald-400/30"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <GitFork className="w-4 h-4" /> RepoDNA Intelligence
           </Link>
           <Link
             to="/student/exam-prep"
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-purple-500/30 transition-all flex items-center gap-2 border border-purple-400/30"
+            className="px-5 py-3 rounded-2xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 transition-all flex items-center gap-2 border border-[#786498]/40"
           >
             <GraduationCap className="w-4 h-4" /> Exam Preparation
           </Link>
           <Link
             to="/student/ai-assistant"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] font-bold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
           >
-            <Sparkles className="w-4 h-4" /> AI Assistant
+            <Sparkles className="w-4 h-4 text-[#C85A32]" /> AI Assistant
           </Link>
         </div>
 
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Attendance Rate</span>
-            <span className={`text-2xl font-extrabold ${stats.attendance_percentage >= 75 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Attendance Rate</span>
+            <span className={`text-2xl font-extrabold ${stats.attendance_percentage >= 75 ? 'text-[#5E8C71]' : 'text-rose-600'}`}>
               {stats.attendance_percentage}%
             </span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Target: 75.0% Min</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Target: 75.0% Min</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Calendar className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Current CGPA</span>
-            <span className="text-2xl font-extrabold text-indigo-600">{stats.cgpa}</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Academic Record</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Current CGPA</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">{stats.cgpa}</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Academic Record</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Issued Library Books</span>
-            <span className="text-2xl font-extrabold text-slate-900">{stats.issued_books}</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Active Holds</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Issued Library Books</span>
+            <span className="text-2xl font-extrabold text-[#3D5A80]">{stats.issued_books}</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Active Holds</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Open Concerns</span>
-            <span className="text-2xl font-extrabold text-slate-900">{stats.open_complaints}</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Hostel & Campus</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Open Concerns</span>
+            <span className="text-2xl font-extrabold text-[#D9822B]">{stats.open_complaints}</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Hostel & Campus</span>
           </div>
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
@@ -163,63 +163,65 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
       {/* AI Developer & Study Intelligence Featured Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* RepoDNA Card */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white p-6 rounded-[28px] shadow-lg border border-emerald-500/30 flex flex-col justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center border border-emerald-500/30 shrink-0">
+        <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-lg border border-[rgba(200,90,50,0.3)] flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="flex items-start gap-4 z-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#FDF2ED]/10 text-[#C85A32] flex items-center justify-center border border-[#C85A32]/30 shrink-0">
               <GitFork className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                RepoDNA — GitHub Intelligence <span className="px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 text-[10px] font-bold">New</span>
+                RepoDNA — GitHub Intelligence <span className="px-2 py-0.5 rounded-full bg-[#C85A32]/20 text-[#FDF2ED] text-[10px] font-bold border border-[#C85A32]/30">New</span>
               </h3>
-              <p className="text-xs text-slate-300 font-medium mt-1">
+              <p className="text-xs text-[#8E9893] font-medium mt-1">
                 Enter any public GitHub repository to decode its architecture, APIs, data flow, database schemas, and generate interview Q&A.
               </p>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end z-10">
             <Link
               to="/student/repodna"
-              className="px-5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 shrink-0"
+              className="px-5 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-md shadow-[#C85A32]/20 transition-all flex items-center gap-1.5 shrink-0"
             >
               Launch RepoDNA <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-[#C85A32]/10 rounded-full blur-2xl pointer-events-none" />
         </div>
 
         {/* AI Exam Prep Card */}
-        <div className="bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-950 text-white p-6 rounded-[28px] shadow-lg border border-purple-500/30 flex flex-col justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center border border-purple-500/30 shrink-0">
+        <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-lg border border-[#786498]/40 flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="flex items-start gap-4 z-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#F4F1F8]/10 text-[#786498] flex items-center justify-center border border-[#786498]/30 shrink-0">
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                AI Exam Prep from Notes <span className="px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-200 text-[10px] font-bold">New</span>
+                AI Exam Prep from Notes <span className="px-2 py-0.5 rounded-full bg-[#786498]/20 text-[#F4F1F8] text-[10px] font-bold border border-[#786498]/30">New</span>
               </h3>
-              <p className="text-xs text-slate-300 font-medium mt-1">
+              <p className="text-xs text-[#8E9893] font-medium mt-1">
                 Upload all unit PDFs (Unit 1–5) for any subject to generate complete summaries, 2-mark, 4-mark, and 10-mark model answers.
               </p>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end z-10">
             <Link
               to="/student/exam-prep"
-              className="px-5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 shrink-0"
+              className="px-5 py-2.5 rounded-xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-md shadow-[#786498]/20 transition-all flex items-center gap-1.5 shrink-0"
             >
-              Open Exam Studio <ArrowRight className="w-3.5 h-3.5" />
+              Open Exam Studio <ArrowRight className="w-3.5 h-3.5 text-white" />
             </Link>
           </div>
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-[#786498]/10 rounded-full blur-2xl pointer-events-none" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <div className="lg:col-span-8 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-indigo-600" /> Enrolled Courses
+            <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#C85A32]" /> Enrolled Courses
             </h2>
-            <Link to="/student/academics" className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
+            <Link to="/student/academics" className="text-xs font-bold text-[#C85A32] hover:underline flex items-center gap-1">
               View All <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -227,41 +229,41 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {classes.length > 0 ? (
               classes.slice(0, 4).map((c, idx) => (
-                <div key={c.id || idx} className="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 hover:border-indigo-200 transition-all">
+                <div key={c.id || idx} className="p-4 rounded-2xl bg-[#FDFBF8] border border-[#EAE3D8] hover:border-[rgba(200,90,50,0.3)] transition-all">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold font-mono">
+                    <span className="px-2.5 py-1 rounded-lg bg-[#FDF2ED] text-[#C85A32] text-xs font-bold font-mono border border-[rgba(200,90,50,0.2)]">
                       {c.code}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-semibold">{c.credits || 3} Credits</span>
+                    <span className="text-[11px] text-[#8E9893] font-semibold">{c.credits || 3} Credits</span>
                   </div>
-                  <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{c.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1 font-medium">Department: {c.department || 'Computer Science'}</p>
+                  <h3 className="text-sm font-bold text-[#1C211F] line-clamp-1">{c.title}</h3>
+                  <p className="text-xs text-[#5E6763] mt-1 font-medium">Department: {c.department || 'Computer Science'}</p>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-4 col-span-2 text-center font-medium">Loading enrolled courses...</p>
+              <p className="text-xs text-[#8E9893] py-4 col-span-2 text-center font-medium">Loading enrolled courses...</p>
             )}
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-600" /> Campus Notices
+        <div className="lg:col-span-4 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+          <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+            <Clock className="w-5 h-5 text-[#C85A32]" /> Campus Notices
           </h2>
 
           <div className="space-y-3">
             {announcements.length > 0 ? (
               announcements.slice(0, 3).map((ann, idx) => (
-                <div key={ann.id || idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                <div key={ann.id || idx} className="p-3.5 rounded-xl bg-[#FDFBF8] border border-[#EAE3D8] space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-slate-900 truncate">{ann.title}</span>
-                    <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">{ann.target_role || 'All'}</span>
+                    <span className="text-xs font-bold text-[#1C211F] truncate">{ann.title}</span>
+                    <span className="text-[10px] text-[#D9822B] font-bold bg-[#FEF7ED] px-2 py-0.5 rounded-full border border-[#D9822B]/20">{ann.target_role || 'All'}</span>
                   </div>
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{ann.content}</p>
+                  <p className="text-xs text-[#5E6763] line-clamp-2 leading-relaxed">{ann.content}</p>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-4 text-center font-medium">No campus notices posted yet.</p>
+              <p className="text-xs text-[#8E9893] py-4 text-center font-medium">No campus notices posted yet.</p>
             )}
           </div>
         </div>
@@ -377,15 +379,15 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
       {/* Top Faculty Command Banner Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Faculty Command Center
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> Faculty Command Center
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 🎓
+            Welcome back, <span className="text-[#C85A32]">{name}</span> 🎓
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Manage course student rosters, record daily classroom attendance, and oversee assignment grading in real time.
           </p>
         </div>
@@ -393,64 +395,64 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
         <div className="flex flex-wrap items-center gap-3 z-10">
           <Link
             to="/faculty/attendance"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Users className="w-4 h-4" /> Open Attendance Portal
           </Link>
 
           <button
             onClick={() => setNoticeModal(true)}
-            className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur-md border border-white/15 transition-all flex items-center gap-2"
+            className="px-4 py-3 rounded-2xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] font-bold text-xs shadow-sm border border-[#EAE3D8] transition-all flex items-center gap-2"
           >
-            <Plus className="w-4 h-4" /> Post Quick Notice
+            <Plus className="w-4 h-4 text-[#C85A32]" /> Post Quick Notice
           </button>
         </div>
 
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Real-Time Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Assigned Courses</span>
-            <span className="text-2xl font-extrabold text-indigo-600">{courses.length || stats.courses_handled}</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Active Teaching Modules</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Assigned Courses</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">{courses.length || stats.courses_handled}</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Active Teaching Modules</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Enrolled Students</span>
-            <span className="text-2xl font-extrabold text-slate-900">{stats.total_students || 20}</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Roster Capacity</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Enrolled Students</span>
+            <span className="text-2xl font-extrabold text-[#1C211F]">{stats.total_students || 20}</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Roster Capacity</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <Users className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pending Grading</span>
-            <span className="text-2xl font-extrabold text-amber-600">{submissions.length}</span>
-            <span className="text-[11px] text-amber-600/90 font-semibold block mt-0.5">Awaiting Review</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Pending Grading</span>
+            <span className="text-2xl font-extrabold text-[#D9822B]">{submissions.length}</span>
+            <span className="text-[11px] text-[#D9822B] font-semibold block mt-0.5">Awaiting Review</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
+          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <CheckSquare className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Class Attendance Rate</span>
-            <span className="text-2xl font-extrabold text-indigo-600">{stats.overall_attendance}%</span>
-            <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">Above Target (75%)</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Class Attendance Rate</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">{stats.overall_attendance}%</span>
+            <span className="text-[11px] text-[#5E8C71] font-semibold block mt-0.5">Above Target (75%)</span>
           </div>
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Calendar className="w-5 h-5" />
           </div>
         </div>
@@ -920,15 +922,15 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 function AdminDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" /> Admin Control Desk
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#C85A32]" /> Admin Control Desk
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 🛡️
+            Welcome back, <span className="text-[#C85A32]">{name}</span> 🛡️
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Manage university users, monitor campus complaints, and broadcast university notices.
           </p>
         </div>
@@ -936,50 +938,51 @@ function AdminDashboard({ name }: { name?: string }) {
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/admin/users"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Users className="w-4 h-4" /> Manage User Accounts
           </Link>
         </div>
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Students</span>
-            <span className="text-2xl font-extrabold text-indigo-600">450</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Total Students</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">450</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Users className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Active Faculty</span>
-            <span className="text-2xl font-extrabold text-emerald-600">32</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Active Faculty</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">32</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Active Courses</span>
-            <span className="text-2xl font-extrabold text-amber-600">24</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Active Courses</span>
+            <span className="text-2xl font-extrabold text-[#3D5A80]">24</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <CheckSquare className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Open Concerns</span>
-            <span className="text-2xl font-extrabold text-rose-600">3</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Open Concerns</span>
+            <span className="text-2xl font-extrabold text-[#D9822B]">3</span>
           </div>
-          <div className="p-3 rounded-2xl bg-rose-50 text-rose-600">
+          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
@@ -991,15 +994,15 @@ function AdminDashboard({ name }: { name?: string }) {
 function SuperAdminDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-950 via-indigo-950 to-purple-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30">
-            <ShieldCheck className="w-3.5 h-3.5 text-purple-400" /> Super Admin Global Control
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#C85A32]" /> Super Admin Global Control
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-white">{name}</span> 👑
+            Welcome back, <span className="text-[#C85A32]">{name}</span> 👑
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Full system governance, institutional user & role control, database security, and audit logs.
           </p>
         </div>
@@ -1007,54 +1010,55 @@ function SuperAdminDashboard({ name }: { name?: string }) {
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/super-admin/users"
-            className="px-5 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Users className="w-4 h-4" /> User & Role Governance
           </Link>
         </div>
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Users</span>
-            <span className="text-2xl font-extrabold text-purple-600">512</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Across All Roles</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Total Users</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">512</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Across All Roles</span>
           </div>
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Users className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Members</span>
-            <span className="text-2xl font-extrabold text-indigo-600">32</span>
-            <span className="text-[11px] text-slate-500 font-semibold block mt-0.5">Active Staff</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Faculty Members</span>
+            <span className="text-2xl font-extrabold text-[#3D5A80]">32</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Active Staff</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">System Health</span>
-            <span className="text-2xl font-extrabold text-emerald-600">99.9%</span>
-            <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">FastAPI & DB Live</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">System Health</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">99.9%</span>
+            <span className="text-[11px] text-[#5E8C71] font-semibold block mt-0.5">FastAPI & DB Live</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Activity className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Security Audits</span>
-            <span className="text-2xl font-extrabold text-slate-900">0</span>
-            <span className="text-[11px] text-emerald-600 font-semibold block mt-0.5">No Active Alerts</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Security Audits</span>
+            <span className="text-2xl font-extrabold text-[#1C211F]">0</span>
+            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">No Active Alerts</span>
           </div>
-          <div className="p-3 rounded-2xl bg-slate-50 text-slate-600">
+          <div className="p-3 rounded-2xl bg-[#FDFBF8] text-[#8E9893] border border-[#EAE3D8]">
             <ShieldCheck className="w-5 h-5" />
           </div>
         </div>
@@ -1066,15 +1070,15 @@ function SuperAdminDashboard({ name }: { name?: string }) {
 function LibrarianDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> Library Operations
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <BookOpen className="w-3.5 h-3.5 text-[#C85A32]" /> Library Operations
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Library Desk, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 📚
+            Library Desk, <span className="text-[#C85A32]">{name}</span> 📚
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Manage catalog records, issue/return textbooks, and track student lending history.
           </p>
         </div>
@@ -1082,11 +1086,12 @@ function LibrarianDashboard({ name }: { name?: string }) {
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/library/library"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <BookOpen className="w-4 h-4" /> Open Library Catalog
           </Link>
         </div>
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
     </div>
   );
@@ -1095,63 +1100,64 @@ function LibrarianDashboard({ name }: { name?: string }) {
 function HostelWardenDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <Building2 className="w-3.5 h-3.5 text-indigo-400" /> Hostel Administration
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <Building2 className="w-3.5 h-3.5 text-[#C85A32]" /> Hostel Administration
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Hostel Warden Portal, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 🏠
+            Hostel Warden Portal, <span className="text-[#C85A32]">{name}</span> 🏠
           </h1>
         </div>
 
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/hostel/hostel"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Building2 className="w-4 h-4" /> Manage Hostel Rooms
           </Link>
         </div>
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Rooms</span>
-            <span className="text-2xl font-extrabold text-indigo-600">120</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Total Rooms</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">120</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Building2 className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Occupied Beds</span>
-            <span className="text-2xl font-extrabold text-emerald-600">210</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Occupied Beds</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">210</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Users className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Maintenance Requests</span>
-            <span className="text-2xl font-extrabold text-amber-600">4</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Maintenance Requests</span>
+            <span className="text-2xl font-extrabold text-[#D9822B]">4</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
+          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Gate Pass Pending</span>
-            <span className="text-2xl font-extrabold text-indigo-600">2</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Gate Pass Pending</span>
+            <span className="text-2xl font-extrabold text-[#3D5A80]">2</span>
           </div>
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <Clock className="w-5 h-5" />
           </div>
         </div>
@@ -1163,63 +1169,64 @@ function HostelWardenDashboard({ name }: { name?: string }) {
 function PlacementOfficerDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white p-7 rounded-[28px] shadow-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <Target className="w-3.5 h-3.5 text-indigo-400" /> Corporate Placement Desk
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
+            <Target className="w-3.5 h-3.5 text-[#C85A32]" /> Corporate Placement Desk
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Placement Officer Portal, <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-white">{name}</span> 💼
+            Placement Officer Portal, <span className="text-[#C85A32]">{name}</span> 💼
           </h1>
         </div>
 
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/placement/placements"
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <ClipboardList className="w-4 h-4" /> View Corporate Drives
           </Link>
         </div>
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Recruiting Companies</span>
-            <span className="text-2xl font-extrabold text-indigo-600">12</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Recruiting Companies</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">12</span>
           </div>
-          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Building2 className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Active Drives</span>
-            <span className="text-2xl font-extrabold text-emerald-600">4</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Active Drives</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">4</span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Target className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Applications</span>
-            <span className="text-2xl font-extrabold text-slate-900">45</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Total Applications</span>
+            <span className="text-2xl font-extrabold text-[#1C211F]">45</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-600">
+          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
             <ClipboardList className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Placement Rate</span>
-            <span className="text-2xl font-extrabold text-emerald-600">88.5%</span>
+            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Placement Rate</span>
+            <span className="text-2xl font-extrabold text-[#5E8C71]">88.5%</span>
           </div>
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
+          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Award className="w-5 h-5" />
           </div>
         </div>
