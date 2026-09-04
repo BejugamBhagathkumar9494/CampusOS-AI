@@ -134,18 +134,13 @@ export default function LandingPage() {
               />
             </div>
             {isAuthenticated ? (
-              <>
-                <Link to={dashboardLink} className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
-                  Dashboard
-                </Link>
-                <Link
-                  to={dashboardLink}
-                  className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
-                >
-                  <span>Go to Dashboard</span>
-                  <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </>
+              <Link
+                to={dashboardLink}
+                className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
+              >
+                <span>Go to Dashboard</span>
+                <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             ) : (
               <>
                 <Link to="/register" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
@@ -180,13 +175,34 @@ export default function LandingPage() {
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">FAQ</a>
             <hr className="border-slate-100" />
             <div className="flex flex-col gap-4">
-              <Link to={isAuthenticated ? dashboardLink : '/register'} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-center text-base font-semibold text-slate-800 hover:text-blue-600 py-2 border border-slate-200 rounded-xl">
-                {isAuthenticated ? 'Dashboard' : 'Register'}
-              </Link>
-              <Link to={isAuthenticated ? dashboardLink : '/login'} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-blue-500/20 hover:bg-blue-700">
-                <span>{isAuthenticated ? 'Go to Dashboard' : 'Login'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  to={dashboardLink}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                >
+                  <span>Go to Dashboard</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center text-base font-semibold text-slate-800 hover:text-blue-600 py-2 border border-slate-200 rounded-xl"
+                  >
+                    Register
+                  </Link>
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                  >
+                    <span>Login</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

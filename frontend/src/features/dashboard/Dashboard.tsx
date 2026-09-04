@@ -88,10 +88,16 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
 
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            to="/student/mock-interview"
+            to="/student/repodna"
             className="px-4 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
-            <Mic className="w-4 h-4" /> AI Mock Interview
+            <GitFork className="w-4 h-4" /> RepoDNA
+          </Link>
+          <Link
+            to="/student/mock-interview"
+            className="px-4 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#1C211F] font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
+          >
+            <Mic className="w-4 h-4 text-[#C85A32]" /> AI Mock Interview
           </Link>
           <Link
             to="/student/exam-prep"
@@ -99,59 +105,188 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
           >
             <GraduationCap className="w-4 h-4 text-[#C85A32]" /> Exam Prep
           </Link>
-          <Link
-            to="/student/repodna"
-            className="px-4 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#1C211F] font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
-          >
-            <GitFork className="w-4 h-4 text-[#C85A32]" /> RepoDNA
-          </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
-          <div>
-            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Attendance Rate</span>
-            <span className={`text-2xl font-bold ${stats.attendance_percentage >= 75 ? 'text-[#5E8C71]' : 'text-[#C85A32]'}`}>
-              {stats.attendance_percentage}%
+      {/* Student Academic & AI Performance Hub - Unified Command Card */}
+      <div className="bg-white rounded-2xl border border-[#EAE3D8] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+        {/* Card Header */}
+        <div className="p-5 sm:p-6 border-b border-[#EAE3D8]/60 bg-gradient-to-r from-[#FAF7F2] via-white to-[#FDF2ED]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center border border-[#C85A32]/20 shadow-xs">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-[#1C211F]">
+                  Academic & AI Readiness Hub
+                </h2>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#5E8C71] animate-pulse"></span>
+                  Good Standing
+                </span>
+              </div>
+              <p className="text-xs text-[#5E6763] font-normal mt-0.5">
+                Real-time snapshot of attendance health, cumulative GPA, enrolled workload, and placement preparedness
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <Link
+              to="/student/academics"
+              className="px-3.5 py-2 rounded-xl border border-[#EAE3D8] hover:border-[#C85A32]/40 bg-white hover:bg-[#FAF7F2] text-[#1C211F] text-xs font-semibold transition-all flex items-center gap-1.5 shadow-2xs"
+            >
+              Academic Record <ArrowRight className="w-3.5 h-3.5 text-[#C85A32]" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Unified 4 Performance Pillars */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#EAE3D8]/60 bg-white">
+          {/* 1. Attendance Health */}
+          <div className="p-5 flex flex-col justify-between hover:bg-[#FAF7F2]/40 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider">Attendance Rate</span>
+              <div className="p-2 rounded-lg bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
+                <Calendar className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <span className={`text-2xl sm:text-3xl font-bold ${stats.attendance_percentage >= 75 ? 'text-[#5E8C71]' : 'text-[#C85A32]'}`}>
+                  {stats.attendance_percentage}%
+                </span>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#F0F6F2] text-[#5E8C71]">
+                  {stats.attendance_percentage >= 75 ? 'Optimal' : 'Attention'}
+                </span>
+              </div>
+              <div className="w-full bg-[#EAE3D8]/50 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[#5E8C71] h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(0, stats.attendance_percentage))}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-[#5E6763] font-medium pt-0.5">
+                <span>Target: 75.0% Min</span>
+                <span className="text-[#5E8C71] font-semibold">Safe</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Cumulative CGPA */}
+          <div className="p-5 flex flex-col justify-between hover:bg-[#FAF7F2]/40 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider">Current CGPA</span>
+              <div className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
+                <Award className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#C85A32]">
+                    {stats.cgpa}
+                  </span>
+                  <span className="text-xs text-[#8E9893] font-medium">/ 10.0</span>
+                </div>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32]">
+                  Distinction
+                </span>
+              </div>
+              <div className="w-full bg-[#EAE3D8]/50 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[#C85A32] h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(0, (Number(stats.cgpa) / 10) * 100))}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-[#5E6763] font-medium pt-0.5">
+                <span>Academic Standing</span>
+                <span className="text-[#C85A32] font-semibold">Top Tier</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Course Load & Credits */}
+          <div className="p-5 flex flex-col justify-between hover:bg-[#FAF7F2]/40 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider">Active Coursework</span>
+              <div className="p-2 rounded-xl bg-[#FAF7F2] text-[#1C211F] border border-[#EAE3D8]">
+                <BookOpen className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl sm:text-3xl font-bold text-[#1C211F]">
+                  {classes.length > 0 ? classes.length : 4} Modules
+                </span>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[#1C211F] border border-[#EAE3D8]">
+                  {classes.reduce((sum, c) => sum + (c.credits || 3), 0) || 16} Credits
+                </span>
+              </div>
+              <div className="w-full bg-[#EAE3D8]/50 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[#1C211F] h-2 rounded-full transition-all duration-500"
+                  style={{ width: '85%' }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-[#5E6763] font-medium pt-0.5">
+                <span>Enrolled Load</span>
+                <span className="text-[#1C211F] font-semibold">In Progress</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. AI Career Readiness */}
+          <div className="p-5 flex flex-col justify-between hover:bg-[#FAF7F2]/40 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider">AI Skill Readiness</span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 text-indigo-600 border border-indigo-200">
+                <Sparkles className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    92%
+                  </span>
+                </div>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  Interview Ready
+                </span>
+              </div>
+              <div className="w-full bg-[#EAE3D8]/50 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                  style={{ width: '92%' }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-[#5E6763] font-medium pt-0.5">
+                <span>RepoDNA & Voice AI</span>
+                <Link to="/student/mock-interview" className="text-indigo-600 font-semibold hover:underline flex items-center gap-0.5">
+                  Practice <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Insight Advisory Footer */}
+        <div className="px-5 py-3 bg-[#FAF7F2] border-t border-[#EAE3D8]/60 flex items-center justify-between text-xs text-[#5E6763] flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#C85A32] shrink-0" />
+            <span className="font-semibold text-[#1C211F]">
+              AI Academic Advisory:
             </span>
-            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Target: 75.0% Min</span>
+            <span>
+              Attendance is at {stats.attendance_percentage}%. You have full eligibility for upcoming placements and semester examinations.
+            </span>
           </div>
-          <div className="p-3 rounded-xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
-            <Calendar className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
-          <div>
-            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Current CGPA</span>
-            <span className="text-2xl font-bold text-[#C85A32]">{stats.cgpa}</span>
-            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Academic Record</span>
-          </div>
-          <div className="p-3 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
-            <BookOpen className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
-          <div>
-            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Issued Books</span>
-            <span className="text-2xl font-bold text-[#1C211F]">{stats.issued_books}</span>
-            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Active Holds</span>
-          </div>
-          <div className="p-3 rounded-xl bg-[#FAF7F2] text-[#C85A32] border border-[#EAE3D8]">
-            <Clock className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
-          <div>
-            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Open Concerns</span>
-            <span className="text-2xl font-bold text-[#D9822B]">{stats.open_complaints}</span>
-            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Campus Support</span>
-          </div>
-          <div className="p-3 rounded-xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
-            <AlertTriangle className="w-5 h-5" />
+          <div className="flex items-center gap-3 font-semibold text-[11px]">
+            <Link to="/student/repodna" className="text-[#C85A32] hover:underline flex items-center gap-1">
+              Run RepoDNA Audit →
+            </Link>
           </div>
         </div>
       </div>

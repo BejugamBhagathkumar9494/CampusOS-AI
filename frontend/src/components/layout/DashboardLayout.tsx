@@ -105,8 +105,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const getSidebarItems = (userRole: UserRole | string) => {
     const studentItems = [
       { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
-      { name: 'AI Voice Mock Interview', path: '/student/mock-interview', icon: Mic },
       { name: 'RepoDNA Intelligence', path: '/student/repodna', icon: GitFork },
+      { name: 'AI Voice Mock Interview', path: '/student/mock-interview', icon: Mic },
       { name: 'AI Exam Prep', path: '/student/exam-prep', icon: GraduationCap },
       { name: 'AI Assistant', path: '/student/ai-assistant', icon: MessageSquare },
       { name: 'Exams', path: '/student/exams', icon: FileText },
