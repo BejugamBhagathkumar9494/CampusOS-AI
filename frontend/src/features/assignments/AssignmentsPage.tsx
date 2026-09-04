@@ -230,7 +230,7 @@ export default function AssignmentsPage() {
                       <div className="mt-3 p-3.5 rounded-xl bg-white border border-[#EAE3D8] space-y-1.5">
                         <div className="flex items-center justify-between">
                           <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-md border ${
-                            isGraded ? 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71]/30' : 'bg-[#F4EFEA] text-[#3D5A80] border-[#3D5A80]/30'
+                            isGraded ? 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71]/30' : 'bg-[#FAF0E9] text-[#C85A32] border-[#C85A32]/30'
                           }`}>
                             {isGraded ? 'Graded & Evaluated' : 'Submitted • Pending Faculty Evaluation'}
                           </span>

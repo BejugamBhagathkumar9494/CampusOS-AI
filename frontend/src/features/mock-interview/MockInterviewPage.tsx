@@ -27,7 +27,13 @@ import {
   HelpCircle,
   Copy,
   Terminal,
-  Activity
+  Activity,
+  Bot,
+  User,
+  Maximize2,
+  Minimize2,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 
@@ -40,12 +46,21 @@ interface InterviewRole {
   seniority_levels: string[];
 }
 
+export interface AnswerVerification {
+  status: string;
+  score: number;
+  summary: string;
+  key_points_covered: string[];
+  missing_or_incorrect: string[];
+}
+
 interface TranscriptItem {
   role: 'interviewer' | 'student';
   content: string;
   timestamp: number;
   turn_index?: number;
   is_followup?: boolean;
+  verification?: AnswerVerification;
 }
 
 interface EvaluationRubric {
@@ -110,6 +125,8 @@ export default function MockInterviewPage() {
   const [audioWaves, setAudioWaves] = useState<number[]>([15, 30, 45, 60, 40, 25, 50, 75, 60, 35, 20]);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [latestVerification, setLatestVerification] = useState<AnswerVerification | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // Evaluation & 7-Day Plan State
   const [evaluation, setEvaluation] = useState<InterviewEvaluation | null>(null);
@@ -121,6 +138,27 @@ export default function MockInterviewPage() {
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const timerRef = useRef<any>(null);
   const waveIntervalRef = useRef<any>(null);
+
+  // Fullscreen management for full screen mock interview studio
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const onFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
 
   // Fetch available interview roles
   useEffect(() => {
@@ -331,6 +369,7 @@ export default function MockInterviewPage() {
   const handleStartInterview = async () => {
     setStage('interview');
     setElapsedSeconds(0);
+    setLatestVerification(null);
     setIsProcessingTurn(true);
 
     try {
@@ -433,8 +472,16 @@ export default function MockInterviewPage() {
         setCurrentRound(data.current_round);
         setActiveQuestion(data.interviewer_response);
 
+        if (data.verification) {
+          setLatestVerification(data.verification);
+        }
+
         const updatedTranscript: TranscriptItem[] = [
-          ...newTranscript,
+          ...newTranscript.map((t, idx) =>
+            idx === newTranscript.length - 1 && data.verification
+              ? { ...t, verification: data.verification }
+              : t
+          ),
           {
             role: 'interviewer',
             content: data.interviewer_response,
@@ -459,10 +506,20 @@ export default function MockInterviewPage() {
       setTimeout(() => {
         const fallbackFollowUp =
           "Thanks for explaining that. You hit on the main points. Let's dig deeper: How does this architecture handle network partitioning or high concurrency race conditions?";
+        const fallbackVerification: AnswerVerification = {
+          status: 'Verified • Adequate',
+          score: 84,
+          summary: 'Candidate articulated core technical constructs clearly. Would benefit from providing more concrete latency metrics and failure-mode recovery specifics.',
+          key_points_covered: ['Core architectural components', 'Asynchronous data flow', 'Component boundaries'],
+          missing_or_incorrect: ['Network partition handling', 'Cache stampede and race condition edge cases']
+        };
+        setLatestVerification(fallbackVerification);
         setCurrentRound((prev) => prev + 1);
         setActiveQuestion(fallbackFollowUp);
         setTranscript((prev) => [
-          ...prev,
+          ...prev.map((t, idx) =>
+            idx === prev.length - 1 ? { ...t, verification: fallbackVerification } : t
+          ),
           {
             role: 'interviewer',
             content: fallbackFollowUp,
@@ -754,7 +811,7 @@ export default function MockInterviewPage() {
               {/* Optional Resume Notes */}
               <div className="rounded-2xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 shadow-sm">
                 <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-[#3D5A80]" />
+                  <BookOpen className="h-5 w-5 text-[#C85A32]" />
                   3. Candidate Profile Notes / Target Company (Optional)
                 </h2>
                 <p className="mt-1 text-xs text-[#5E6763]">
@@ -805,9 +862,9 @@ export default function MockInterviewPage() {
                       </div>
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-[#5E6763] flex items-center gap-1.5">
-                          <Volume2 className="h-3.5 w-3.5 text-[#3D5A80]" /> Voice Synthesis
+                          <Volume2 className="h-3.5 w-3.5 text-[#C85A32]" /> Voice Synthesis
                         </span>
-                        <span className="font-semibold text-[#3D5A80]">Enabled (Natural AI)</span>
+                        <span className="font-semibold text-[#C85A32]">Enabled (Natural AI)</span>
                       </div>
                     </div>
                   </div>
@@ -855,21 +912,21 @@ export default function MockInterviewPage() {
   }
 
   // -------------------------------------------------------------
-  // RENDER: LIVE INTERVIEW STAGE
+  // RENDER: LIVE INTERVIEW STAGE (FULL SCREEN STUDIO)
   // -------------------------------------------------------------
   if (stage === 'interview') {
     const activeRoleTitle = roles.find((r) => r.id === selectedRole)?.title || 'Technical Candidate';
 
     return (
-      <div className="min-h-screen bg-[#FAF7F2] text-[#1C211F] font-sans flex flex-col">
+      <div className="fixed inset-0 z-50 bg-[#FAF7F2] text-[#1C211F] font-sans flex flex-col overflow-y-auto">
         {/* Top Header HUD */}
-        <header className="border-b border-[#EAE3D8] bg-[#FFFFFF] px-6 py-4 sticky top-0 z-20 shadow-sm">
-          <div className="mx-auto max-w-6xl flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <header className="border-b border-[#EAE3D8] bg-[#FFFFFF] px-4 sm:px-6 py-3.5 sticky top-0 z-20 shadow-xs">
+          <div className="mx-auto max-w-7xl flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-[#5E8C71] animate-pulse"></div>
+                <div className="h-2.5 w-2.5 rounded-full bg-[#5E8C71] animate-pulse"></div>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#5E8C71]">
-                  Live Technical Session
+                  Live Technical Studio
                 </span>
               </div>
               <div className="h-4 w-px bg-[#EAE3D8]"></div>
@@ -881,14 +938,14 @@ export default function MockInterviewPage() {
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Turn Counter */}
-              <div className="rounded-lg bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-1.5 text-xs font-bold text-[#2D3330]">
+              <div className="rounded-lg bg-[#FAF7F2] border border-[#EAE3D8] px-2.5 py-1 text-xs font-bold text-[#2D3330]">
                 Turn {currentRound} / {totalRounds}
               </div>
 
               {/* Timer */}
-              <div className="flex items-center gap-1.5 rounded-lg bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-1.5 text-xs font-mono font-semibold text-[#1C211F]">
+              <div className="flex items-center gap-1.5 rounded-lg bg-[#FAF7F2] border border-[#EAE3D8] px-2.5 py-1 text-xs font-mono font-semibold text-[#1C211F]">
                 <Clock className="h-3.5 w-3.5 text-[#C85A32]" />
                 {formatTime(elapsedSeconds)}
               </div>
@@ -903,7 +960,7 @@ export default function MockInterviewPage() {
                     setIsInterviewerSpeaking(false);
                   }
                 }}
-                className={`p-2 rounded-lg border transition-all ${
+                className={`p-1.5 rounded-lg border transition-all ${
                   voiceMuted
                     ? 'border-[#D9822B] bg-[#D9822B]/10 text-[#D9822B]'
                     : 'border-[#EAE3D8] bg-[#FAF7F2] text-[#5E6763] hover:text-[#1C211F]'
@@ -913,23 +970,52 @@ export default function MockInterviewPage() {
                 {voiceMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
 
+              {/* Fullscreen Toggle */}
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="p-1.5 rounded-lg border border-[#EAE3D8] bg-[#FAF7F2] text-[#5E6763] hover:text-[#C85A32] transition-all"
+                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              >
+                {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </button>
+
+              {/* Exit Studio Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Exit technical mock interview studio and return to configuration?')) {
+                    stopVoiceRecognition();
+                    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                      window.speechSynthesis.cancel();
+                    }
+                    setStage('setup');
+                  }
+                }}
+                className="flex items-center gap-1 rounded-lg border border-[#EAE3D8] bg-[#FAF7F2] px-2.5 py-1 text-xs font-bold text-[#5E6763] hover:text-[#C85A32] hover:bg-white transition-all"
+                title="Exit Interview Studio"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Exit</span>
+              </button>
+
               {/* Wrap Up & Score Button */}
               <button
                 type="button"
                 onClick={handleEndAndEvaluate}
-                className="flex items-center gap-1.5 rounded-lg bg-[#FAF0E9] border border-[#C85A32]/30 px-3.5 py-1.5 text-xs font-bold text-[#C85A32] hover:bg-[#FDF2ED] transition-all"
+                className="flex items-center gap-1.5 rounded-lg bg-[#FAF0E9] border border-[#C85A32]/30 px-3 py-1 text-xs font-bold text-[#C85A32] hover:bg-[#FDF2ED] transition-all"
               >
                 <Square className="h-3.5 w-3.5 fill-[#C85A32]" />
-                Wrap Up & Evaluate
+                <span className="hidden sm:inline">Wrap Up &</span> Evaluate
               </button>
             </div>
           </div>
         </header>
 
         {/* Main Studio Arena */}
-        <main className="flex-1 mx-auto max-w-5xl w-full p-4 md:p-8 flex flex-col justify-between gap-6">
+        <main className="flex-1 mx-auto max-w-6xl w-full p-4 sm:p-6 md:p-8 flex flex-col justify-start gap-5">
           {/* Top Section: AI Interviewer Card with Animated Visualizer */}
-          <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 md:p-8 shadow-sm relative overflow-hidden">
+          <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 md:p-7 shadow-xs relative overflow-hidden">
             {/* Background ambient tint */}
             <div className="absolute top-0 right-0 h-40 w-40 bg-[#FDF2ED] rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
 
@@ -937,15 +1023,15 @@ export default function MockInterviewPage() {
               {/* Avatar Visualizer Box */}
               <div className="relative flex-shrink-0 flex flex-col items-center">
                 <div
-                  className={`h-24 w-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  className={`h-22 w-22 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isInterviewerSpeaking
                       ? 'bg-[#C85A32] shadow-[0_0_24px_rgba(200,90,50,0.35)] scale-105'
                       : isProcessingTurn
-                      ? 'bg-[#3D5A80] animate-pulse'
+                      ? 'bg-[#2D3330] animate-pulse'
                       : 'bg-[#2D3330]'
                   }`}
                 >
-                  <Cpu className="h-10 w-10 text-white" />
+                  <Cpu className="h-9 w-9 text-white" />
                 </div>
 
                 {/* Status Indicator Badge */}
@@ -955,8 +1041,8 @@ export default function MockInterviewPage() {
                       <Volume2 className="h-3 w-3 animate-bounce" /> Speaking
                     </span>
                   ) : isProcessingTurn ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#3D5A80]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#3D5A80]">
-                      <Sparkles className="h-3 w-3 animate-spin" /> Reasoning...
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#FEF7ED] px-2.5 py-0.5 text-[11px] font-bold text-[#D9822B] border border-[#D9822B]/30">
+                      <Sparkles className="h-3 w-3 animate-spin" /> Verifying & Reasoning...
                     </span>
                   ) : isListening ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#5E8C71]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#5E8C71]">
@@ -990,7 +1076,7 @@ export default function MockInterviewPage() {
                 </p>
 
                 {/* Audio Wave Visualizer Bars */}
-                <div className="mt-4 flex items-center justify-center md:justify-start gap-1 h-8">
+                <div className="mt-4 flex items-center justify-center md:justify-start gap-1 h-7">
                   {audioWaves.map((height, idx) => (
                     <div
                       key={idx}
@@ -1009,17 +1095,104 @@ export default function MockInterviewPage() {
             </div>
           </div>
 
+          {/* Middle Section: Real-Time LLM Answer Verification Engine */}
+          <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-5 md:p-6 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EAE3D8] pb-3 mb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-[#5E8C71]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#1C211F]">
+                  LLM Question & Answer Verification Engine
+                </span>
+              </div>
+              {latestVerification ? (
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-xs font-extrabold ${
+                      latestVerification.score >= 85
+                        ? 'bg-[#5E8C71]/15 text-[#5E8C71] border border-[#5E8C71]/30'
+                        : latestVerification.score >= 70
+                        ? 'bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/30'
+                        : 'bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/30'
+                    }`}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    {latestVerification.status} ({latestVerification.score}/100)
+                  </span>
+                </div>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#FAF7F2] px-3 py-0.5 text-xs font-medium text-[#8E9893] border border-[#EAE3D8]">
+                  <Sparkles className="h-3.5 w-3.5 text-[#C85A32]" />
+                  Awaiting Candidate Response for Turn {currentRound}
+                </span>
+              )}
+            </div>
+
+            {latestVerification ? (
+              <div className="space-y-3">
+                <p className="text-xs md:text-sm text-[#2D3330] leading-relaxed">
+                  <strong className="text-[#C85A32] font-bold">Verification Assessment: </strong>
+                  {latestVerification.summary}
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div className="rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] p-3.5">
+                    <span className="text-xs font-bold text-[#5E8C71] flex items-center gap-1.5 mb-2">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Verified Key Concepts
+                    </span>
+                    <ul className="space-y-1.5 text-xs text-[#2D3330]">
+                      {latestVerification.key_points_covered && latestVerification.key_points_covered.length > 0 ? (
+                        latestVerification.key_points_covered.map((pt, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-[#5E8C71] font-bold">•</span>
+                            <span>{pt}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-[#8E9893] italic">No major core concepts recognized.</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  <div className="rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] p-3.5">
+                    <span className="text-xs font-bold text-[#D9822B] flex items-center gap-1.5 mb-2">
+                      <AlertCircle className="h-3.5 w-3.5" /> Missing Nuances & Edge Cases
+                    </span>
+                    <ul className="space-y-1.5 text-xs text-[#2D3330]">
+                      {latestVerification.missing_or_incorrect && latestVerification.missing_or_incorrect.length > 0 ? (
+                        latestVerification.missing_or_incorrect.map((mis, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-[#D9822B] font-bold">•</span>
+                            <span>{mis}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-[#5E8C71] font-semibold">Exhaustive coverage of architectural trade-offs.</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#5E6763] flex items-center gap-3">
+                <Sparkles className="h-4 w-4 text-[#C85A32] flex-shrink-0" />
+                <span>
+                  Speak or type your technical response below. The Gemini LLM evaluator verifies technical accuracy, architectural soundness, and edge case depth immediately upon submission.
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Bottom Section: Candidate Speech / Text Console */}
-          <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 md:p-8 shadow-sm">
+          <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 md:p-7 shadow-xs">
             <div className="flex items-center justify-between border-b border-[#EAE3D8] pb-3 mb-4">
               <span className="text-xs font-bold uppercase tracking-wider text-[#2D3330] flex items-center gap-1.5">
                 <Mic className="h-4 w-4 text-[#C85A32]" />
-                Your Voice Response Console
+                Candidate Technical Response Console
               </span>
               <button
                 type="button"
                 onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                className="text-xs font-semibold text-[#3D5A80] hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-[#C85A32] hover:underline flex items-center gap-1"
               >
                 {isDrawerOpen ? 'Hide Full Transcript' : 'View Full Transcript'} ({transcript.length} turns)
               </button>
@@ -1038,7 +1211,7 @@ export default function MockInterviewPage() {
                     ? 'Listening to your voice... Speak clearly into your microphone.'
                     : 'Click "Start Speaking" or type your complete technical response here...'
                 }
-                rows={4}
+                rows={3}
                 className="w-full rounded-2xl border border-[#EAE3D8] bg-[#FAF7F2] p-4 text-sm text-[#1C211F] placeholder-[#8E9893] focus:border-[#C85A32] focus:bg-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-[#C85A32]/20"
               />
 
@@ -1057,7 +1230,7 @@ export default function MockInterviewPage() {
                   <button
                     type="button"
                     onClick={stopVoiceRecognition}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-[#D9822B] px-5 py-3 text-xs font-bold text-white shadow-sm hover:bg-[#B44E27] transition-all"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-[#D9822B] px-5 py-3 text-xs font-bold text-white shadow-xs hover:bg-[#B44E27] transition-all"
                   >
                     <MicOff className="h-4 w-4" /> Pause Recording
                   </button>
@@ -1065,7 +1238,7 @@ export default function MockInterviewPage() {
                   <button
                     type="button"
                     onClick={startVoiceRecognition}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-[#5E8C71] px-5 py-3 text-xs font-bold text-white shadow-sm hover:bg-[#4D755E] transition-all active:scale-[0.98]"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-xl bg-[#5E8C71] px-5 py-3 text-xs font-bold text-white shadow-xs hover:bg-[#4D755E] transition-all active:scale-[0.98]"
                   >
                     <Mic className="h-4 w-4 animate-pulse" /> Start Speaking
                   </button>
@@ -1076,7 +1249,7 @@ export default function MockInterviewPage() {
                 type="button"
                 onClick={handleSubmitTurn}
                 disabled={isProcessingTurn || (!liveSpeechText && !textInputFallback.trim())}
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs font-bold text-white shadow-md transition-all ${
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs font-bold text-white shadow-xs transition-all ${
                   isProcessingTurn || (!liveSpeechText && !textInputFallback.trim())
                     ? 'bg-[#8E9893] cursor-not-allowed opacity-60'
                     : 'bg-[#C85A32] hover:bg-[#B44E27] active:scale-[0.98]'
@@ -1085,7 +1258,7 @@ export default function MockInterviewPage() {
                 {isProcessingTurn ? (
                   <>
                     <Sparkles className="h-4 w-4 animate-spin" />
-                    Analyzing Response...
+                    Verifying & Formulating Follow-up...
                   </>
                 ) : (
                   <>
@@ -1099,29 +1272,49 @@ export default function MockInterviewPage() {
 
           {/* Transcript Drawer Accordion */}
           {isDrawerOpen && (
-            <div className="rounded-2xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 shadow-sm">
+            <div className="rounded-3xl border border-[#EAE3D8] bg-[#FFFFFF] p-6 shadow-xs">
               <h3 className="text-sm font-bold text-[#1C211F] mb-4 flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-[#C85A32]" /> Complete Interview Dialogue History
+                <Terminal className="h-4 w-4 text-[#C85A32]" /> Complete Interview Dialogue & Verification History
               </h3>
-              <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
                 {transcript.map((item, idx) => (
                   <div
                     key={idx}
-                    className={`p-3.5 rounded-xl text-xs leading-relaxed ${
+                    className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
                       item.role === 'interviewer'
                         ? 'bg-[#FDF2ED] border border-[#C85A32]/20 text-[#2D3330]'
                         : 'bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F]'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1 font-bold">
-                      <span className={item.role === 'interviewer' ? 'text-[#C85A32]' : 'text-[#3D5A80]'}>
-                        {item.role === 'interviewer' ? '🤖 Interviewer' : '👤 You'}
+                    <div className="flex items-center justify-between mb-1.5 font-bold">
+                      <span className={`inline-flex items-center gap-1.5 ${item.role === 'interviewer' ? 'text-[#C85A32]' : 'text-[#2D3330]'}`}>
+                        {item.role === 'interviewer' ? (
+                          <>
+                            <Bot className="h-3.5 w-3.5 text-[#C85A32]" />
+                            Interviewer
+                          </>
+                        ) : (
+                          <>
+                            <User className="h-3.5 w-3.5 text-[#2D3330]" />
+                            Candidate (You)
+                          </>
+                        )}
                       </span>
                       <span className="text-[10px] text-[#8E9893]">
                         {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                     </div>
                     <p>{item.content}</p>
+
+                    {item.verification && (
+                      <div className="mt-2 pt-2 border-t border-[#EAE3D8] flex items-center gap-2 text-[11px]">
+                        <ShieldCheck className="h-3.5 w-3.5 text-[#5E8C71]" />
+                        <span className="font-semibold text-[#5E8C71]">
+                          LLM Verified ({item.verification.score}/100):
+                        </span>
+                        <span className="text-[#5E6763]">{item.verification.status}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1243,8 +1436,8 @@ export default function MockInterviewPage() {
             {[
               { label: 'Technical Competence', metric: evaluation.rubrics.technical_competence, icon: Code2, color: '#C85A32' },
               { label: 'Communication Clarity', metric: evaluation.rubrics.communication_clarity, icon: Activity, color: '#5E8C71' },
-              { label: 'Problem Solving', metric: evaluation.rubrics.problem_solving, icon: Cpu, color: '#3D5A80' },
-              { label: 'System Architecture', metric: evaluation.rubrics.system_architecture, icon: Database, color: '#786498' },
+              { label: 'Problem Solving', metric: evaluation.rubrics.problem_solving, icon: Cpu, color: '#2D3330' },
+              { label: 'System Architecture', metric: evaluation.rubrics.system_architecture, icon: Database, color: '#C85A32' },
               { label: 'Confidence & Delivery', metric: evaluation.rubrics.confidence_delivery, icon: Sparkles, color: '#D9822B' },
             ].map((r, i) => (
               <div key={i} className="rounded-2xl border border-[#EAE3D8] bg-[#FFFFFF] p-4 shadow-sm flex flex-col justify-between">

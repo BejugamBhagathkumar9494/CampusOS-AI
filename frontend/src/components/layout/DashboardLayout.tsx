@@ -109,8 +109,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       { name: 'RepoDNA Intelligence', path: '/student/repodna', icon: GitFork },
       { name: 'AI Exam Prep', path: '/student/exam-prep', icon: GraduationCap },
       { name: 'AI Assistant', path: '/student/ai-assistant', icon: MessageSquare },
-      { name: 'Academics', path: '/student/academics', icon: BookOpen },
-      { name: 'Attendance', path: '/student/attendance', icon: CalendarCheck },
       { name: 'Exams', path: '/student/exams', icon: FileText },
       { name: 'Assignments', path: '/student/assignments', icon: FileEdit },
       { name: 'Library', path: '/student/library', icon: Library },
@@ -124,8 +122,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const facultyItems = [
       { name: 'Dashboard', path: '/faculty/dashboard', icon: LayoutDashboard },
       { name: 'AI Assistant', path: '/faculty/ai-assistant', icon: MessageSquare },
-      { name: 'Academics', path: '/faculty/academics', icon: BookOpen },
-      { name: 'Attendance', path: '/faculty/attendance', icon: CalendarCheck },
       { name: 'Exams', path: '/faculty/exams', icon: FileText },
       { name: 'Assignments', path: '/faculty/assignments', icon: FileEdit },
       { name: 'Settings', path: '/faculty/settings', icon: Settings },

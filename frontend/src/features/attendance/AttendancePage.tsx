@@ -366,7 +366,7 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
                             onClick={() => handleStatusChange(st.student_id, 'excused')}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                               currentStatus === 'excused'
-                                ? 'bg-[#3D5A80] text-white shadow-xs'
+                                ? 'bg-[#D9822B] text-white shadow-xs'
                                 : 'text-[#5E6763] hover:text-[#1C211F]'
                             }`}
                           >

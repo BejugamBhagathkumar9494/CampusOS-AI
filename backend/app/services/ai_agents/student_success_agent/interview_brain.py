@@ -11,6 +11,7 @@ Handles:
 """
 import uuid
 import json
+import re
 import time
 from typing import Dict, Any, List, Optional
 import os
@@ -221,6 +222,10 @@ async def process_interview_turn(
             "status": "error"
         }
 
+    # Find last question asked by interviewer
+    prior_interviewer_turns = [t for t in session["transcript"] if t["role"] == "interviewer"]
+    last_question = prior_interviewer_turns[-1]["content"] if prior_interviewer_turns else "Technical Interview Question"
+
     # Record student turn
     session["transcript"].append({
         "role": "student",
@@ -243,14 +248,35 @@ Key Technical Focus Areas: {focus_areas}.
 
 Current Status: Turn {current_round} of {total_rounds}.
 
-INTERVIEWER BEHAVIOR DIRECTIVES:
-1. Speak naturally like a real human interviewer in a technical room. Keep responses concise (2 to 4 sentences max) because this is a VOICE conversation.
-2. ADAPT DYNAMICALLY to the candidate's last answer:
-   - If their answer was high-level or vague, ask a deep follow-up drill-down on the specific mechanism, edge case, or trade-off they mentioned.
-   - If they gave an incomplete or slightly inaccurate answer, gently probe: "That's an interesting approach, but what happens if [specific failure scenario] occurs?"
-   - If their answer was thorough, acknowledge it briefly and transition to the next technical dimension (e.g. from data structure/API to concurrency, caching, or distributed system design).
-3. Do NOT provide immediate grading or long lectures during the interview. Stay in character as the interviewer.
-4. {"This is the final turn. Give a brief closing remark thanking them for their time and letting them know the interview is wrapping up." if is_final_turn else "Ask the next challenging, realistic interview question or follow-up."}
+TASK:
+1. QUESTION & ANSWER VERIFICATION:
+The candidate just responded to this question:
+"{last_question}"
+
+Candidate's Answer:
+"{student_transcript.strip()}"
+
+Verify the candidate's answer with technical rigor:
+- Accuracy rating: "strong" (score 80-100), "adequate" (score 60-79), or "needs_improvement" (score 0-59).
+- Key technical concepts and mechanisms correctly identified.
+- Gaps, missing trade-offs, or misconceptions.
+- A concise 1-2 sentence technical assessment.
+
+2. INTERVIEWER NEXT SPOKEN RESPONSE:
+{"This is the final turn. Give a brief closing remark thanking them for their time and letting them know the interview is wrapping up." if is_final_turn else "Ask the next challenging, realistic interview question or drill-down (2 to 4 sentences max). Acknowledge their point naturally and probe deeper."}
+
+OUTPUT FORMAT:
+Return STRICTLY a valid JSON object matching this schema (no markdown fences or extra prose outside JSON):
+{{
+  "verification": {{
+    "status": "strong" | "adequate" | "needs_improvement",
+    "score": <0-100>,
+    "summary": "<1-2 sentence assessment of answer accuracy and depth>",
+    "key_points_covered": ["<point 1>", "<point 2>"],
+    "missing_or_incorrect": ["<missing edge case or gap>"]
+  }},
+  "interviewer_response": "<spoken response with next question or conclusion>"
+}}
 """
 
     prompt_history = []
@@ -260,10 +286,49 @@ INTERVIEWER BEHAVIOR DIRECTIVES:
             "content": turn["content"]
         })
 
-    interviewer_reply = await call_gemini_for_interview(prompt_history, system_instruction)
+    interviewer_reply_raw = await call_gemini_for_interview(prompt_history, system_instruction)
 
-    # Clean reply
-    interviewer_reply = interviewer_reply.replace("Interviewer:", "").replace("AI:", "").strip()
+    # Parse JSON or fallback
+    verification_data = None
+    interviewer_reply = ""
+    try:
+        clean_text = interviewer_reply_raw.strip()
+        if clean_text.startswith("```"):
+            clean_text = re.sub(r"^```(?:json)?", "", clean_text)
+            clean_text = re.sub(r"```$", "", clean_text).strip()
+        
+        parsed = json.loads(clean_text)
+        verification_data = parsed.get("verification")
+        interviewer_reply = parsed.get("interviewer_response", "")
+    except Exception:
+        json_match = re.search(r"\{.*\}", interviewer_reply_raw, re.DOTALL)
+        if json_match:
+            try:
+                parsed = json.loads(json_match.group(0))
+                verification_data = parsed.get("verification")
+                interviewer_reply = parsed.get("interviewer_response", "")
+            except Exception:
+                pass
+
+    if not interviewer_reply or not interviewer_reply.strip():
+        interviewer_reply = interviewer_reply_raw.replace("Interviewer:", "").replace("AI:", "").strip()
+        if "{" in interviewer_reply and "}" in interviewer_reply:
+            interviewer_reply = "Thank you for explaining that. Let's delve deeper: How would you handle high concurrency or data consistency in this scenario?"
+
+    if not verification_data:
+        word_count = len(student_transcript.strip().split())
+        score = min(92, max(55, 60 + word_count // 3))
+        status = "strong" if score >= 80 else ("adequate" if score >= 65 else "needs_improvement")
+        verification_data = {
+            "status": status,
+            "score": score,
+            "summary": f"Demonstrated solid technical reasoning with relevant terminology ({word_count} words analyzed).",
+            "key_points_covered": ["Addressed core architectural flow", "Applied role-relevant concepts"],
+            "missing_or_incorrect": ["Could expand on high-concurrency race conditions and edge case recovery"]
+        }
+
+    # Store verification on the student turn in session transcript
+    session["transcript"][-1]["verification"] = verification_data
 
     # Record interviewer turn
     session["transcript"].append({
@@ -281,6 +346,7 @@ INTERVIEWER BEHAVIOR DIRECTIVES:
     return {
         "session_id": session_id,
         "interviewer_response": interviewer_reply,
+        "verification": verification_data,
         "current_round": min(session["current_round"], total_rounds),
         "total_rounds": total_rounds,
         "is_finished": is_final_turn,

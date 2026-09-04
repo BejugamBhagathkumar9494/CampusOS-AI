@@ -130,16 +130,16 @@ export default function AIInsightsPage() {
             <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-2">
               <div className="flex justify-between items-center text-[#8E9893]">
                 <span className="text-xs font-bold uppercase tracking-wider">Placement Readiness</span>
-                <Award className="w-4 h-4 text-[#786498]" />
+                <Award className="w-4 h-4 text-[#C85A32]" />
               </div>
-              <div className="text-3xl font-extrabold text-[#786498]">{metrics.placementForecast}%</div>
+              <div className="text-3xl font-extrabold text-[#C85A32]">{metrics.placementForecast}%</div>
               <span className="text-[11px] font-semibold text-[#5E6763]">{metrics.totalDrives} Active Drives</span>
             </div>
 
             <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-2">
               <div className="flex justify-between items-center text-[#8E9893]">
                 <span className="text-xs font-bold uppercase tracking-wider">Average CGPA</span>
-                <BookOpen className="w-4 h-4 text-[#3D5A80]" />
+                <BookOpen className="w-4 h-4 text-[#C85A32]" />
               </div>
               <div className="text-3xl font-extrabold text-[#1C211F]">{metrics.avgCgpa}</div>
               <span className="text-[11px] font-semibold text-[#5E6763]">Recalculated academic mean</span>
@@ -157,8 +157,8 @@ export default function AIInsightsPage() {
                   <span className="text-xl font-extrabold text-[#1C211F]">70%</span>
                   <span className="text-[10px] text-[#5E6763] block mt-0.5">Feature Learning</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-[#F4F1F8] border border-[#786498]/20 text-center">
-                  <span className="text-[10px] font-bold text-[#786498] uppercase block">Validation Set</span>
+                <div className="p-4 rounded-2xl bg-[#FEF7ED] border border-[#D9822B]/20 text-center">
+                  <span className="text-[10px] font-bold text-[#D9822B] uppercase block">Validation Set</span>
                   <span className="text-xl font-extrabold text-[#1C211F]">15%</span>
                   <span className="text-[10px] text-[#5E6763] block mt-0.5">Hyperparameter Tuning</span>
                 </div>

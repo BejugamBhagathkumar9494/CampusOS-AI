@@ -657,7 +657,7 @@ export const UserManagementPage = () => {
                       <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8] font-mono">
                         {c.code}
                       </span>
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F4F1F8] text-[#786498] border border-[#EAE3D8]">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FAF0E9] text-[#C85A32] border border-[#EAE3D8]">
                         Semester {c.semester || 1}
                       </span>
                     </div>
