@@ -314,16 +314,16 @@ export default function AIAssistant() {
           {/* Chat History Sidebar Toggle Button */}
           <button
             onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-            className="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-2xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#5E6763] text-xs font-bold transition-all flex items-center gap-1.5 border border-[#EAE3D8]"
             title="View AI Chat History"
           >
-            <History className="w-4 h-4 text-indigo-600" />
+            <History className="w-4 h-4 text-[#C85A32]" />
             <span>Chat History ({pastSessions.length})</span>
           </button>
 
           <button
             onClick={startNewChatSession}
-            className="px-3.5 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            className="px-3.5 py-2 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shadow-[#C85A32]/20"
             title="Start New AI Chat Session"
           >
             <Plus className="w-4 h-4" />
@@ -331,24 +331,24 @@ export default function AIAssistant() {
           </button>
 
           {/* Segmented Mode Selector Switch */}
-          <div className="bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80 flex items-center gap-1">
+          <div className="bg-[#FAF7F2] p-1 rounded-2xl border border-[#EAE3D8] flex items-center gap-1">
             <button
               onClick={() => setMode('llm')}
               className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mode === 'llm' ? 'bg-white text-purple-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+                mode === 'llm' ? 'bg-white text-[#786498] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <Sparkles className="w-3.5 h-3.5 text-[#786498]" />
               <span className="hidden sm:inline">✨ LLM Mode</span>
               <span className="sm:hidden">LLM</span>
             </button>
             <button
               onClick={() => setMode('rag')}
               className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mode === 'rag' ? 'bg-white text-sky-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+                mode === 'rag' ? 'bg-white text-[#3D5A80] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+              <BookOpen className="w-3.5 h-3.5 text-[#3D5A80]" />
               <span className="hidden sm:inline">📚 Campus RAG</span>
               <span className="sm:hidden">Campus</span>
             </button>
@@ -356,10 +356,10 @@ export default function AIAssistant() {
               <button
                 onClick={() => setMode('subject_rag')}
                 className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  mode === 'subject_rag' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-800'
+                  mode === 'subject_rag' ? 'bg-white text-[#C85A32] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
                 }`}
               >
-                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+                <GraduationCap className="w-3.5 h-3.5 text-[#C85A32]" />
                 <span className="hidden sm:inline">🎓 My Subject Notes</span>
                 <span className="sm:hidden">Notes</span>
               </button>
@@ -371,7 +371,7 @@ export default function AIAssistant() {
             <select
               value={selectedColId}
               onChange={(e) => setSelectedColId(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-indigo-200 bg-indigo-50/50 text-indigo-900 text-xs font-bold outline-none"
+              className="px-3 py-2 rounded-xl border border-[#C85A32]/30 bg-[#FDF2ED] text-[#C85A32] text-xs font-bold outline-none"
             >
               {studyCollections.map((col) => (
                 <option key={col.id} value={col.id}>
@@ -387,26 +387,26 @@ export default function AIAssistant() {
       <div className="flex-1 flex gap-4 overflow-hidden relative">
         {/* Chat History Sidebar Overlay / Panel */}
         {showHistorySidebar && (
-          <div className="absolute lg:relative z-40 inset-y-0 left-0 w-72 bg-white rounded-3xl p-4 border border-slate-200 shadow-xl lg:shadow-sm flex flex-col space-y-3 animate-fade-in shrink-0">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <History className="w-4 h-4 text-indigo-600" /> AI Chat History
+          <div className="absolute lg:relative z-40 inset-y-0 left-0 w-72 bg-white rounded-3xl p-4 border border-[#EAE3D8] shadow-xl lg:shadow-sm flex flex-col space-y-3 animate-fade-in shrink-0">
+            <div className="flex items-center justify-between border-b border-[#F3ECE2] pb-3">
+              <h3 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                <History className="w-4 h-4 text-[#C85A32]" /> AI Chat History
               </h3>
-              <button onClick={() => setShowHistorySidebar(false)} className="text-slate-400 hover:text-slate-600 p-1">
+              <button onClick={() => setShowHistorySidebar(false)} className="text-[#8E9893] hover:text-[#1C211F] p-1">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <button
               onClick={startNewChatSession}
-              className="w-full py-2.5 px-3 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center justify-center gap-2 border border-indigo-100 transition-all"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#FDF2ED] text-[#C85A32] hover:bg-[#FAF0E9] text-xs font-bold flex items-center justify-center gap-2 border border-[#C85A32]/20 transition-all"
             >
               <Plus className="w-4 h-4" /> Start New Session
             </button>
 
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {pastSessions.length === 0 ? (
-                <p className="text-xs text-slate-400 p-4 text-center">No previous AI sessions recorded.</p>
+                <p className="text-xs text-[#8E9893] p-4 text-center">No previous AI sessions recorded.</p>
               ) : (
                 pastSessions.map(s => (
                   <button
@@ -414,15 +414,15 @@ export default function AIAssistant() {
                     onClick={() => loadPastSessionMessages(s)}
                     className={`w-full text-left p-3 rounded-xl transition-all border text-xs font-medium space-y-1 block ${
                       sessionId === s.id
-                        ? 'bg-indigo-50 border-indigo-200 text-indigo-950 font-bold'
-                        : 'bg-slate-50/60 hover:bg-slate-100 border-slate-100 text-slate-700'
+                        ? 'bg-[#FDF2ED] border-[#C85A32]/30 text-[#C85A32] font-bold'
+                        : 'bg-[#FAF7F2] hover:bg-[#F4EFEA] border-[#EAE3D8] text-[#2D3330]'
                     }`}
                   >
                     <div className="flex items-center gap-1.5 truncate">
-                      <MessageSquare className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                      <MessageSquare className="w-3.5 h-3.5 text-[#C85A32] shrink-0" />
                       <span className="truncate">{s.title || 'Chat Session'}</span>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                    <div className="flex items-center justify-between text-[10px] text-[#8E9893] font-mono">
                       <span>{new Date(s.created_at).toLocaleDateString()}</span>
                       <span>{s.message_count} msg(s)</span>
                     </div>
@@ -434,29 +434,29 @@ export default function AIAssistant() {
         )}
 
         {/* Chat Feed */}
-        <div className="flex-1 bg-white rounded-[24px] border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+        <div className="flex-1 bg-white rounded-[24px] border border-[#EAE3D8] shadow-sm flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             {messages.map((msg) => {
               const isUser = msg.role === 'user' || msg.sender === 'user';
               return (
                 <div key={msg.id} className={`flex gap-3 sm:gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
                   <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs ${
-                    isUser ? 'bg-indigo-600 text-white' : (isLLM ? 'bg-purple-100 text-purple-700' : 'bg-sky-100 text-sky-700')
+                    isUser ? 'bg-[#C85A32] text-white' : (isLLM ? 'bg-[#F4F1F8] text-[#786498]' : 'bg-[#EEF3F8] text-[#3D5A80]')
                   }`}>
                     {isUser ? <User className="w-4 h-4 sm:w-5 sm:h-5" /> : <Bot className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </div>
 
                   <div className={`space-y-2 max-w-[85%] sm:max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
-                    <div className={`flex items-center gap-2 text-[11px] text-slate-400 font-medium ${isUser ? 'justify-end' : 'justify-start'}`}>
-                      <span className="font-bold text-slate-700">{isUser ? 'You' : (msg.agentName || 'AI Assistant')}</span>
+                    <div className={`flex items-center gap-2 text-[11px] text-[#8E9893] font-medium ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <span className="font-bold text-[#1C211F]">{isUser ? 'You' : (msg.agentName || 'AI Assistant')}</span>
                       <span>•</span>
                       <span>{msg.timestamp}</span>
                     </div>
 
                     <div className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed ${
                       isUser
-                        ? 'bg-indigo-600 text-white rounded-tr-xs shadow-sm font-medium'
-                        : 'bg-slate-50 border border-slate-200/70 text-slate-800 rounded-tl-xs whitespace-pre-wrap'
+                        ? 'bg-[#C85A32] text-white rounded-tr-xs shadow-sm font-medium'
+                        : 'bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] rounded-tl-xs whitespace-pre-wrap'
                     }`}>
                       {msg.content}
                     </div>
@@ -466,21 +466,21 @@ export default function AIAssistant() {
                       <div className="mt-2 space-y-1.5">
                         <button
                           onClick={() => toggleSources(msg.id)}
-                          className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-100 hover:bg-sky-100/70 px-3 py-1 rounded-xl transition-all flex items-center gap-1.5"
+                          className="text-[11px] font-bold text-[#3D5A80] bg-[#EEF3F8] border border-[#3D5A80]/20 hover:bg-[#EEF3F8]/80 px-3 py-1 rounded-xl transition-all flex items-center gap-1.5"
                         >
-                          <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+                          <BookOpen className="w-3.5 h-3.5 text-[#3D5A80]" />
                           <span>Sources & Document Citations ({msg.sources.length})</span>
                           {expandedSources[msg.id] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                         </button>
 
                         {expandedSources[msg.id] && (
-                          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs text-slate-700 animate-fade-in max-h-48 overflow-y-auto">
+                          <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2 text-xs text-[#2D3330] animate-fade-in max-h-48 overflow-y-auto">
                             {msg.sources.map((src: any, i: number) => (
-                              <div key={i} className="p-2.5 rounded-xl bg-white border border-slate-100 space-y-1">
-                                <span className="font-bold text-slate-900 block text-[11px]">
+                              <div key={i} className="p-2.5 rounded-xl bg-white border border-[#EAE3D8] space-y-1">
+                                <span className="font-bold text-[#1C211F] block text-[11px]">
                                   📄 Document: {src.file_name || src.title || 'University Record'} (Page {src.page_number || 1})
                                 </span>
-                                <p className="text-[11px] text-slate-600 font-mono leading-relaxed bg-slate-50 p-2 rounded-lg">
+                                <p className="text-[11px] text-[#5E6763] font-mono leading-relaxed bg-[#FAF7F2] p-2 rounded-lg">
                                   "{src.content}"
                                 </p>
                               </div>
@@ -495,8 +495,8 @@ export default function AIAssistant() {
             })}
 
             {isLoading && (
-              <div className="flex items-center gap-3 text-xs font-bold text-slate-500 bg-slate-50 p-4 rounded-2xl w-max animate-pulse">
-                <RefreshCw className="w-4 h-4 animate-spin text-indigo-600" />
+              <div className="flex items-center gap-3 text-xs font-bold text-[#5E6763] bg-[#FAF7F2] p-4 rounded-2xl w-max animate-pulse border border-[#EAE3D8]">
+                <RefreshCw className="w-4 h-4 animate-spin text-[#C85A32]" />
                 <span>AI Assistant is generating response...</span>
               </div>
             )}
@@ -504,13 +504,13 @@ export default function AIAssistant() {
           </div>
 
           {/* Suggested Prompts */}
-          <div className="p-3 bg-slate-50/70 border-t border-slate-100 flex items-center gap-2 overflow-x-auto">
-            <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider shrink-0 px-2">Suggestions:</span>
+          <div className="p-3 bg-[#FAF7F2] border-t border-[#F3ECE2] flex items-center gap-2 overflow-x-auto">
+            <span className="text-[10px] font-extrabold uppercase text-[#8E9893] tracking-wider shrink-0 px-2">Suggestions:</span>
             {suggestedQueries.map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(q)}
-                className="px-3 py-1 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-slate-600 hover:text-indigo-600 text-xs font-medium shrink-0 transition-all shadow-2xs"
+                className="px-3 py-1 rounded-xl bg-white border border-[#EAE3D8] hover:border-[#C85A32] text-[#5E6763] hover:text-[#C85A32] text-xs font-medium shrink-0 transition-all shadow-2xs"
               >
                 {q}
               </button>
@@ -518,20 +518,20 @@ export default function AIAssistant() {
           </div>
 
           {/* Input Box */}
-          <div className="p-4 bg-white border-t border-slate-100 flex items-center gap-3">
+          <div className="p-4 bg-white border-t border-[#EAE3D8] flex items-center gap-3">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={isLLM ? "Ask LLM Mode (General knowledge, DSA, React, SQL)..." : "Ask RAG Mode (Hostel rules, library policies, attendance criteria)..."}
-              className="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+              className="flex-1 px-4 py-3 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs sm:text-sm font-medium text-[#1C211F] focus:outline-none focus:ring-2 focus:ring-[#C85A32]/20 focus:border-[#C85A32] focus:bg-white transition-all"
             />
 
             <button
               onClick={() => handleSend()}
               disabled={isLoading || !inputValue.trim()}
-              className="p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-40 transition-all active:scale-95 shrink-0"
+              className="p-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-md shadow-[#C85A32]/20 disabled:opacity-40 transition-all active:scale-95 shrink-0"
             >
               <Send className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>

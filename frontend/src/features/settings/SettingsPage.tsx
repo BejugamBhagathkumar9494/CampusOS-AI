@@ -33,41 +33,41 @@ export default function SettingsPage() {
   return (
     <div className="space-y-7 animate-fade-in font-sans">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8]">
             <Lock className="w-5 h-5" />
           </span>
           Account Settings
         </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">Manage security settings, notifications, active sessions, and password preferences.</p>
+        <p className="text-sm text-[#5E6763] font-medium mt-1">Manage security settings, notifications, active sessions, and password preferences.</p>
       </div>
 
-      {msg && <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold max-w-2xl">{msg}</div>}
-      {err && <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold max-w-2xl">{err}</div>}
+      {msg && <div className="p-4 rounded-xl bg-[#F0F6F2] border border-[#5E8C71]/30 text-[#5E8C71] text-xs font-bold max-w-2xl">{msg}</div>}
+      {err && <div className="p-4 rounded-xl bg-[#FDF2ED] border border-[#C85A32]/30 text-[#C85A32] text-xs font-bold max-w-2xl">{err}</div>}
 
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-5 max-w-2xl">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-indigo-600" /> Security & Authentication
+      <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-5 max-w-2xl">
+        <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-[#C85A32]" /> Security & Authentication
         </h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">Registered Email Address</label>
-            <input type="email" value={profile?.email || ''} disabled className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-500 font-medium" />
+            <label className="block text-xs font-bold text-[#5E6763] mb-1">Registered Email Address</label>
+            <input type="email" value={profile?.email || ''} disabled className="w-full p-3 rounded-xl border border-[#EAE3D8] bg-[#FAF7F2] text-xs sm:text-sm text-[#8E9893] font-medium" />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">New Security Password</label>
+            <label className="block text-xs font-bold text-[#5E6763] mb-1">New Security Password</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password (min 6 chars)"
-              className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-900 outline-none focus:border-indigo-500"
+              className="w-full p-3 rounded-xl border border-[#EAE3D8] bg-[#FAF7F2] text-xs sm:text-sm text-[#1C211F] outline-none focus:border-[#C85A32]"
             />
           </div>
           <button
             onClick={handleUpdatePassword}
             disabled={submitting}
-            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-colors"
+            className="w-full py-3 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-md shadow-[#C85A32]/20 transition-colors"
           >
             {submitting ? 'Updating Password...' : 'Update Password'}
           </button>

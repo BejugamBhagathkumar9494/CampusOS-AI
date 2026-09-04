@@ -274,15 +274,15 @@ export default function ExamPrepPage() {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
       {/* Hero Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-7 sm:p-8 rounded-[32px] shadow-2xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-gradient-to-r from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] p-7 sm:p-8 rounded-[32px] shadow-sm relative overflow-hidden">
         <div className="space-y-2.5 max-w-2xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> B.Tech Multi-Unit PDF Exam Generator
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E9] text-[#C85A32] text-xs font-bold border border-[#EAE3D8]">
+            <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> B.Tech Multi-Unit PDF Exam Generator
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            AI Exam Preparation from <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white to-purple-300">Multiple PDF Notes</span> 🎓
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1C211F]">
+            AI Exam Preparation from <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#C85A32] via-[#D9822B] to-[#786498]">Multiple PDF Notes</span> 🎓
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5E6763] font-medium leading-relaxed">
             Upload all unit PDFs for any engineering subject. CampusOS processes the entire lesson set as a single knowledge collection to generate complete summaries, 2-mark, 4-mark, 10-mark model answers, and revision sheets.
           </p>
         </div>
@@ -290,7 +290,7 @@ export default function ExamPrepPage() {
         <div className="flex flex-wrap items-center gap-3 z-10">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-500/30 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/20 transition-all flex items-center gap-2"
           >
             <Plus className="w-4 h-4" /> New Subject Collection
           </button>
@@ -298,7 +298,7 @@ export default function ExamPrepPage() {
             <button
               onClick={handleGenerateExamNotes}
               disabled={isGenerating || collectionDocs.length === 0}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-purple-500/25 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-5 py-3 rounded-2xl bg-[#786498] hover:bg-[#786498]/90 text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {isGenerating ? 'Analyzing & Generating...' : 'Generate Exam Notes'}
@@ -306,7 +306,7 @@ export default function ExamPrepPage() {
           )}
         </div>
 
-        <div className="absolute -right-16 -top-16 w-56 h-56 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-56 h-56 bg-[#FDF2ED] rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Status Alert */}
@@ -314,13 +314,13 @@ export default function ExamPrepPage() {
         <div
           className={`p-4 rounded-2xl flex items-center justify-between gap-3 text-xs font-bold animate-fade-in ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              ? 'bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/30'
               : 'bg-rose-50 text-rose-800 border border-rose-200'
           }`}
         >
           <div className="flex items-center gap-2">
             {statusMessage.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#5E8C71] shrink-0" />
             ) : (
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             )}
@@ -328,7 +328,7 @@ export default function ExamPrepPage() {
           </div>
           <button
             onClick={() => setStatusMessage(null)}
-            className="text-slate-400 hover:text-slate-600"
+            className="text-[#8E9893] hover:text-[#1C211F]"
           >
             ✕
           </button>
@@ -356,16 +356,16 @@ export default function ExamPrepPage() {
               onClick={() => setActiveTab(card.id as TabType)}
               className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between ${
                 isActive
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20 scale-[1.02]'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-md shadow-[#C85A32]/20 scale-[1.02]'
+                  : 'bg-white hover:bg-[#FAF7F2] text-[#2D3330] border-[#EAE3D8]'
               }`}
             >
               <div className="flex items-center justify-between w-full mb-2">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-indigo-600'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#C85A32]'}`} />
                 {card.count !== undefined && (
                   <span
                     className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                      isActive ? 'bg-white/20 text-white' : 'bg-[#FAF7F2] text-[#5E6763]'
                     }`}
                   >
                     {card.count}
@@ -380,22 +380,22 @@ export default function ExamPrepPage() {
 
       {/* Subject Header & Unit Filter Bar */}
       {selectedCollection && (
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#EAE3D8] shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 font-black flex items-center justify-center text-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] font-black flex items-center justify-center text-xs">
               {selectedCollection.course_code.substring(0, 4)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-extrabold text-slate-900">
+                <h2 className="text-sm font-extrabold text-[#1C211F]">
                   {selectedCollection.subject_name}
                 </h2>
-                <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32] text-[10px] font-bold">
                   {selectedCollection.course_code}
                 </span>
-                <span className="text-slate-400 text-xs">• Sem {selectedCollection.semester} ({selectedCollection.branch})</span>
+                <span className="text-[#8E9893] text-xs">• Sem {selectedCollection.semester} ({selectedCollection.branch})</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-[11px] text-[#5E6763] font-medium">
                 {collectionDocs.length} PDF files uploaded • Unified Exam Material Ready
               </p>
             </div>
@@ -404,8 +404,8 @@ export default function ExamPrepPage() {
           {/* Unit Filter */}
           {['summary', 'two_marks', 'four_marks', 'ten_marks'].includes(activeTab) && (
             <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-                <Filter className="w-3 h-3 text-indigo-500" /> Unit:
+              <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider mr-1 flex items-center gap-1">
+                <Filter className="w-3 h-3 text-[#C85A32]" /> Unit:
               </span>
               {availableUnits.map((u) => (
                 <button
@@ -413,8 +413,8 @@ export default function ExamPrepPage() {
                   onClick={() => setSelectedUnit(u)}
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                     selectedUnit === u
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[#C85A32] text-white shadow-xs'
+                      : 'bg-[#FAF7F2] text-[#5E6763] hover:bg-[#F4EFEA]'
                   }`}
                 >
                   {u}
@@ -429,12 +429,12 @@ export default function ExamPrepPage() {
       {activeTab === 'subjects' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-indigo-600" /> Your Subject Study Collections ({collections.length})
+            <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#C85A32]" /> Your Subject Study Collections ({collections.length})
             </h3>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-[#C85A32] text-white font-bold text-xs hover:bg-[#B44E27] transition-colors flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" /> Add Subject
             </button>
@@ -450,12 +450,12 @@ export default function ExamPrepPage() {
                     onClick={() => handleSelectCollection(col)}
                     className={`p-6 rounded-3xl border transition-all cursor-pointer relative group ${
                       isSelected
-                        ? 'bg-gradient-to-br from-indigo-50/70 to-purple-50/40 border-indigo-300 shadow-md ring-2 ring-indigo-500/20'
-                        : 'bg-white border-slate-200 hover:border-indigo-200 shadow-xs'
+                        ? 'bg-gradient-to-br from-[#FDF2ED] to-[#FAF7F2] border-[#C85A32] shadow-md ring-2 ring-[#C85A32]/20'
+                        : 'bg-white border-[#EAE3D8] hover:border-[#C85A32]/40 shadow-xs'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <span className="px-3 py-1 rounded-xl bg-indigo-100 text-indigo-800 text-xs font-extrabold font-mono">
+                      <span className="px-3 py-1 rounded-xl bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold font-mono">
                         {col.course_code}
                       </span>
                       <button
@@ -463,26 +463,26 @@ export default function ExamPrepPage() {
                           e.stopPropagation();
                           handleDeleteCollection(col.id);
                         }}
-                        className="p-1.5 rounded-lg text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        className="p-1.5 rounded-lg text-[#8E9893] hover:text-rose-600 hover:bg-rose-50 transition-colors"
                         title="Delete collection"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <h4 className="text-base font-extrabold text-slate-900 line-clamp-1 mb-1">
+                    <h4 className="text-base font-extrabold text-[#1C211F] line-clamp-1 mb-1">
                       {col.subject_name}
                     </h4>
-                    <p className="text-xs text-slate-500 font-medium mb-4">
+                    <p className="text-xs text-[#5E6763] font-medium mb-4">
                       Semester {col.semester} • {col.branch} • {col.academic_year}
                     </p>
 
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
-                      <div className="flex items-center gap-2 text-slate-600 font-bold">
-                        <FileText className="w-4 h-4 text-indigo-500" />
+                    <div className="flex items-center justify-between border-t border-[#F3ECE2] pt-4 text-xs">
+                      <div className="flex items-center gap-2 text-[#5E6763] font-bold">
+                        <FileText className="w-4 h-4 text-[#C85A32]" />
                         <span>{col.documents_count} PDFs Uploaded</span>
                       </div>
-                      <span className="text-indigo-600 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      <span className="text-[#C85A32] font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                         Open Notes <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -491,17 +491,17 @@ export default function ExamPrepPage() {
               })}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-4">
-              <BookOpen className="w-12 h-12 text-slate-300 mx-auto" />
+            <div className="bg-white rounded-3xl p-12 text-center border border-[#EAE3D8] space-y-4">
+              <BookOpen className="w-12 h-12 text-[#8E9893] mx-auto" />
               <div>
-                <h4 className="text-base font-extrabold text-slate-800">No Subject Study Collections Yet</h4>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
+                <h4 className="text-base font-extrabold text-[#1C211F]">No Subject Study Collections Yet</h4>
+                <p className="text-xs text-[#5E6763] max-w-sm mx-auto mt-1">
                   Create a subject study collection (e.g. Database Management Systems, CS401) and upload your lesson PDFs to begin.
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all inline-flex items-center gap-2"
+                className="px-6 py-2.5 rounded-xl bg-[#C85A32] text-white font-bold text-xs hover:bg-[#B44E27] shadow-md shadow-[#C85A32]/20 transition-all inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Create First Subject Collection
               </button>
@@ -510,14 +510,14 @@ export default function ExamPrepPage() {
 
           {/* Uploaded Documents in Selected Collection */}
           {selectedCollection && (
-            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div className="bg-white rounded-3xl p-6 border border-[#EAE3D8] shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-indigo-600" /> Uploaded Unit PDFs in {selectedCollection.subject_name} ({collectionDocs.length})
+                <h4 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-[#C85A32]" /> Uploaded Unit PDFs in {selectedCollection.subject_name} ({collectionDocs.length})
                 </h4>
                 <button
                   onClick={() => setActiveTab('upload')}
-                  className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#C85A32] hover:underline flex items-center gap-1"
                 >
                   <Plus className="w-3.5 h-3.5" /> Upload more PDFs
                 </button>
@@ -528,29 +528,29 @@ export default function ExamPrepPage() {
                   {collectionDocs.map((doc) => (
                     <div
                       key={doc.id}
-                      className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between"
+                      className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center shrink-0">
                           <FileText className="w-4 h-4" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="text-xs font-bold text-slate-800 truncate">{doc.file_name}</p>
-                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold mt-0.5">
-                            <span className="text-indigo-600 font-bold">{doc.unit_detected || 'Unit'}</span>
+                          <p className="text-xs font-bold text-[#1C211F] truncate">{doc.file_name}</p>
+                          <div className="flex items-center gap-1.5 text-[10px] text-[#8E9893] font-semibold mt-0.5">
+                            <span className="text-[#C85A32] font-bold">{doc.unit_detected || 'Unit'}</span>
                             <span>•</span>
                             <span>{doc.page_count} Pages</span>
                           </div>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-black shrink-0">
+                      <span className="px-2 py-0.5 rounded-md bg-[#F0F6F2] text-[#5E8C71] text-[10px] font-black shrink-0">
                         ✓ Processed
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 py-3 text-center">
+                <p className="text-xs text-[#5E6763] py-3 text-center">
                   No PDFs uploaded yet in this collection.
                 </p>
               )}
@@ -574,10 +574,10 @@ export default function ExamPrepPage() {
       {activeTab === 'summary' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-600" /> Complete Chapter Summaries (Unit-by-Unit)
+            <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#C85A32]" /> Complete Chapter Summaries (Unit-by-Unit)
             </h3>
-            <span className="text-xs text-slate-500 font-semibold">
+            <span className="text-xs text-[#5E6763] font-semibold">
               Showing: {selectedUnit} ({filterByUnit(materials.summaries).length} Units)
             </span>
           </div>
@@ -589,10 +589,10 @@ export default function ExamPrepPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No chapter summaries generated yet.</p>
-              <p className="text-xs text-slate-400 mt-1">
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <FileText className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No chapter summaries generated yet.</p>
+              <p className="text-xs text-[#5E6763] mt-1">
                 Click "Generate Exam Notes" at the top to generate full summaries for all units.
               </p>
             </div>
@@ -605,14 +605,14 @@ export default function ExamPrepPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Award className="w-5 h-5 text-emerald-600" /> 2-Mark Short Answer Questions & Answers
+              <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                <Award className="w-5 h-5 text-[#5E8C71]" /> 2-Mark Short Answer Questions & Answers
               </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-[#8E9893] font-medium mt-0.5">
                 Concise, keyword-rich answers structured with Definition + 2 Key Points (~3-5 sentences)
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
+            <span className="px-3 py-1 rounded-full bg-[#F0F6F2] text-[#5E8C71] text-xs font-extrabold">
               {filterByUnit(materials.two_mark_questions).length} Questions
             </span>
           </div>
@@ -624,9 +624,9 @@ export default function ExamPrepPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Award className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No 2-mark questions generated yet.</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Award className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No 2-mark questions generated yet.</p>
             </div>
           )}
         </div>
@@ -637,14 +637,14 @@ export default function ExamPrepPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-600" /> 4-Mark Medium-Answer Questions & Answers
+              <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                <Layers className="w-5 h-5 text-[#C85A32]" /> 4-Mark Medium-Answer Questions & Answers
               </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-[#8E9893] font-medium mt-0.5">
                 Structured with 1. Definition, 2. Explanation, 3. 2-4 Points, 4. Example
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-extrabold">
+            <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold">
               {filterByUnit(materials.four_mark_questions).length} Questions
             </span>
           </div>
@@ -656,9 +656,9 @@ export default function ExamPrepPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No 4-mark questions generated yet.</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Layers className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No 4-mark questions generated yet.</p>
             </div>
           )}
         </div>
@@ -669,14 +669,14 @@ export default function ExamPrepPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Award className="w-5 h-5 text-purple-600" /> 10-Mark Complete University Long Answers
+              <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                <Award className="w-5 h-5 text-[#786498]" /> 10-Mark Complete University Long Answers
               </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-[#8E9893] font-medium mt-0.5">
                 Exhaustive 500-800 words: Intro, Concept, Working, Types, Example, Advantages, Limitations, Diagram citations & Conclusion
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-extrabold">
+            <span className="px-3 py-1 rounded-full bg-[#F4F1F8] text-[#786498] text-xs font-extrabold">
               {filterByUnit(materials.ten_mark_questions).length} Questions
             </span>
           </div>
@@ -688,9 +688,9 @@ export default function ExamPrepPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Award className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No 10-mark questions generated yet.</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Award className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No 10-mark questions generated yet.</p>
             </div>
           )}
         </div>
@@ -701,14 +701,14 @@ export default function ExamPrepPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" /> Most Important University Exam Questions
+              <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#D9822B]" /> Most Important University Exam Questions
               </h3>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
+              <p className="text-xs text-[#8E9893] font-medium mt-0.5">
                 Prioritized and ranked based on recurrence and technical depth in uploaded PDF notes
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-extrabold">
+            <span className="px-3 py-1 rounded-full bg-[#FEF7ED] text-[#D9822B] text-xs font-extrabold">
               {materials.important_questions.length} Ranked Questions
             </span>
           </div>
@@ -718,39 +718,39 @@ export default function ExamPrepPage() {
               {materials.important_questions.map((q, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs hover:border-amber-300 transition-all space-y-3"
+                  className="bg-white rounded-3xl p-6 border border-[#EAE3D8] shadow-xs hover:border-[#D9822B]/50 transition-all space-y-3"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center">
+                      <span className="w-7 h-7 rounded-lg bg-[#FEF7ED] text-[#D9822B] text-xs font-black flex items-center justify-center">
                         #{q.priority_rank || idx + 1}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#F4F1F8] text-[#786498] text-xs font-bold">
                         {q.marks} Marks
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#5E6763] text-xs font-bold">
                         {q.unit}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] font-bold text-[#D9822B] bg-[#FEF7ED] px-2.5 py-1 rounded-full">
                       High priority based on uploaded notes
                     </span>
                   </div>
 
-                  <h4 className="text-base font-bold text-slate-900">{q.question}</h4>
+                  <h4 className="text-base font-bold text-[#1C211F]">{q.question}</h4>
 
                   {q.priority_reason && (
-                    <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 font-medium">
-                      <strong>Ranking Signal:</strong> {q.priority_reason}
+                    <p className="text-xs text-[#5E6763] bg-[#FAF7F2] p-3 rounded-xl border border-[#EAE3D8] font-medium">
+                      <strong className="text-[#1C211F]">Ranking Signal:</strong> {q.priority_reason}
                     </p>
                   )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Sparkles className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No important questions generated yet.</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Sparkles className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No important questions generated yet.</p>
             </div>
           )}
         </div>
@@ -767,16 +767,16 @@ export default function ExamPrepPage() {
 
       {/* TAB 9: ASK AI NOTES */}
       {activeTab === 'ask_ai' && selectedCollection && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE3D8] shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-[#F3ECE2] pb-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center shadow-inner">
               <MessageSquare className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-extrabold text-slate-900">
+              <h3 className="text-lg font-extrabold text-[#1C211F]">
                 Ask Questions on {selectedCollection.subject_name}
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-[#5E6763] font-medium">
                 Strictly grounded in your uploaded PDF notes (Anti-Hallucination Verified)
               </p>
             </div>
@@ -784,7 +784,7 @@ export default function ExamPrepPage() {
 
           {/* Prompt suggestions */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-slate-400">Try asking:</span>
+            <span className="text-xs font-bold text-[#8E9893]">Try asking:</span>
             {[
               'Explain this for 10 marks',
               'Give me a 4-mark answer',
@@ -796,7 +796,7 @@ export default function ExamPrepPage() {
                 key={i}
                 type="button"
                 onClick={() => setAiQuestion(s)}
-                className="px-3 py-1 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 text-xs font-semibold transition-colors"
+                className="px-3 py-1 rounded-xl bg-[#FAF7F2] hover:bg-[#FDF2ED] text-[#5E6763] hover:text-[#C85A32] text-xs font-semibold transition-colors border border-[#EAE3D8]"
               >
                 {s}
               </button>
@@ -812,7 +812,7 @@ export default function ExamPrepPage() {
                   placeholder={`e.g. What is normalization? or Explain 2PL for 10 marks in ${selectedCollection.subject_name}`}
                   value={aiQuestion}
                   onChange={(e) => setAiQuestion(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3.5 rounded-2xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium outline-none transition-all shadow-inner"
+                  className="w-full pl-4 pr-10 py-3.5 rounded-2xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium outline-none transition-all shadow-inner text-[#1C211F]"
                 />
               </div>
 
@@ -820,7 +820,7 @@ export default function ExamPrepPage() {
                 <select
                   value={aiMarkTarget || ''}
                   onChange={(e) => setAiMarkTarget(e.target.value ? Number(e.target.value) : undefined)}
-                  className="px-4 py-3.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700 bg-white outline-none"
+                  className="px-4 py-3.5 rounded-2xl border border-[#EAE3D8] text-xs font-bold text-[#5E6763] bg-white outline-none"
                 >
                   <option value="">Auto Mark Format</option>
                   <option value="2">2-Mark Format</option>
@@ -831,7 +831,7 @@ export default function ExamPrepPage() {
                 <button
                   type="submit"
                   disabled={isAiAnswering || !aiQuestion.trim()}
-                  className="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-500/25 disabled:opacity-50 transition-all flex items-center gap-2 shrink-0"
+                  className="px-6 py-3.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 disabled:opacity-50 transition-all flex items-center gap-2 shrink-0"
                 >
                   {isAiAnswering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   <span>{isAiAnswering ? 'Searching Notes...' : 'Ask AI'}</span>
@@ -842,7 +842,7 @@ export default function ExamPrepPage() {
 
           {/* AI Result Card */}
           {aiAnswerResult && (
-            <div className="pt-4 border-t border-slate-100">
+            <div className="pt-4 border-t border-[#F3ECE2]">
               <AnswerCard
                 item={{
                   id: 9999,

@@ -3,8 +3,9 @@ import {
   Sparkles, Calendar, BookOpen, Clock, AlertTriangle,
   Users, CheckSquare, Building2, ShieldCheck,
   ClipboardList, Target, ArrowRight,
-  Plus, FileText, CheckCircle2, Award, Bell, Activity, X, GraduationCap, GitFork
+  Plus, FileText, CheckCircle2, Award, Bell, Activity, X, GraduationCap, GitFork, Mic
 } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { analyticsService } from '../../services/analyticsService';
@@ -88,26 +89,33 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
           </p>
         </div>
 
-        <div className="flex items-center gap-3 z-10">
+        <div className="flex flex-wrap items-center gap-3 z-10">
+          <Link
+            to="/student/mock-interview"
+            className="px-4 py-2.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
+          >
+            <Mic className="w-4 h-4" /> AI Mock Interview
+          </Link>
           <Link
             to="/student/repodna"
-            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
+            className="px-4 py-2.5 rounded-2xl bg-[#5E8C71] hover:bg-[#4D755E] text-white font-extrabold text-xs shadow-lg shadow-[#5E8C71]/25 transition-all flex items-center gap-2 border border-[#5E8C71]/40"
           >
             <GitFork className="w-4 h-4" /> RepoDNA Intelligence
           </Link>
           <Link
             to="/student/exam-prep"
-            className="px-5 py-3 rounded-2xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 transition-all flex items-center gap-2 border border-[#786498]/40"
+            className="px-4 py-2.5 rounded-2xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 transition-all flex items-center gap-2 border border-[#786498]/40"
           >
-            <GraduationCap className="w-4 h-4" /> Exam Preparation
+            <GraduationCap className="w-4 h-4" /> Exam Prep
           </Link>
           <Link
             to="/student/ai-assistant"
-            className="px-5 py-3 rounded-2xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] font-bold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
+            className="px-4 py-2.5 rounded-2xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] font-bold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
           >
             <Sparkles className="w-4 h-4 text-[#C85A32]" /> AI Assistant
           </Link>
         </div>
+
 
         <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
@@ -459,55 +467,55 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
       </div>
 
       {/* Quick Command Hub */}
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-indigo-600" /> Faculty Command & Control Shortcuts
+      <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
+          <Activity className="w-5 h-5 text-[#C85A32]" /> Faculty Command & Control Shortcuts
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <Link
             to="/faculty/attendance"
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-200 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FDF2ED] border border-[#EAE3D8] hover:border-[#C85A32]/30 transition-all text-center space-y-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Users className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-800 block">Mark Attendance</span>
+            <span className="text-xs font-bold text-[#1C211F] block">Mark Attendance</span>
           </Link>
 
           <Link
             to="/academics"
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-200 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#F0F6F2] border border-[#EAE3D8] hover:border-[#5E8C71]/30 transition-all text-center space-y-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#F0F6F2] text-[#5E8C71] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <FileText className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-800 block">Upload Quiz</span>
+            <span className="text-xs font-bold text-[#1C211F] block">Upload Quiz</span>
           </Link>
 
           <button
             onClick={() => setNoticeModal(true)}
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-purple-50 border border-slate-100 hover:border-purple-200 transition-all text-center space-y-2 group w-full"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#F4F1F8] border border-[#EAE3D8] hover:border-[#786498]/30 transition-all text-center space-y-2 group w-full"
           >
-            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#F4F1F8] text-[#786498] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Bell className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-800 block">Broadcast Notice</span>
+            <span className="text-xs font-bold text-[#1C211F] block">Broadcast Notice</span>
           </button>
 
           <Link
             to="/student/ai-assistant"
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-amber-50 border border-slate-100 hover:border-amber-200 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FEF7ED] border border-[#EAE3D8] hover:border-[#D9822B]/30 transition-all text-center space-y-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF7ED] text-[#D9822B] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Sparkles className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-800 block">AI Assistant</span>
+            <span className="text-xs font-bold text-[#1C211F] block">AI Assistant</span>
           </Link>
 
           <Link
             to="/faculty/attendance"
-            className="p-4 rounded-2xl bg-slate-50 hover:bg-sky-50 border border-slate-100 hover:border-sky-200 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#EEF3F8] border border-[#EAE3D8] hover:border-[#3D5A80]/30 transition-all text-center space-y-2 group"
           >
             <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Award className="w-5 h-5" />
@@ -538,39 +546,39 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
       {/* Assigned Courses Roster Grid */}
       <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-600" /> Active Assigned Courses & Timetable
+          <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#C85A32]" /> Active Assigned Courses & Timetable
           </h2>
-          <span className="text-xs font-bold text-slate-400">{courses.length} Courses Handled</span>
+          <span className="text-xs font-bold text-[#8E9893]">{courses.length} Courses Handled</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {courses.map((c) => (
-            <div key={c.id} className="p-5 rounded-2xl bg-slate-50/70 border border-slate-100 hover:border-indigo-200 transition-all flex flex-col justify-between space-y-4">
+            <div key={c.id} className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] hover:border-[#C85A32]/30 transition-all flex flex-col justify-between space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
-                  <span className="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-extrabold font-mono">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold font-mono">
                     {c.code}
                   </span>
-                  <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold text-[#5E8C71] bg-[#F0F6F2] px-2 py-0.5 rounded-full">
                     {c.enrolled} Students
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">{c.title}</h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  {c.schedule} | <span className="font-semibold text-slate-700">{c.room}</span>
+                <h3 className="text-sm font-bold text-[#1C211F] leading-snug">{c.title}</h3>
+                <p className="text-xs text-[#5E6763] font-medium">
+                  {c.schedule} | <span className="font-semibold text-[#1C211F]">{c.room}</span>
                 </p>
               </div>
 
               {/* Attendance Progress bar */}
-              <div className="space-y-1.5 pt-2 border-t border-slate-200/60">
-                <div className="flex justify-between text-[11px] font-bold text-slate-600">
+              <div className="space-y-1.5 pt-2 border-t border-[#EAE3D8]">
+                <div className="flex justify-between text-[11px] font-bold text-[#5E6763]">
                   <span>Class Attendance</span>
-                  <span className="text-indigo-600">{c.attendance}%</span>
+                  <span className="text-[#C85A32]">{c.attendance}%</span>
                 </div>
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F4EFEA] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full"
+                    className="h-full bg-[#C85A32] rounded-full"
                     style={{ width: `${c.attendance}%` }}
                   />
                 </div>
@@ -579,13 +587,13 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
               <div className="flex items-center gap-2 pt-1">
                 <Link
                   to="/faculty/attendance"
-                  className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs text-center transition-all shadow-xs"
+                  className="flex-1 py-2 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs text-center transition-all shadow-xs"
                 >
                   Attendance
                 </Link>
                 <Link
                   to="/academics"
-                  className="px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs text-center transition-all"
+                  className="px-3 py-2 rounded-xl bg-white hover:bg-[#F4EFEA] border border-[#EAE3D8] text-[#1C211F] font-bold text-xs text-center transition-all"
                 >
                   Assignments
                 </Link>
@@ -598,12 +606,12 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
       {/* 2-Column Split: Pending Submissions Queue & Real-time Class Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Recent Student Submissions & Grading Queue */}
-        <div className="lg:col-span-7 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <div className="lg:col-span-7 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <CheckSquare className="w-5 h-5 text-amber-500" /> Pending Grading Queue ({submissions.length})
+            <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
+              <CheckSquare className="w-5 h-5 text-[#D9822B]" /> Pending Grading Queue ({submissions.length})
             </h2>
-            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-bold text-[#D9822B] bg-[#FEF7ED] px-2.5 py-1 rounded-full">
               Requires Action
             </span>
           </div>
@@ -611,33 +619,33 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
           <div className="space-y-3">
             {submissions.length > 0 ? (
               submissions.map((sub) => (
-                <div key={sub.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-amber-200 transition-all">
+                <div key={sub.id} className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#D9822B]/40 transition-all">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-100 text-indigo-700">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FDF2ED] text-[#C85A32]">
                         {sub.course_code}
                       </span>
-                      <h4 className="text-xs font-bold text-slate-900">{sub.assignment_title}</h4>
+                      <h4 className="text-xs font-bold text-[#1C211F]">{sub.assignment_title}</h4>
                     </div>
-                    <p className="text-xs text-slate-600 font-medium">
-                      Student: <span className="font-bold text-slate-800">{sub.student_name}</span> ({sub.student_roll})
+                    <p className="text-xs text-[#5E6763] font-medium">
+                      Student: <span className="font-bold text-[#1C211F]">{sub.student_name}</span> ({sub.student_roll})
                     </p>
-                    <span className="text-[10px] text-slate-400 font-semibold block">Submitted: {sub.submitted_at}</span>
+                    <span className="text-[10px] text-[#8E9893] font-semibold block">Submitted: {sub.submitted_at}</span>
                   </div>
 
                   <button
                     onClick={() => setGradingModal(sub)}
-                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all shrink-0 self-start sm:self-center"
+                    className="px-4 py-2 rounded-xl bg-[#D9822B] hover:bg-[#B44E27] text-white font-bold text-xs shadow-xs transition-all shrink-0 self-start sm:self-center"
                   >
                     Grade & Feedback
                   </button>
                 </div>
               ))
             ) : (
-              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-slate-700">All student submissions are graded!</p>
-                <p className="text-[11px] text-slate-400">No pending assignments in evaluation queue.</p>
+              <div className="p-8 text-center bg-[#FAF7F2] rounded-2xl border border-dashed border-[#EAE3D8] space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-[#5E8C71] mx-auto" />
+                <p className="text-xs font-bold text-[#1C211F]">All student submissions are graded!</p>
+                <p className="text-[11px] text-[#8E9893]">No pending assignments in evaluation queue.</p>
               </div>
             )}
           </div>
@@ -646,28 +654,28 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
         {/* Right Column: Today's Schedule & At-Risk Attendance Alerts */}
         <div className="lg:col-span-5 space-y-6">
           {/* Today's Teaching Schedule */}
-          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-600" /> Today's Lecture Schedule
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#C85A32]" /> Today's Lecture Schedule
             </h2>
 
             <div className="space-y-3">
-              <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-100 flex justify-between items-center">
+              <div className="p-3.5 rounded-xl bg-[#F0F6F2] border border-[#5E8C71]/30 flex justify-between items-center">
                 <div>
-                  <span className="text-xs font-bold text-indigo-900 block">CS-301 Data Structures</span>
-                  <span className="text-[11px] text-indigo-700 font-medium">09:00 AM - 10:30 AM | Room 302</span>
+                  <span className="text-xs font-bold text-[#1C211F] block">CS-301 Data Structures</span>
+                  <span className="text-[11px] text-[#5E6763] font-medium">09:00 AM - 10:30 AM | Room 302</span>
                 </div>
-                <span className="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold bg-[#5E8C71] text-white px-2 py-0.5 rounded-full">
                   Completed
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-100 flex justify-between items-center">
+              <div className="p-3.5 rounded-xl bg-[#FEF7ED] border border-[#D9822B]/30 flex justify-between items-center">
                 <div>
-                  <span className="text-xs font-bold text-amber-900 block">CS-402 Artificial Intelligence</span>
-                  <span className="text-[11px] text-amber-700 font-medium">11:30 AM - 01:00 PM | Lab 4</span>
+                  <span className="text-xs font-bold text-[#D9822B] block">CS-402 Artificial Intelligence</span>
+                  <span className="text-[11px] text-[#5E6763] font-medium">11:30 AM - 01:00 PM | Lab 4</span>
                 </div>
-                <span className="text-[10px] font-bold bg-amber-600 text-white px-2 py-0.5 rounded-full animate-pulse">
+                <span className="text-[10px] font-bold bg-[#D9822B] text-white px-2 py-0.5 rounded-full animate-pulse">
                   Next Up
                 </span>
               </div>
@@ -728,27 +736,27 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
       {/* AI Teaching Insights & Announcements Feed */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-[24px] p-6 shadow-md space-y-4">
+        <div className="lg:col-span-6 bg-[#1C211F] text-white rounded-[24px] p-6 shadow-md space-y-4 border border-[#2D3330]">
           <div className="flex justify-between items-center">
             <h2 className="text-base font-extrabold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-400" /> AI Teaching Insights & Class Health
+              <Sparkles className="w-5 h-5 text-[#C85A32]" /> AI Teaching Insights & Class Health
             </h2>
-            <span className="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
+            <span className="text-[10px] font-bold bg-[#C85A32]/20 text-[#FAF0E9] px-2 py-0.5 rounded-full border border-[#C85A32]/30">
               Live Synthesis
             </span>
           </div>
 
           <div className="space-y-3 text-xs leading-relaxed">
             <div className="p-3.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 space-y-1">
-              <span className="font-bold text-indigo-300 block">💡 CS-301 Quiz Performance Insight</span>
-              <p className="text-slate-300">
+              <span className="font-bold text-[#FAF0E9] block">💡 CS-301 Quiz Performance Insight</span>
+              <p className="text-[#FAF7F2]/80">
                 85% of CS-301 students scored above 80% on Quiz 2. Recommended focus area for next week: Advanced Graph Traversal Algorithms.
               </p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 space-y-1">
-              <span className="font-bold text-indigo-300 block">📊 Lab Submission Rate</span>
-              <p className="text-slate-300">
+              <span className="font-bold text-[#FAF0E9] block">📊 Lab Submission Rate</span>
+              <p className="text-[#FAF7F2]/80">
                 Neural Networks Lab report submission rate is 90% (18/20 students). 2 pending submissions in queue.
               </p>
             </div>
@@ -756,20 +764,20 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
           <Link
             to="/student/ai-assistant"
-            className="inline-flex items-center gap-2 text-xs font-bold text-indigo-300 hover:text-white transition-colors pt-2"
+            className="inline-flex items-center gap-2 text-xs font-bold text-[#C85A32] hover:text-[#B44E27] transition-colors pt-2"
           >
             Open AI Assistant for Lesson Planning <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="lg:col-span-6 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <div className="lg:col-span-6 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-indigo-600" /> Faculty Notices & Announcements
+            <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
+              <Bell className="w-5 h-5 text-[#C85A32]" /> Faculty Notices & Announcements
             </h2>
             <button
               onClick={() => setNoticeModal(true)}
-              className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#C85A32] hover:underline flex items-center gap-1"
             >
               + Post Notice
             </button>
@@ -778,18 +786,18 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
           <div className="space-y-3">
             {announcements.length > 0 ? (
               announcements.slice(0, 3).map((ann, idx) => (
-                <div key={ann.id || idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                <div key={ann.id || idx} className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-1">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-slate-900">{ann.title}</span>
-                    <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-[#1C211F]">{ann.title}</span>
+                    <span className="text-[10px] text-[#C85A32] font-bold bg-[#FDF2ED] px-2 py-0.5 rounded-full">
                       {ann.target_role || 'Student'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 line-clamp-2">{ann.content}</p>
+                  <p className="text-xs text-[#5E6763] line-clamp-2">{ann.content}</p>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-4 text-center">No recent department notices posted.</p>
+              <p className="text-xs text-[#8E9893] py-4 text-center">No recent department notices posted.</p>
             )}
           </div>
         </div>
@@ -825,18 +833,18 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
                   value={gradeInput}
                   onChange={(e) => setGradeInput(e.target.value)}
                   placeholder="e.g. 92"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:outline-none focus:border-[#C85A32]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-slate-700 font-bold">Faculty Feedback</label>
+                <label className="block text-[#1C211F] font-bold">Faculty Feedback</label>
                 <textarea
                   rows={3}
                   value={feedbackInput}
                   onChange={(e) => setFeedbackInput(e.target.value)}
                   placeholder="Great explanation of tree balancing algorithms!"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:outline-none focus:border-[#C85A32]"
                 />
               </div>
 
@@ -844,13 +852,13 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
                 <button
                   type="button"
                   onClick={() => setGradingModal(null)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-[#EAE3D8] text-[#5E6763] font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-[#D9822B] hover:bg-[#B44E27] text-white font-bold shadow-md"
                 >
                   Submit Marks & Feedback
                 </button>
@@ -862,37 +870,37 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
       {/* Modal: Post Quick Notice */}
       {noticeModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[28px] max-w-lg w-full p-6 space-y-5 shadow-2xl animate-fade-in">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">Broadcast Class Notice</h3>
-              <button onClick={() => setNoticeModal(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-[28px] max-w-lg w-full p-6 space-y-5 shadow-2xl animate-fade-in border border-[#EAE3D8]">
+            <div className="flex justify-between items-center border-b border-[#EAE3D8] pb-3">
+              <h3 className="text-base font-bold text-[#1C211F]">Broadcast Class Notice</h3>
+              <button onClick={() => setNoticeModal(false)} className="p-1 rounded-lg text-[#8E9893] hover:text-[#1C211F]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleNoticeSubmit} className="space-y-4 text-xs font-medium">
               <div className="space-y-1.5">
-                <label className="block text-slate-700 font-bold">Notice Headline / Title</label>
+                <label className="block text-[#1C211F] font-bold">Notice Headline / Title</label>
                 <input
                   type="text"
                   required
                   value={noticeTitle}
                   onChange={(e) => setNoticeTitle(e.target.value)}
                   placeholder="e.g. CS-301 Midterm Examination Schedule Released"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:outline-none focus:border-[#C85A32]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-slate-700 font-bold">Announcement Content</label>
+                <label className="block text-[#1C211F] font-bold">Announcement Content</label>
                 <textarea
                   rows={4}
                   required
                   value={noticeContent}
                   onChange={(e) => setNoticeContent(e.target.value)}
                   placeholder="Please review chapter 4 before tomorrow's lecture..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:outline-none focus:border-[#C85A32]"
                 />
               </div>
 
@@ -900,13 +908,13 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
                 <button
                   type="button"
                   onClick={() => setNoticeModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-[#EAE3D8] text-[#5E6763] font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold shadow-md"
                 >
                   Publish Notice
                 </button>

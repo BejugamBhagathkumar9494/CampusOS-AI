@@ -177,39 +177,39 @@ export default function PlacementsPage() {
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-7 rounded-[24px] bg-gradient-to-r from-[#EEF2FF] via-[#F3E8FF] to-[#E0E7FF] border border-indigo-100/80 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-7 rounded-[24px] bg-gradient-to-r from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] border border-[#EAE3D8] shadow-xs">
         <div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 text-indigo-600 text-xs font-extrabold mb-2 border border-white/80 shadow-2xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white text-[#C85A32] text-xs font-extrabold mb-2 border border-[#EAE3D8] shadow-2xs">
             <Award className="w-3.5 h-3.5" /> 100,000+ Placement Dataset ML Model
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-3">
             Placements & Recruitment Drives
             {myApplications.length > 0 && (
-              <span className="px-3 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
+              <span className="px-3 py-1 text-xs font-bold rounded-full bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/30">
                 {myApplications.length} Applied
               </span>
             )}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">Check drive eligibility, apply for active recruiters, and predict readiness scores.</p>
+          <p className="text-xs sm:text-sm text-[#5E6763] font-medium mt-1">Check drive eligibility, apply for active recruiters, and predict readiness scores.</p>
         </div>
         {analytics && (
           <div className="flex flex-wrap items-center gap-3">
-            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
-              <span className="text-[11px] font-bold text-slate-400 uppercase">Dataset Total</span>
-              <div className="text-base font-extrabold text-slate-900">{analytics.total_records?.toLocaleString()}</div>
+            <div className="text-center px-4 py-2 rounded-2xl bg-white border border-[#EAE3D8] shadow-xs">
+              <span className="text-[11px] font-bold text-[#8E9893] uppercase">Dataset Total</span>
+              <div className="text-base font-extrabold text-[#1C211F]">{analytics.total_records?.toLocaleString()}</div>
             </div>
-            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
-              <span className="text-[11px] font-bold text-slate-400 uppercase">Placement Rate</span>
-              <div className="text-base font-extrabold text-emerald-600">{analytics.placement_rate}%</div>
+            <div className="text-center px-4 py-2 rounded-2xl bg-white border border-[#EAE3D8] shadow-xs">
+              <span className="text-[11px] font-bold text-[#8E9893] uppercase">Placement Rate</span>
+              <div className="text-base font-extrabold text-[#5E8C71]">{analytics.placement_rate}%</div>
             </div>
-            <div className="text-center px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-xs">
-              <span className="text-[11px] font-bold text-slate-400 uppercase">Avg Salary</span>
-              <div className="text-base font-extrabold text-indigo-600">{analytics.avg_salary_lpa} LPA</div>
+            <div className="text-center px-4 py-2 rounded-2xl bg-white border border-[#EAE3D8] shadow-xs">
+              <span className="text-[11px] font-bold text-[#8E9893] uppercase">Avg Salary</span>
+              <div className="text-base font-extrabold text-[#C85A32]">{analytics.avg_salary_lpa} LPA</div>
             </div>
             {isOfficer && (
               <button
                 onClick={() => setShowDriveModal(true)}
-                className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+                className="px-5 py-2.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-md shadow-[#C85A32]/20 transition-all active:scale-95"
               >
                 + Create Recruitment Drive
               </button>
@@ -219,26 +219,26 @@ export default function PlacementsPage() {
       </div>
 
       {applyMsg && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold animate-fade-in">
+        <div className="p-4 rounded-xl bg-[#F0F6F2] border border-[#5E8C71]/30 text-[#5E8C71] text-xs font-bold animate-fade-in">
           {applyMsg}
         </div>
       )}
 
       {/* Placement Officer Drive Applicants Roster */}
       {isOfficer && drives.length > 0 && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-indigo-600" /> Placement Officer: Drive Applications & Decisions
+              <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-[#C85A32]" /> Placement Officer: Drive Applications & Decisions
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Select a drive to manage student applications and issue Shortlists/Offers directly into DB.</p>
+              <p className="text-xs text-[#5E6763] mt-0.5">Select a drive to manage student applications and issue Shortlists/Offers directly into DB.</p>
             </div>
 
             <select
               value={selectedDriveId || ''}
               onChange={(e) => setSelectedDriveId(e.target.value)}
-              className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none"
+              className="px-4 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs font-bold text-[#1C211F] focus:outline-none"
             >
               {drives.map(d => (
                 <option key={d.id} value={d.id}>
@@ -297,32 +297,32 @@ export default function PlacementsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Briefcase className="w-5 h-5 text-indigo-600" /> Active Recruitment Drives ({drives.length})
+      <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+          <Briefcase className="w-5 h-5 text-[#C85A32]" /> Active Recruitment Drives ({drives.length})
         </h2>
         {drives.length === 0 ? (
-          <p className="text-xs text-slate-400 font-medium p-4 text-center">No active recruitment drives listed currently.</p>
+          <p className="text-xs text-[#8E9893] font-medium p-4 text-center">No active recruitment drives listed currently.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {drives.map((d) => (
-              <div key={d.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+              <div key={d.id} className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">{d.companies?.name || 'Company'}</span>
-                    <h3 className="text-base font-bold text-slate-900 mt-1">{d.job_title}</h3>
+                    <span className="text-xs font-bold text-[#C85A32] bg-[#FDF2ED] px-2.5 py-0.5 rounded-md">{d.companies?.name || 'Company'}</span>
+                    <h3 className="text-base font-bold text-[#1C211F] mt-1">{d.job_title}</h3>
                     {d.package_ctc && (
-                      <p className="text-xs text-slate-500 font-medium">Package: <span className="font-bold text-emerald-600">{d.package_ctc} LPA</span></p>
+                      <p className="text-xs text-[#5E6763] font-medium">Package: <span className="font-bold text-[#5E8C71]">{d.package_ctc} LPA</span></p>
                     )}
                   </div>
-                  <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                  <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-[#F0F6F2] text-[#5E8C71]">
                     ACTIVE
                   </span>
                 </div>
-                {d.min_cgpa && <p className="text-xs text-slate-500 font-mono">Min CGPA: {d.min_cgpa}</p>}
+                {d.min_cgpa && <p className="text-xs text-[#5E6763] font-mono">Min CGPA: {d.min_cgpa}</p>}
                 <button
                   onClick={() => handleApplyDrive(d.id)}
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs"
+                  className="w-full py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-bold transition-all shadow-xs"
                 >
                   Apply for Drive
                 </button>
@@ -333,18 +333,18 @@ export default function PlacementsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-indigo-600" /> ML Readiness & Salary Calculator
+        <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+          <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-[#C85A32]" /> ML Readiness & Salary Calculator
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">CGPA (0 - 10)</label>
-              <input value={cgpa} onChange={(e) => setCgpa(e.target.value)} type="number" step="0.01" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">CGPA (0 - 10)</label>
+              <input value={cgpa} onChange={(e) => setCgpa(e.target.value)} type="number" step="0.01" className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Branch</label>
-              <select value={branch} onChange={(e) => setBranch(e.target.value)} className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500">
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">Branch</label>
+              <select value={branch} onChange={(e) => setBranch(e.target.value)} className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]">
                 <option value="CSE">CSE</option>
                 <option value="IT">IT</option>
                 <option value="ECE">ECE</option>
@@ -352,45 +352,45 @@ export default function PlacementsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">College Tier</label>
-              <select value={tier} onChange={(e) => setTier(e.target.value)} className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500">
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">College Tier</label>
+              <select value={tier} onChange={(e) => setTier(e.target.value)} className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]">
                 <option value="Tier 1">Tier 1</option>
                 <option value="Tier 2">Tier 2</option>
                 <option value="Tier 3">Tier 3</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Coding Score (0-100)</label>
-              <input value={codingScore} onChange={(e) => setCodingScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">Coding Score (0-100)</label>
+              <input value={codingScore} onChange={(e) => setCodingScore(e.target.value)} type="number" className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Mock Interview Score</label>
-              <input value={mockScore} onChange={(e) => setMockScore(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">Mock Interview Score</label>
+              <input value={mockScore} onChange={(e) => setMockScore(e.target.value)} type="number" className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1">Internships Count</label>
-              <input value={internships} onChange={(e) => setInternships(e.target.value)} type="number" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
+              <label className="block text-xs font-bold text-[#5E6763] mb-1">Internships Count</label>
+              <input value={internships} onChange={(e) => setInternships(e.target.value)} type="number" className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">Skills (comma separated)</label>
-            <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Python, SQL, React, System Design" className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-900 focus:bg-white focus:border-indigo-500" />
+            <label className="block text-xs font-bold text-[#5E6763] mb-1">Skills (comma separated)</label>
+            <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Python, SQL, React, System Design" className="w-full rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] px-3 py-2 text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]" />
           </div>
 
-          <button onClick={calculateReadiness} disabled={loading} className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-3 text-xs font-bold text-white transition-all shadow-md shadow-indigo-500/20">
+          <button onClick={calculateReadiness} disabled={loading} className="w-full rounded-xl bg-[#C85A32] hover:bg-[#B44E27] py-3 text-xs font-bold text-white transition-all shadow-md shadow-[#C85A32]/20">
             {loading ? 'Predicting with ML...' : 'Calculate Placement Readiness & Expected Salary'}
           </button>
 
           {prediction && (
-            <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-3 animate-fade-in">
+            <div className="p-4 rounded-2xl bg-[#FDF2ED] border border-[#C85A32]/20 space-y-3 animate-fade-in">
               <div className="flex justify-between items-center">
                 <div>
-                  <span className="text-[11px] font-bold text-slate-400 uppercase">Readiness</span>
-                  <div className="text-base font-extrabold text-slate-900">{prediction.readiness_rating} ({prediction.readiness_score}%)</div>
+                  <span className="text-[11px] font-bold text-[#8E9893] uppercase">Readiness</span>
+                  <div className="text-base font-extrabold text-[#1C211F]">{prediction.readiness_rating} ({prediction.readiness_score}%)</div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase">Expected Salary</span>
-                  <div className="text-xl font-extrabold text-emerald-600">{prediction.expected_salary_lpa} LPA</div>
+                  <span className="text-[11px] font-bold text-[#8E9893] uppercase">Expected Salary</span>
+                  <div className="text-xl font-extrabold text-[#5E8C71]">{prediction.expected_salary_lpa} LPA</div>
                 </div>
               </div>
             </div>
@@ -398,44 +398,44 @@ export default function PlacementsPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-600" /> AI Resume Reviewer
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+            <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#C85A32]" /> AI Resume Reviewer
             </h2>
             <textarea
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
               placeholder="Paste resume text here (e.g. 'Built web app using Python, FastAPI, React, SQL...')"
-              className="w-full h-24 p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:bg-white focus:border-indigo-500"
+              className="w-full h-24 p-3 rounded-xl border border-[#EAE3D8] bg-[#FAF7F2] text-xs text-[#1C211F] focus:bg-white focus:border-[#C85A32]"
             />
-            <button onClick={handleResumeReview} disabled={evaluatingResume || !resumeText} className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 rounded-xl text-xs font-bold text-white transition-all shadow-xs">
+            <button onClick={handleResumeReview} disabled={evaluatingResume || !resumeText} className="w-full py-2.5 bg-[#1C211F] hover:bg-[#2D3330] rounded-xl text-xs font-bold text-white transition-all shadow-xs">
               {evaluatingResume ? 'Analyzing Resume...' : 'Analyze Resume Score & Skill Gaps'}
             </button>
 
             {resumeResult && (
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 animate-fade-in">
+              <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2 animate-fade-in">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-500">Score</span>
-                  <span className="text-base font-extrabold text-indigo-600">{resumeResult.score}/100</span>
+                  <span className="text-xs font-bold text-[#5E6763]">Score</span>
+                  <span className="text-base font-extrabold text-[#C85A32]">{resumeResult.score}/100</span>
                 </div>
-                <p className="text-xs text-slate-700 font-medium">{resumeResult.feedback}</p>
+                <p className="text-xs text-[#2D3330] font-medium">{resumeResult.feedback}</p>
               </div>
             )}
           </div>
 
-          <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-indigo-600" /> Active Campus Recruiters ({companies.length})
+          <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+            <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-[#C85A32]" /> Active Campus Recruiters ({companies.length})
             </h2>
             {companies.length === 0 ? (
-              <p className="text-xs text-slate-400 font-medium p-4 text-center">No recruiting companies listed.</p>
+              <p className="text-xs text-[#8E9893] font-medium p-4 text-center">No recruiting companies listed.</p>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 {companies.map((comp) => (
-                  <div key={comp.id || comp.name} className="p-3 rounded-xl bg-slate-50/70 border border-slate-100 flex justify-between items-center">
+                  <div key={comp.id || comp.name} className="p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] flex justify-between items-center">
                     <div>
-                      <h3 className="text-xs font-bold text-slate-900">{comp.name}</h3>
-                      <p className="text-[10px] text-slate-400 font-medium">{comp.industry || 'Tech'}</p>
+                      <h3 className="text-xs font-bold text-[#1C211F]">{comp.name}</h3>
+                      <p className="text-[10px] text-[#8E9893] font-medium">{comp.industry || 'Tech'}</p>
                     </div>
                   </div>
                 ))}
@@ -445,80 +445,68 @@ export default function PlacementsPage() {
         </div>
       </div>
 
-      {/* Create Drive Modal */}
+      {/* Officer Drive Creation Modal */}
       {showDriveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-extrabold text-slate-900">Create Recruitment Drive</h3>
-              <button onClick={() => setShowDriveModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-
-            <form onSubmit={handleCreateDriveSubmit} className="space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#EAE3D8] space-y-4">
+            <h3 className="text-base font-extrabold text-[#1C211F]">Post New Recruitment Drive</h3>
+            <div className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Company Name</label>
+                <label className="block text-xs font-bold text-[#5E6763] mb-1">Company Name</label>
                 <input
-                  type="text"
-                  required
-                  placeholder="e.g. Microsoft"
                   value={newDrive.company_name}
                   onChange={(e) => setNewDrive({ ...newDrive, company_name: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                  placeholder="e.g. Google, Microsoft, TCS"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#1C211F]"
                 />
               </div>
-
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Job Title</label>
+                <label className="block text-xs font-bold text-[#5E6763] mb-1">Job Title</label>
                 <input
-                  type="text"
-                  required
-                  placeholder="e.g. Software Development Engineer (SDE-1)"
                   value={newDrive.job_title}
                   onChange={(e) => setNewDrive({ ...newDrive, job_title: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                  placeholder="e.g. Graduate Software Engineer"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#1C211F]"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Package (CTC LPA)</label>
+                  <label className="block text-xs font-bold text-[#5E6763] mb-1">Package CTC (LPA)</label>
                   <input
                     type="number"
                     step="0.1"
                     value={newDrive.package_ctc}
                     onChange={(e) => setNewDrive({ ...newDrive, package_ctc: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#1C211F]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Min CGPA Required</label>
+                  <label className="block text-xs font-bold text-[#5E6763] mb-1">Min CGPA</label>
                   <input
                     type="number"
                     step="0.1"
                     value={newDrive.min_cgpa}
                     onChange={(e) => setNewDrive({ ...newDrive, min_cgpa: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#1C211F]"
                   />
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDriveModal(false)}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={creatingDrive}
-                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 disabled:opacity-50"
-                >
-                  {creatingDrive ? 'Creating...' : 'Create Drive'}
-                </button>
-              </div>
-            </form>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setShowDriveModal(false)}
+                className="w-1/2 py-2.5 rounded-xl bg-[#FAF7F2] text-[#5E6763] font-bold text-xs hover:bg-[#F4EFEA]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateDriveSubmit}
+                disabled={creatingDrive || !newDrive.company_name || !newDrive.job_title}
+                className="w-1/2 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-md shadow-[#C85A32]/20 disabled:opacity-50"
+              >
+                {creatingDrive ? 'Publishing...' : 'Publish Drive'}
+              </button>
+            </div>
           </div>
         </div>
       )}

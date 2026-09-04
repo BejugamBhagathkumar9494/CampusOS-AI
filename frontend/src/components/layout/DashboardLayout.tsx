@@ -22,7 +22,9 @@ import {
   Calendar,
   GraduationCap,
   GitFork,
+  Mic,
 } from 'lucide-react';
+
 import { useAuth } from '../../auth/hooks/useAuth';
 import { notificationService } from '../../services/notificationService';
 import { supabase } from '../../services/supabaseClient';
@@ -103,6 +105,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const getSidebarItems = (userRole: UserRole | string) => {
     const studentItems = [
       { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
+      { name: 'AI Voice Mock Interview', path: '/student/mock-interview', icon: Mic },
       { name: 'RepoDNA Intelligence', path: '/student/repodna', icon: GitFork },
       { name: 'AI Exam Prep', path: '/student/exam-prep', icon: GraduationCap },
       { name: 'AI Assistant', path: '/student/ai-assistant', icon: MessageSquare },
@@ -116,6 +119,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       { name: 'Settings', path: '/student/settings', icon: Settings },
       { name: 'Profile', path: '/student/profile', icon: User },
     ];
+
 
     const facultyItems = [
       { name: 'Dashboard', path: '/faculty/dashboard', icon: LayoutDashboard },
@@ -154,11 +158,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const placementItems = [
       { name: 'Dashboard', path: '/placement/dashboard', icon: LayoutDashboard },
+      { name: 'AI Voice Mock Interview', path: '/placement/mock-interview', icon: Mic },
       { name: 'AI Assistant', path: '/placement/ai-assistant', icon: MessageSquare },
       { name: 'Placements', path: '/placement/placements', icon: Briefcase },
       { name: 'Settings', path: '/placement/settings', icon: Settings },
       { name: 'Profile', path: '/placement/profile', icon: User },
     ];
+
 
     switch (userRole) {
       case 'faculty': return facultyItems;

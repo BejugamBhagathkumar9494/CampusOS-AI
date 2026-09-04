@@ -31,6 +31,19 @@ def run_student_success_agent(student_id: str, context: Dict[str, Any]) -> Dict[
         recommendations.append(f"Attendance is safe at {overall_rate}%. You can miss up to {buffer_info['margin_absences_allowed']} classes while maintaining 75%.")
         recommendations.append("Continue participating in upcoming lab sessions and internal quizzes.")
 
+
+    # Check if student has mock interview session records to factor into success score
+    from app.services.ai_agents.student_success_agent.interview_brain import INTERVIEW_SESSIONS
+    recent_interviews = [s for s in INTERVIEW_SESSIONS.values() if s.get("student_id") == student_id]
+    latest_eval = recent_interviews[-1].get("evaluation") if recent_interviews and "evaluation" in recent_interviews[-1] else None
+
+    interview_readiness = {
+        "completed_sessions": len(recent_interviews),
+        "latest_score": latest_eval.get("overall_score") if latest_eval else None,
+        "hire_decision": latest_eval.get("hire_decision") if latest_eval else "Not Attempted",
+        "has_active_7day_plan": bool(latest_eval and latest_eval.get("seven_day_action_plan"))
+    }
+
     return {
         "student_id": student_id,
         "academic_risk_status": risk_status,
@@ -41,6 +54,8 @@ def run_student_success_agent(student_id: str, context: Dict[str, Any]) -> Dict[
             "focus_subjects": context.get("focus_subjects", ["Automata Theory", "Computer Networks"]),
             "hours_per_week": 12,
         },
+        "interview_readiness": interview_readiness,
         "weekly_recommendations": recommendations,
     }
+
 

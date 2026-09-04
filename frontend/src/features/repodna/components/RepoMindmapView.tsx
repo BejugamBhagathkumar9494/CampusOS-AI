@@ -101,9 +101,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Frontend UI & Client',
       category: 'frontend',
       level: 1,
-      color: '#06b6d4',
-      bgColor: '#083344',
-      borderColor: '#06b6d4',
+      color: '#C85A32',
+      bgColor: '#FDF2ED',
+      borderColor: '#C85A32',
       icon: '🎨',
       details: {
         title: 'Frontend Application & User Interface',
@@ -117,9 +117,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Dashboard & Layouts',
           category: 'frontend',
           level: 2,
-          color: '#38bdf8',
-          bgColor: '#0c4a6e',
-          borderColor: '#38bdf8',
+          color: '#C85A32',
+          bgColor: '#FAF0E9',
+          borderColor: '#EAE3D8',
           icon: '📊',
           details: {
             title: 'Student Dashboard & Navigation',
@@ -133,9 +133,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'AI Exam Prep Hub',
           category: 'frontend',
           level: 2,
-          color: '#38bdf8',
-          bgColor: '#0c4a6e',
-          borderColor: '#38bdf8',
+          color: '#C85A32',
+          bgColor: '#FAF0E9',
+          borderColor: '#EAE3D8',
           icon: '📚',
           details: {
             title: 'Exam Preparation UI',
@@ -149,9 +149,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'RepoDNA Intelligence UI',
           category: 'frontend',
           level: 2,
-          color: '#38bdf8',
-          bgColor: '#0c4a6e',
-          borderColor: '#38bdf8',
+          color: '#C85A32',
+          bgColor: '#FAF0E9',
+          borderColor: '#EAE3D8',
           icon: '🧬',
           details: {
             title: 'RepoDNA Interactive Portal',
@@ -165,9 +165,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: getCleanName(f.file_path),
           category: 'frontend' as const,
           level: 2,
-          color: '#7dd3fc',
-          bgColor: '#164e63',
-          borderColor: '#7dd3fc',
+          color: '#C85A32',
+          bgColor: '#FAF0E9',
+          borderColor: '#EAE3D8',
           icon: '📄',
           details: {
             title: getCleanName(f.file_path),
@@ -195,9 +195,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Backend APIs & Routes',
       category: 'backend',
       level: 1,
-      color: '#a855f7',
-      bgColor: '#3b0764',
-      borderColor: '#a855f7',
+      color: '#3D5A80',
+      bgColor: '#EEF3F8',
+      borderColor: '#3D5A80',
       icon: '⚙️',
       details: {
         title: 'Backend API & Business Logic Server',
@@ -212,9 +212,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'RepoDNA API Router',
           category: 'backend',
           level: 2,
-          color: '#c084fc',
-          bgColor: '#581c87',
-          borderColor: '#c084fc',
+          color: '#3D5A80',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '⚡',
           details: {
             title: 'RepoDNA API Endpoints',
@@ -229,9 +229,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Exam Prep Router',
           category: 'backend',
           level: 2,
-          color: '#c084fc',
-          bgColor: '#581c87',
-          borderColor: '#c084fc',
+          color: '#3D5A80',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '⚡',
           details: {
             title: 'Exam Preparation API Endpoints',
@@ -246,9 +246,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'AI Assistant Router',
           category: 'backend',
           level: 2,
-          color: '#c084fc',
-          bgColor: '#581c87',
-          borderColor: '#c084fc',
+          color: '#3D5A80',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '🤖',
           details: {
             title: 'CampusOS AI Assistant Router',
@@ -270,9 +270,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Database & Schemas',
       category: 'database',
       level: 1,
-      color: '#10b981',
-      bgColor: '#022c22',
-      borderColor: '#10b981',
+      color: '#D9822B',
+      bgColor: '#FEF7ED',
+      borderColor: '#D9822B',
       icon: '🗄️',
       details: {
         title: 'Database & Entity Schemas',
@@ -287,9 +287,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'User & Auth Models',
           category: 'database',
           level: 2,
-          color: '#34d399',
-          bgColor: '#064e3b',
-          borderColor: '#34d399',
+          color: '#D9822B',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '👤',
           details: {
             title: 'User & Role Tables',
@@ -303,9 +303,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'StudyRepository Models',
           category: 'database',
           level: 2,
-          color: '#34d399',
-          bgColor: '#064e3b',
-          borderColor: '#34d399',
+          color: '#D9822B',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '📦',
           details: {
             title: 'RepoDNA Repository Tables',
@@ -319,9 +319,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Exam Prep Tables',
           category: 'database',
           level: 2,
-          color: '#34d399',
-          bgColor: '#064e3b',
-          borderColor: '#34d399',
+          color: '#D9822B',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '📑',
           details: {
             title: 'StudyCollection & Exam Material Tables',
@@ -339,9 +339,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'AI Engine & Grounded RAG',
       category: 'ai',
       level: 1,
-      color: '#ec4899',
-      bgColor: '#4c0519',
-      borderColor: '#ec4899',
+      color: '#786498',
+      bgColor: '#F4F1F8',
+      borderColor: '#786498',
       icon: '🧠',
       details: {
         title: 'CampusOS AI & RAG Engine',
@@ -355,9 +355,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Exam Material Generator',
           category: 'ai',
           level: 2,
-          color: '#f472b6',
-          bgColor: '#831843',
-          borderColor: '#f472b6',
+          color: '#786498',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '✨',
           details: {
             title: 'Exam Note & Question Orchestrator',
@@ -371,9 +371,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'RepoDNA Generator',
           category: 'ai',
           level: 2,
-          color: '#f472b6',
-          bgColor: '#831843',
-          borderColor: '#f472b6',
+          color: '#786498',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '🧬',
           details: {
             title: 'RepoDNA Intelligence Pipeline',
@@ -387,9 +387,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'PDF Extraction Engine',
           category: 'ai',
           level: 2,
-          color: '#f472b6',
-          bgColor: '#831843',
-          borderColor: '#f472b6',
+          color: '#786498',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '📄',
           details: {
             title: 'PDF & Document Ingestion',
@@ -408,9 +408,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Security & Auth',
       category: 'security',
       level: 1,
-      color: '#f59e0b',
-      bgColor: '#451a03',
-      borderColor: '#f59e0b',
+      color: '#5E8C71',
+      bgColor: '#F0F6F2',
+      borderColor: '#5E8C71',
       icon: '🔐',
       details: {
         title: 'Authentication & Access Control',
@@ -424,9 +424,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Auth Dependency Guard',
           category: 'security',
           level: 2,
-          color: '#fbbf24',
-          bgColor: '#78350f',
-          borderColor: '#fbbf24',
+          color: '#5E8C71',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '🛡️',
           details: {
             title: 'get_current_user Dependency',
@@ -440,9 +440,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'CORS & Security Middleware',
           category: 'security',
           level: 2,
-          color: '#fbbf24',
-          bgColor: '#78350f',
-          borderColor: '#fbbf24',
+          color: '#5E8C71',
+          bgColor: '#FAF7F2',
+          borderColor: '#DCD2C3',
           icon: '🌐',
           details: {
             title: 'CORS Preflight & Security Headers',
@@ -460,9 +460,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Core & Scanner Engine',
       category: 'core',
       level: 1,
-      color: '#6366f1',
-      bgColor: '#1e1b4b',
-      borderColor: '#6366f1',
+      color: '#1C211F',
+      bgColor: '#EFE8DF',
+      borderColor: '#1C211F',
       icon: '🛠️',
       details: {
         title: 'Core Repository Scanner & Workspace Engine',
@@ -476,9 +476,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'GitHub Scanner & Fallback',
           category: 'core',
           level: 2,
-          color: '#818cf8',
-          bgColor: '#312e81',
-          borderColor: '#818cf8',
+          color: '#2D3330',
+          bgColor: '#FAF7F2',
+          borderColor: '#EAE3D8',
           icon: '🔍',
           details: {
             title: 'GitHub Repository Scanner',
@@ -492,9 +492,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Tech Stack Detector',
           category: 'core',
           level: 2,
-          color: '#818cf8',
-          bgColor: '#312e81',
-          borderColor: '#818cf8',
+          color: '#2D3330',
+          bgColor: '#FAF7F2',
+          borderColor: '#EAE3D8',
           icon: '🔬',
           details: {
             title: 'Technology & Framework Detector',
@@ -511,9 +511,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: rootName,
       category: 'root',
       level: 0,
-      color: '#6366f1',
-      bgColor: '#1e1b4b',
-      borderColor: '#818cf8',
+      color: '#FFFFFF',
+      bgColor: '#C85A32',
+      borderColor: '#B44E27',
       icon: '🧬',
       details: {
         title: `${repository.owner} / ${repository.repo_name}`,
@@ -749,7 +749,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden bg-slate-950 text-white rounded-3xl border border-slate-800 shadow-2xl transition-all duration-300 select-none ${
+      className={`relative w-full overflow-hidden bg-[#FAF7F2] text-[#1C211F] rounded-3xl border border-[#EAE3D8] shadow-xl transition-all duration-300 select-none ${
         isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen' : 'h-[780px]'
       }`}
       onMouseDown={handleMouseDown}
@@ -758,25 +758,25 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       onWheel={handleWheel}
     >
       {/* Background Starry Orbit Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:28px_28px] opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#DCD2C3_1px,transparent_1px)] [background-size:28px_28px] opacity-60 pointer-events-none" />
 
       {/* TOP CONTROLS & SEARCH BAR */}
       <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Search Box */}
           <div className="relative flex items-center">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5" />
+            <Search className="w-4 h-4 text-[#8E9893] absolute left-3.5" />
             <input
               type="text"
               placeholder="Search components, APIs, models, files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-48 sm:w-72 shadow-lg"
+              className="pl-9 pr-4 py-2 bg-white/95 backdrop-blur-md border border-[#EAE3D8] rounded-2xl text-xs text-[#1C211F] placeholder-[#8E9893] focus:outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] w-48 sm:w-72 shadow-sm"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-slate-400 hover:text-white text-xs"
+                className="absolute right-3 text-[#8E9893] hover:text-[#1C211F] text-xs"
               >
                 ✕
               </button>
@@ -784,13 +784,13 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           </div>
 
           {/* Layout Toggle */}
-          <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-800 shadow-lg">
+          <div className="flex items-center bg-white/95 backdrop-blur-md p-1 rounded-2xl border border-[#EAE3D8] shadow-sm">
             <button
               onClick={() => setLayoutMode('radial')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 layoutMode === 'radial'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#C85A32] text-white shadow-xs'
+                  : 'text-[#5E6763] hover:text-[#1C211F]'
               }`}
             >
               <Compass className="w-3.5 h-3.5" /> Radial Mindmap
@@ -799,8 +799,8 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
               onClick={() => setLayoutMode('tree')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 layoutMode === 'tree'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#C85A32] text-white shadow-xs'
+                  : 'text-[#5E6763] hover:text-[#1C211F]'
               }`}
             >
               <Workflow className="w-3.5 h-3.5" /> Hierarchical Tree
@@ -809,35 +809,35 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
         </div>
 
         {/* Zoom & Screen Controls */}
-        <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-800 shadow-lg">
+        <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-[#EAE3D8] shadow-sm">
           <button
             onClick={() => setZoom(prev => Math.min(prev + 0.15, 2.8))}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#5E6763] hover:text-[#1C211F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
             title="Zoom In"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
-          <span className="text-xs font-mono text-slate-300 min-w-[3rem] text-center">
+          <span className="text-xs font-mono text-[#1C211F] font-bold min-w-[3rem] text-center">
             {Math.round(zoom * 100)}%
           </span>
           <button
             onClick={() => setZoom(prev => Math.max(prev - 0.15, 0.35))}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#5E6763] hover:text-[#1C211F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
             title="Zoom Out"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
-          <div className="w-[1px] h-4 bg-slate-800 mx-1" />
+          <div className="w-[1px] h-4 bg-[#EAE3D8] mx-1" />
           <button
             onClick={resetView}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#5E6763] hover:text-[#1C211F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
             title="Reset View"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#5E6763] hover:text-[#1C211F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
             title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -860,23 +860,24 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                 cy={layoutGraph.centerY}
                 r={260}
                 fill="none"
-                stroke="#1e293b"
+                stroke="#EAE3D8"
                 strokeWidth="1.5"
                 strokeDasharray="4 6"
-                className="opacity-50"
+                className="opacity-70"
               />
               <circle
                 cx={layoutGraph.centerX}
                 cy={layoutGraph.centerY}
                 r={435}
                 fill="none"
-                stroke="#0f172a"
+                stroke="#DCD2C3"
                 strokeWidth="1.5"
                 strokeDasharray="3 5"
-                className="opacity-30"
+                className="opacity-50"
               />
             </>
           )}
+
 
           {/* Smooth Curving Connecting Links */}
           {layoutGraph.links.map((link, idx) => {
@@ -965,11 +966,11 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                     onClick={(e) => toggleExpand(node.id, e)}
                     className="cursor-pointer hover:opacity-80 transition-opacity"
                   >
-                    <circle r="8" fill="#1e293b" stroke={node.borderColor} strokeWidth="1.5" />
+                    <circle r="8" fill="#FFFFFF" stroke={node.borderColor} strokeWidth="1.5" />
                     <text
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      fill="#ffffff"
+                      fill="#1C211F"
                       fontSize="9"
                       fontWeight="bold"
                       className="pointer-events-none select-none"
@@ -987,18 +988,18 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                     width={Math.min(180, (node.name.length * 8.4) + 24)}
                     height="20"
                     rx="8"
-                    fill="#090d16"
-                    stroke={isSelected ? '#ffffff' : '#334155'}
-                    strokeWidth="1"
-                    className="opacity-95 drop-shadow-md group-hover:stroke-indigo-400 transition-colors"
+                    fill="#FFFFFF"
+                    stroke={isSelected ? '#C85A32' : '#EAE3D8'}
+                    strokeWidth="1.5"
+                    className="drop-shadow-xs group-hover:stroke-[#C85A32] transition-colors"
                   />
                   <text
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fill={isSelected ? '#ffffff' : '#e2e8f0'}
+                    fill={isSelected ? '#C85A32' : '#1C211F'}
                     fontSize={isRoot ? '12' : isBranch ? '11' : '10'}
                     fontWeight={isRoot ? '800' : isBranch ? '700' : '600'}
-                    className="select-none drop-shadow-sm"
+                    className="select-none"
                   >
                     {node.name.length > 24 ? `${node.name.slice(0, 22)}...` : node.name}
                   </text>
@@ -1011,24 +1012,24 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
 
       {/* FLOATING DEEP INSPECTOR DRAWER */}
       {selectedNode && (
-        <div className="absolute right-4 top-20 bottom-4 w-84 sm:w-[410px] bg-slate-900/95 backdrop-blur-2xl rounded-3xl border border-slate-700/80 p-6 shadow-2xl z-30 flex flex-col justify-between animate-fade-in pointer-events-auto">
+        <div className="absolute right-4 top-20 bottom-4 w-84 sm:w-[410px] bg-white/98 backdrop-blur-2xl rounded-3xl border border-[#EAE3D8] p-6 shadow-2xl z-30 flex flex-col justify-between animate-fade-in pointer-events-auto">
           <div className="space-y-4 overflow-y-auto pr-1">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-start justify-between border-b border-[#EAE3D8] pb-3">
               <div className="flex items-center gap-3">
                 <span
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-lg border"
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm border"
                   style={{ backgroundColor: selectedNode.bgColor, borderColor: selectedNode.borderColor }}
                 >
                   {selectedNode.icon}
                 </span>
                 <div>
-                  <h3 className="text-sm font-black text-white leading-tight">
+                  <h3 className="text-sm font-black text-[#1C211F] leading-tight">
                     {selectedNode.details.title || selectedNode.name}
                   </h3>
                   <span
                     className="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
-                    style={{ backgroundColor: `${selectedNode.color}22`, color: selectedNode.color, border: `1px solid ${selectedNode.color}55` }}
+                    style={{ backgroundColor: `${selectedNode.color}15`, color: selectedNode.color, border: `1px solid ${selectedNode.color}40` }}
                   >
                     {selectedNode.category} Layer • Level {selectedNode.level}
                   </span>
@@ -1036,26 +1037,26 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#5E6763] hover:text-[#1C211F] flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Architectural Role & Purpose */}
-            <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200 leading-relaxed space-y-1.5 shadow-inner">
-              <span className="block text-[10px] uppercase font-black text-indigo-400 tracking-wider">
+            <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#2D3330] leading-relaxed space-y-1.5 shadow-inner">
+              <span className="block text-[10px] uppercase font-black text-[#C85A32] tracking-wider">
                 Architectural Role & Description
               </span>
-              <p className="font-medium text-slate-300">
+              <p className="font-medium text-[#2D3330]">
                 {selectedNode.details.role}
               </p>
             </div>
 
             {/* File Path */}
             {selectedNode.details.path && (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs font-mono text-cyan-300">
-                <FileCode className="w-4 h-4 text-cyan-400 shrink-0" />
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-[#FDF2ED] border border-[#EAE3D8] text-xs font-mono text-[#C85A32]">
+                <FileCode className="w-4 h-4 text-[#C85A32] shrink-0" />
                 <span className="truncate">{selectedNode.details.path}</span>
               </div>
             )}
@@ -1063,14 +1064,14 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             {/* Technologies & Frameworks */}
             {selectedNode.details.tech && selectedNode.details.tech.length > 0 && (
               <div>
-                <span className="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">
+                <span className="block text-[10px] uppercase font-black text-[#5E6763] tracking-wider mb-2">
                   Technologies / Stack
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedNode.details.tech.map((t, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-xl bg-indigo-950/80 text-indigo-300 border border-indigo-700/50 text-[11px] font-bold"
+                      className="px-2.5 py-1 rounded-xl bg-[#FAF7F2] text-[#1C211F] border border-[#EAE3D8] text-[11px] font-bold"
                     >
                       {t}
                     </span>
@@ -1082,16 +1083,16 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             {/* API Endpoints */}
             {selectedNode.details.endpoints && selectedNode.details.endpoints.length > 0 && (
               <div>
-                <span className="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">
+                <span className="block text-[10px] uppercase font-black text-[#5E6763] tracking-wider mb-2">
                   Associated API Endpoints
                 </span>
                 <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
                   {selectedNode.details.endpoints.map((ep, idx) => (
                     <div
                       key={idx}
-                      className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] font-mono text-emerald-400 flex items-center gap-2"
+                      className="p-2.5 rounded-xl bg-[#EEF3F8] border border-[#3D5A80]/20 text-[11px] font-mono text-[#3D5A80] flex items-center gap-2"
                     >
-                      <Terminal className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <Terminal className="w-3.5 h-3.5 text-[#3D5A80] shrink-0" />
                       <span className="truncate">{ep}</span>
                     </div>
                   ))}
@@ -1102,14 +1103,14 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             {/* Database Models */}
             {selectedNode.details.models && selectedNode.details.models.length > 0 && (
               <div>
-                <span className="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">
+                <span className="block text-[10px] uppercase font-black text-[#5E6763] tracking-wider mb-2">
                   Database Models & Tables
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedNode.details.models.map((m, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-xl bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 text-[11px] font-bold flex items-center gap-1.5"
+                      className="px-2.5 py-1 rounded-xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/30 text-[11px] font-bold flex items-center gap-1.5"
                     >
                       <Database className="w-3 h-3" /> {m}
                     </span>
@@ -1121,10 +1122,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             {/* Source Code Excerpt */}
             {selectedNode.details.excerpt && (
               <div>
-                <span className="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">
+                <span className="block text-[10px] uppercase font-black text-[#5E6763] tracking-wider mb-2">
                   Source Excerpt
                 </span>
-                <pre className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[10px] font-mono text-slate-300 max-h-32 overflow-y-auto overflow-x-auto whitespace-pre leading-snug">
+                <pre className="p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-[10px] font-mono text-[#2D3330] max-h-32 overflow-y-auto overflow-x-auto whitespace-pre leading-snug">
                   {selectedNode.details.excerpt}
                 </pre>
               </div>
@@ -1132,14 +1133,14 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           </div>
 
           {/* Action: Ask AI Deep Dive */}
-          <div className="pt-4 border-t border-slate-800">
+          <div className="pt-4 border-t border-[#EAE3D8]">
             <button
               onClick={() => {
                 if (onAskAI) {
                   onAskAI(`Explain in detail how '${selectedNode.details.title || selectedNode.name}' functions in this repository, its architectural role, dependencies, and code implementation.`);
                 }
               }}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/30 transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-[#C85A32]/25 transition-all active:scale-95"
             >
               <Sparkles className="w-4 h-4" /> Ask AI About This Component
             </button>
@@ -1148,27 +1149,27 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       )}
 
       {/* BOTTOM LEGEND & HELPER BAR */}
-      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-3 pointer-events-auto bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-800 text-xs text-slate-300 shadow-xl">
-        <span className="font-extrabold text-white flex items-center gap-1.5 mr-1">
-          <Info className="w-3.5 h-3.5 text-indigo-400" /> Repository Mindmap:
+      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-3 pointer-events-auto bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-[#EAE3D8] text-xs text-[#2D3330] shadow-md">
+        <span className="font-extrabold text-[#1C211F] flex items-center gap-1.5 mr-1">
+          <Info className="w-3.5 h-3.5 text-[#C85A32]" /> Repository Mindmap:
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" /> Frontend UI
+          <span className="w-2.5 h-2.5 rounded-full bg-[#C85A32]" /> Frontend UI
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Backend APIs
+          <span className="w-2.5 h-2.5 rounded-full bg-[#3D5A80]" /> Backend APIs
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Database
+          <span className="w-2.5 h-2.5 rounded-full bg-[#D9822B]" /> Database
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-pink-400" /> AI & RAG
+          <span className="w-2.5 h-2.5 rounded-full bg-[#786498]" /> AI & RAG
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Security
+          <span className="w-2.5 h-2.5 rounded-full bg-[#5E8C71]" /> Security
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-indigo-400" /> Core
+          <span className="w-2.5 h-2.5 rounded-full bg-[#1C211F]" /> Core
         </span>
       </div>
     </div>

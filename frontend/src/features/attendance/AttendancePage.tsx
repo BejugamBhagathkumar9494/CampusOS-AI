@@ -137,13 +137,13 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
     <div className="space-y-7 animate-fade-in font-sans">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8]">
               <Users className="w-5 h-5" />
             </span>
             Faculty Attendance Portal
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
+          <p className="text-sm text-[#5E6763] font-medium mt-1">
             Select assigned course, view student profiles, and log daily classroom attendance directly into Supabase.
           </p>
         </div>
@@ -152,7 +152,7 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
           <button
             onClick={handleSaveAttendance}
             disabled={saving || !activeRoster}
-            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-xs shadow-md shadow-indigo-200 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] active:scale-[0.98] text-white font-bold text-xs shadow-md shadow-[#C85A32]/20 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {saving ? (
               <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
@@ -166,24 +166,24 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
 
       {feedback && (
         <div className={`p-4 rounded-2xl border text-xs font-bold animate-fade-in flex items-center gap-2.5 ${
-          feedback.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
+          feedback.type === 'success' ? 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71]/30' : 'bg-rose-50 text-rose-800 border-rose-200'
         }`}>
-          {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />}
+          {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-[#5E8C71] shrink-0" /> : <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />}
           {feedback.message}
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-8 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
+        <div className="lg:col-span-8 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-indigo-600" /> Select Course Roster
+              <label className="text-xs font-bold text-[#5E6763] uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#C85A32]" /> Select Course Roster
               </label>
               <select
                 value={selectedCourseId}
                 onChange={(e) => setSelectedCourseId(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/20 focus:border-[#C85A32] transition-all"
               >
                 {rosters.map((r) => (
                   <option key={r.course_id} value={r.course_id}>
@@ -194,34 +194,34 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-indigo-600" /> Lecture Date
+              <label className="text-xs font-bold text-[#5E6763] uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#C85A32]" /> Lecture Date
               </label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/20 focus:border-[#C85A32] transition-all"
               />
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-[#F3ECE2]">
             <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
+              <Search className="w-4 h-4 text-[#8E9893] absolute left-3.5 top-2.5" />
               <input
                 type="text"
                 placeholder="Search by student name or roll no..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs font-semibold text-[#1C211F] placeholder:text-[#8E9893] focus:outline-none focus:ring-2 focus:ring-[#C85A32]/20 focus:border-[#C85A32]"
               />
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               <button
                 onClick={() => handleMarkAll('present')}
-                className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all border border-emerald-200 flex items-center gap-1"
+                className="px-3 py-1.5 rounded-lg bg-[#F0F6F2] hover:bg-[#F0F6F2]/80 text-[#5E8C71] text-xs font-bold transition-all border border-[#5E8C71]/30 flex items-center gap-1"
               >
                 <Check className="w-3.5 h-3.5" /> All Present
               </button>
@@ -235,21 +235,21 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white rounded-[24px] p-6 shadow-md flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-4 bg-gradient-to-br from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] text-[#1C211F] border border-[#EAE3D8] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
           <div>
-            <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">Session Attendance Summary</span>
-            <div className="text-3xl font-extrabold text-white tracking-tight">{sessionRate}%</div>
-            <p className="text-xs text-indigo-200 font-medium mt-1">
+            <span className="text-[11px] font-bold text-[#C85A32] uppercase tracking-wider block mb-1">Session Attendance Summary</span>
+            <div className="text-3xl font-extrabold text-[#1C211F] tracking-tight">{sessionRate}%</div>
+            <p className="text-xs text-[#5E6763] font-medium mt-1">
               {presentCount} Present / {absentCount} Absent out of {totalCount} Students
             </p>
           </div>
 
-          <div className="pt-4 flex items-center justify-between text-xs border-t border-white/10 mt-3">
-            <span className="font-semibold text-slate-300">Course Code:</span>
-            <span className="font-mono font-bold text-indigo-300">{activeRoster?.code || 'N/A'}</span>
+          <div className="pt-4 flex items-center justify-between text-xs border-t border-[#EAE3D8] mt-3">
+            <span className="font-semibold text-[#5E6763]">Course Code:</span>
+            <span className="font-mono font-bold text-[#C85A32]">{activeRoster?.code || 'N/A'}</span>
           </div>
 
-          <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#C85A32]/10 rounded-full blur-2xl pointer-events-none" />
         </div>
       </div>
 
@@ -274,23 +274,23 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
         </div>
       )}
 
-      <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-600" /> Student Attendance Roster ({filteredStudents.length})
+      <div className="bg-white rounded-[24px] border border-[#EAE3D8] shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-[#EAE3D8] flex justify-between items-center">
+          <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#C85A32]" /> Student Attendance Roster ({filteredStudents.length})
           </h2>
-          <span className="text-xs font-bold text-slate-400">Click student row to view full profile details</span>
+          <span className="text-xs font-bold text-[#8E9893]">Click student row to view full profile details</span>
         </div>
 
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-12 text-center text-xs text-slate-400 font-medium">Loading student rosters from database...</div>
+            <div className="p-12 text-center text-xs text-[#8E9893] font-medium">Loading student rosters from database...</div>
           ) : filteredStudents.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-500 font-medium">No student records found matching search filters.</div>
+            <div className="p-12 text-center text-xs text-[#5E6763] font-medium">No student records found matching search filters.</div>
           ) : (
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-slate-500 font-bold text-xs uppercase tracking-wider">
+                <tr className="bg-[#FAF7F2] border-b border-[#EAE3D8] text-[#5E6763] font-bold text-xs uppercase tracking-wider">
                   <th className="p-4.5 pl-6">Student Information</th>
                   <th className="p-4.5">Roll Number</th>
                   <th className="p-4.5">Department</th>
@@ -298,46 +298,46 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
                   <th className="p-4.5 pr-6 text-center">Status Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
+              <tbody className="divide-y divide-[#EAE3D8] font-medium">
                 {filteredStudents.map((st: any) => {
                   const currentStatus = studentStatuses[st.student_id] || 'present';
                   return (
-                    <tr key={st.student_id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr key={st.student_id} className="hover:bg-[#FAF7F2] transition-colors">
                       <td className="p-4.5 pl-6">
                         <button
                           onClick={() => setInspectedStudent(st)}
-                          className="text-left font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex flex-col"
+                          className="text-left font-bold text-[#C85A32] hover:text-[#B44E27] hover:underline flex flex-col"
                         >
-                          <span className="text-sm font-bold text-slate-900">{st.full_name}</span>
-                          <span className="text-xs text-slate-400 font-normal">{st.email}</span>
+                          <span className="text-sm font-bold text-[#1C211F]">{st.full_name}</span>
+                          <span className="text-xs text-[#8E9893] font-normal">{st.email}</span>
                         </button>
                       </td>
-                      <td className="p-4.5 font-mono text-xs text-slate-700 font-bold">{st.roll_number}</td>
-                      <td className="p-4.5 text-xs text-slate-600">{st.department}</td>
+                      <td className="p-4.5 font-mono text-xs text-[#1C211F] font-bold">{st.roll_number}</td>
+                      <td className="p-4.5 text-xs text-[#5E6763]">{st.department}</td>
                       <td className="p-4.5">
                         <div className="flex items-center gap-2.5">
-                          <span className="font-mono font-bold text-slate-900 w-12">{st.course_attendance_rate}%</span>
-                          <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
+                          <span className="font-mono font-bold text-[#1C211F] w-12">{st.course_attendance_rate}%</span>
+                          <div className="w-24 bg-[#F4EFEA] rounded-full h-2 overflow-hidden">
                             <div
-                              className={`h-2 rounded-full ${st.course_attendance_rate >= 75 ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                              className={`h-2 rounded-full ${st.course_attendance_rate >= 75 ? 'bg-[#5E8C71]' : 'bg-[#C85A32]'}`}
                               style={{ width: `${Math.min(100, st.course_attendance_rate)}%` }}
                             />
                           </div>
                           {st.course_attendance_rate < 75 && (
-                            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 text-[10px] font-extrabold border border-rose-100">
+                            <span className="px-2 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32] text-[10px] font-extrabold border border-[#EAE3D8]">
                               Shortage
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="p-4.5 pr-6 text-center">
-                        <div className="inline-flex rounded-xl bg-slate-100 p-1 gap-1">
+                        <div className="inline-flex rounded-xl bg-[#F4EFEA] p-1 gap-1">
                           <button
                             onClick={() => handleStatusChange(st.student_id, 'present')}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                               currentStatus === 'present'
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-[#5E8C71] text-white shadow-xs'
+                                : 'text-[#5E6763] hover:text-[#1C211F]'
                             }`}
                           >
                             Present
@@ -346,8 +346,8 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
                             onClick={() => handleStatusChange(st.student_id, 'absent')}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                               currentStatus === 'absent'
-                                ? 'bg-rose-600 text-white shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-[#C85A32] text-white shadow-xs'
+                                : 'text-[#5E6763] hover:text-[#1C211F]'
                             }`}
                           >
                             Absent
@@ -356,8 +356,8 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
                             onClick={() => handleStatusChange(st.student_id, 'late')}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                               currentStatus === 'late'
-                                ? 'bg-amber-500 text-white shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-[#D9822B] text-white shadow-xs'
+                                : 'text-[#5E6763] hover:text-[#1C211F]'
                             }`}
                           >
                             Late
@@ -366,8 +366,8 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
                             onClick={() => handleStatusChange(st.student_id, 'excused')}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                               currentStatus === 'excused'
-                                ? 'bg-blue-600 text-white shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
+                                ? 'bg-[#3D5A80] text-white shadow-xs'
+                                : 'text-[#5E6763] hover:text-[#1C211F]'
                             }`}
                           >
                             Excused
@@ -384,41 +384,41 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
       </div>
 
       {inspectedStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-slate-100 shadow-2xl relative">
-            <button onClick={() => setInspectedStudent(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1C211F]/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-5 border border-[#EAE3D8] shadow-2xl relative">
+            <button onClick={() => setInspectedStudent(null)} className="absolute top-4 right-4 text-[#8E9893] hover:text-[#1C211F] p-1">
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-extrabold text-xl border border-indigo-100">
+              <div className="w-14 h-14 rounded-2xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center font-extrabold text-xl border border-[#EAE3D8]">
                 {inspectedStudent.full_name.charAt(0)}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900">{inspectedStudent.full_name}</h3>
-                <p className="text-xs text-slate-500 font-medium">{inspectedStudent.email}</p>
-                <span className="inline-block mt-1 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 font-mono">
+                <h3 className="text-lg font-bold text-[#1C211F]">{inspectedStudent.full_name}</h3>
+                <p className="text-xs text-[#5E6763] font-medium">{inspectedStudent.email}</p>
+                <span className="inline-block mt-1 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8] font-mono">
                   {inspectedStudent.roll_number}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Department</span>
-                <span className="text-xs font-bold text-slate-900">{inspectedStudent.department}</span>
+              <div className="p-3.5 rounded-2xl bg-[#F4EFEA] border border-[#EAE3D8]">
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Department</span>
+                <span className="text-xs font-bold text-[#1C211F]">{inspectedStudent.department}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Current CGPA</span>
-                <span className="text-xs font-bold text-emerald-600">{inspectedStudent.cgpa}</span>
+              <div className="p-3.5 rounded-2xl bg-[#F4EFEA] border border-[#EAE3D8]">
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Current CGPA</span>
+                <span className="text-xs font-bold text-[#5E8C71]">{inspectedStudent.cgpa}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Logged Classes</span>
-                <span className="text-xs font-bold text-slate-900">{inspectedStudent.course_total_classes} Sessions</span>
+              <div className="p-3.5 rounded-2xl bg-[#F4EFEA] border border-[#EAE3D8]">
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Logged Classes</span>
+                <span className="text-xs font-bold text-[#1C211F]">{inspectedStudent.course_total_classes} Sessions</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Course Attendance Rate</span>
-                <span className={`text-xs font-bold ${inspectedStudent.course_attendance_rate >= 75 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <div className="p-3.5 rounded-2xl bg-[#F4EFEA] border border-[#EAE3D8]">
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Course Attendance Rate</span>
+                <span className={`text-xs font-bold ${inspectedStudent.course_attendance_rate >= 75 ? 'text-[#5E8C71]' : 'text-[#C85A32]'}`}>
                   {inspectedStudent.course_attendance_rate}%
                 </span>
               </div>
@@ -427,7 +427,7 @@ function FacultyAttendancePortal({ profile }: { profile?: any }) {
             <div className="pt-2">
               <button
                 onClick={() => setInspectedStudent(null)}
-                className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-[#1C211F] text-white font-bold text-xs hover:bg-[#2D3330] transition-colors"
               >
                 Close Student Profile
               </button>
@@ -489,27 +489,27 @@ function StudentAttendanceBoard({ profile }: { profile?: any }) {
     <div className="space-y-7 animate-fade-in font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-[#F0F6F2] text-[#5E8C71] border border-[#EAE3D8]">
               <Calendar className="w-5 h-5" />
             </span>
             Student Attendance Monitor
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
+          <p className="text-sm text-[#5E6763] font-medium mt-1">
             Real-time database attendance tracking & ML shortage forecasting model.
           </p>
         </div>
 
         {attendanceData && (
-          <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-4">
+          <div className="px-5 py-3 rounded-2xl bg-white border border-[#EAE3D8] shadow-xs flex items-center gap-4">
             <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Overall Rate</span>
-              <span className={`text-2xl font-extrabold ${attendanceData.overall_rate >= 75 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Overall Rate</span>
+              <span className={`text-2xl font-extrabold ${attendanceData.overall_rate >= 75 ? 'text-[#5E8C71]' : 'text-[#C85A32]'}`}>
                 {attendanceData.overall_rate}%
               </span>
             </div>
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm ${
-              attendanceData.overall_rate >= 75 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+              attendanceData.overall_rate >= 75 ? 'bg-[#F0F6F2] text-[#5E8C71]' : 'bg-[#FDF2ED] text-[#C85A32]'
             }`}>
               {attendanceData.overall_rate >= 75 ? <Check className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
             </div>
@@ -519,83 +519,83 @@ function StudentAttendanceBoard({ profile }: { profile?: any }) {
 
       {pred && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-[24px] p-6 shadow-md space-y-4 relative overflow-hidden">
+          <div className="lg:col-span-8 bg-gradient-to-r from-[#1C211F] via-[#2D3330] to-[#1C211F] text-white rounded-[24px] p-6 shadow-md space-y-4 relative overflow-hidden border border-[#EAE3D8]">
             <div className="flex justify-between items-start">
               <div>
-                <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30 inline-flex items-center gap-1.5 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> ML Attendance Predictor Engine
+                <span className="px-3 py-1 rounded-full bg-[#C85A32]/20 text-[#FAF0E9] text-xs font-bold border border-[#C85A32]/30 inline-flex items-center gap-1.5 mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> ML Attendance Predictor Engine
                 </span>
                 <h2 className="text-xl font-extrabold text-white tracking-tight">
                   Shortage Prevention & Target Buffer Analysis
                 </h2>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-extrabold ${
-                pred.shortage_risk ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                pred.shortage_risk ? 'bg-[#C85A32]/20 text-[#FDF2ED] border border-[#C85A32]/30' : 'bg-[#5E8C71]/20 text-[#F0F6F2] border border-[#5E8C71]/30'
               }`}>
                 {pred.shortage_risk ? 'Shortage Warning' : 'Attendance Safe'}
               </span>
             </div>
 
-            <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-xl">
+            <p className="text-xs text-[#FAF7F2]/80 font-medium leading-relaxed max-w-xl">
               {pred.recommendation}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Forecasted Rate</span>
-                <span className="text-lg font-extrabold text-indigo-300">{pred.predicted_attendance}%</span>
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Forecasted Rate</span>
+                <span className="text-lg font-extrabold text-[#FAF7F2]">{pred.predicted_attendance}%</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Required Future Classes</span>
-                <span className="text-lg font-extrabold text-amber-400">{pred.required_future_classes} Sessions</span>
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Required Future Classes</span>
+                <span className="text-lg font-extrabold text-[#D9822B]">{pred.required_future_classes} Sessions</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Allowable Margin Absences</span>
-                <span className="text-lg font-extrabold text-emerald-400">{pred.margin_absences_allowed} Sessions</span>
+                <span className="text-[10px] font-bold text-[#8E9893] uppercase tracking-wider block">Allowable Margin Absences</span>
+                <span className="text-lg font-extrabold text-[#5E8C71]">{pred.margin_absences_allowed} Sessions</span>
               </div>
             </div>
 
-            <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
           </div>
 
-          <div className="lg:col-span-4 bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm flex flex-col justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Academic Eligibility Threshold
+              <h3 className="text-sm font-bold text-[#1C211F] flex items-center gap-2 mb-2">
+                <ShieldCheck className="w-4 h-4 text-[#5E8C71]" /> Academic Eligibility Threshold
               </h3>
-              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+              <p className="text-xs text-[#5E6763] font-medium leading-relaxed">
                 As per university academic regulations, a minimum of 75.0% attendance is mandatory to sit for end-semester examinations.
               </p>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 space-y-2">
+            <div className="pt-4 border-t border-[#EAE3D8] space-y-2">
               <div className="flex justify-between text-xs font-bold">
-                <span className="text-slate-500">Target Threshold:</span>
-                <span className="text-indigo-600">75.0%</span>
+                <span className="text-[#5E6763]">Target Threshold:</span>
+                <span className="text-[#C85A32]">75.0%</span>
               </div>
               <div className="flex justify-between text-xs font-bold">
-                <span className="text-slate-500">Condonation Buffer:</span>
-                <span className="text-slate-700">65.0% - 74.9%</span>
+                <span className="text-[#5E6763]">Condonation Buffer:</span>
+                <span className="text-[#1C211F]">65.0% - 74.9%</span>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-900">Subject Breakdown & Target Buffer</h2>
-          <span className="text-xs font-bold text-indigo-600">Minimum Threshold: 75.0%</span>
+      <div className="bg-white rounded-[24px] border border-[#EAE3D8] shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-[#EAE3D8] flex justify-between items-center">
+          <h2 className="text-lg font-bold text-[#1C211F]">Subject Breakdown & Target Buffer</h2>
+          <span className="text-xs font-bold text-[#C85A32]">Minimum Threshold: 75.0%</span>
         </div>
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-8 text-center text-xs text-slate-400 font-medium">Loading live attendance records...</div>
+            <div className="p-8 text-center text-xs text-[#8E9893] font-medium">Loading live attendance records...</div>
           ) : !attendanceData?.subjects || attendanceData.subjects.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500 font-medium">No attendance records logged for your courses yet.</div>
+            <div className="p-8 text-center text-xs text-[#5E6763] font-medium">No attendance records logged for your courses yet.</div>
           ) : (
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-slate-500 font-bold text-xs uppercase tracking-wider">
+                <tr className="bg-[#FAF7F2] border-b border-[#EAE3D8] text-[#5E6763] font-bold text-xs uppercase tracking-wider">
                   <th className="p-4.5 pl-6">Subject</th>
                   <th className="p-4.5">Total Classes</th>
                   <th className="p-4.5">Attended</th>
@@ -604,20 +604,20 @@ function StudentAttendanceBoard({ profile }: { profile?: any }) {
                   <th className="p-4.5 pr-6">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
+              <tbody className="divide-y divide-[#EAE3D8] font-medium">
                 {attendanceData.subjects.map((sub: any) => (
-                  <tr key={sub.subject_code || sub.subject_name} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="p-4.5 pl-6 font-bold text-slate-900">
-                      {sub.subject_name} <span className="text-xs text-slate-400 font-semibold font-mono">({sub.subject_code})</span>
+                  <tr key={sub.subject_code || sub.subject_name} className="hover:bg-[#FAF7F2] transition-colors">
+                    <td className="p-4.5 pl-6 font-bold text-[#1C211F]">
+                      {sub.subject_name} <span className="text-xs text-[#8E9893] font-semibold font-mono">({sub.subject_code})</span>
                     </td>
-                    <td className="p-4.5 text-slate-600">{sub.total_classes}</td>
-                    <td className="p-4.5 text-slate-600">{sub.attended_classes}</td>
+                    <td className="p-4.5 text-[#5E6763]">{sub.total_classes}</td>
+                    <td className="p-4.5 text-[#5E6763]">{sub.attended_classes}</td>
                     <td className="p-4.5">
                       <div className="flex items-center gap-3">
-                        <span className="font-mono font-bold text-slate-800 w-12">{sub.attendance_rate}%</span>
-                        <div className="w-28 bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <span className="font-mono font-bold text-[#1C211F] w-12">{sub.attendance_rate}%</span>
+                        <div className="w-28 bg-[#F4EFEA] rounded-full h-2 overflow-hidden">
                           <div
-                            className={`h-2 rounded-full ${sub.attendance_rate >= 75 ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                            className={`h-2 rounded-full ${sub.attendance_rate >= 75 ? 'bg-[#5E8C71]' : 'bg-[#C85A32]'}`}
                             style={{ width: `${Math.min(100, sub.attendance_rate)}%` }}
                           />
                         </div>
@@ -625,14 +625,14 @@ function StudentAttendanceBoard({ profile }: { profile?: any }) {
                     </td>
                     <td className="p-4.5 text-xs font-semibold">
                       {sub.attendance_rate >= 75 ? (
-                        <span className="text-emerald-600">Can miss up to {sub.margin_absences_allowed} class{sub.margin_absences_allowed !== 1 ? 'es' : ''}</span>
+                        <span className="text-[#5E8C71]">Can miss up to {sub.margin_absences_allowed} class{sub.margin_absences_allowed !== 1 ? 'es' : ''}</span>
                       ) : (
-                        <span className="text-amber-600 font-bold">Must attend next {sub.required_future_classes} class{sub.required_future_classes !== 1 ? 'es' : ''}</span>
+                        <span className="text-[#D9822B] font-bold">Must attend next {sub.required_future_classes} class{sub.required_future_classes !== 1 ? 'es' : ''}</span>
                       )}
                     </td>
                     <td className="p-4.5 pr-6">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                        sub.status === 'Safe' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'
+                        sub.status === 'Safe' ? 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71]/30' : 'bg-[#FDF2ED] text-[#C85A32] border-[#C85A32]/30'
                       }`}>
                         {sub.status}
                       </span>

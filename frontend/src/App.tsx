@@ -30,20 +30,22 @@ import Settings from './features/settings/SettingsPage';
 import Profile from './features/profile/ProfilePage';
 import ExamPrepPage from './features/exam-prep/ExamPrepPage';
 import RepoDNAPage from './features/repodna/RepoDNAPage';
+import MockInterviewPage from './features/mock-interview/MockInterviewPage';
 import { UserRole } from './types';
+
 
 const DashboardRedirect: React.FC = () => {
   const { isAuthenticated, role, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-slate-100">
+      <div className="flex h-screen w-screen items-center justify-center bg-[#FAF7F2] text-[#1C211F]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative h-12 w-12">
-            <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20"></div>
-            <div className="absolute inset-0 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-[#C85A32]/20"></div>
+            <div className="absolute inset-0 animate-spin rounded-full border-4 border-[#C85A32] border-t-transparent"></div>
           </div>
-          <p className="text-sm font-semibold tracking-wide text-indigo-400">Verifying session identity...</p>
+          <p className="text-sm font-semibold tracking-wide text-[#C85A32]">Verifying session identity...</p>
         </div>
       </div>
     );
@@ -91,8 +93,10 @@ export default function App() {
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="repodna" element={<RepoDNAPage />} />
+                    <Route path="mock-interview" element={<MockInterviewPage />} />
                     <Route path="exam-prep" element={<ExamPrepPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
+
                     <Route path="academics" element={<Academics />} />
                     <Route path="attendance" element={<Attendance />} />
                     <Route path="exams" element={<Exams />} />
@@ -181,8 +185,10 @@ export default function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="mock-interview" element={<MockInterviewPage />} />
                     <Route path="ai-assistant" element={<AIAssistant />} />
                     <Route path="placements" element={<Placements />} />
+
                     <Route path="settings" element={<Settings />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />

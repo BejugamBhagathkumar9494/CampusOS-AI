@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --background: 220 60% 99%;
-    --foreground: 224 71% 4%;
+    --background: 38 42% 96%; /* #FAF7F2 Warm Cream */
+    --foreground: 160 8% 12%; /* #1C211F Charcoal */
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 33 28% 93%; /* #F4EFEA Warm Cream Alt */
+    --muted-foreground: 153 5% 38%; /* #5E6763 Charcoal Secondary */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
+    --popover-foreground: 160 8% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 160 8% 12%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 35 25% 88%; /* #EAE3D8 Beige */
+    --input: 35 25% 88%;
 
-    --primary: 239 84% 67%; /* #6366F1 */
-    --primary-foreground: 210 40% 98%;
+    --primary: 16 60% 49%; /* #C85A32 Terracotta */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 262 83% 58%; /* #8B5CF6 */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 214 36% 37%; /* #3D5A80 Navy */
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 220 14% 96%;
-    --accent-foreground: 224 71% 4%;
+    --accent: 33 28% 93%; /* #F4EFEA */
+    --accent-foreground: 160 8% 12%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 239 84% 67%;
+    --ring: 16 60% 49%; /* #C85A32 Terracotta */
     --radius: 1.25rem;
   }
 }

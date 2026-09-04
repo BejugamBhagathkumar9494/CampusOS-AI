@@ -27,14 +27,14 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Subtab Toggle */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#EAE3D8] shadow-sm">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveSubTab('one_day')}
             className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center gap-2 ${
               activeSubTab === 'one_day'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-[#C85A32] text-white shadow-md shadow-[#C85A32]/20'
+                : 'text-[#5E6763] hover:bg-[#F4EFEA]'
             }`}
           >
             <Clock className="w-4 h-4" /> One-Day Complete Revision
@@ -43,8 +43,8 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
             onClick={() => setActiveSubTab('last_minute')}
             className={`px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center gap-2 ${
               activeSubTab === 'last_minute'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-500/20'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-[#D9822B] text-white shadow-md shadow-[#D9822B]/20'
+                : 'text-[#5E6763] hover:bg-[#F4EFEA]'
             }`}
           >
             <Zap className="w-4 h-4" /> Last-Minute High-Yield Sheet
@@ -53,9 +53,9 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
 
         <button
           onClick={() => window.print()}
-          className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 transition-colors"
+          className="px-4 py-2 rounded-xl border border-[#EAE3D8] text-[#1C211F] hover:bg-[#FAF7F2] text-xs font-bold flex items-center gap-1.5 transition-colors"
         >
-          <Printer className="w-3.5 h-3.5 text-slate-500" /> Print / Save PDF
+          <Printer className="w-3.5 h-3.5 text-[#5E6763]" /> Print / Save PDF
         </button>
       </div>
 
@@ -66,19 +66,19 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
             oneDayData.units.map((u, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6"
+                className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE3D8] shadow-sm space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-center justify-between border-b border-[#F3ECE2] pb-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 font-extrabold flex items-center justify-center text-sm">
+                    <span className="w-10 h-10 rounded-2xl bg-[#FDF2ED] text-[#C85A32] font-extrabold flex items-center justify-center text-sm">
                       U{idx + 1}
                     </span>
                     <div>
-                      <h3 className="text-lg font-extrabold text-slate-900">{u.unit}</h3>
-                      <p className="text-xs text-slate-400 font-semibold">{subjectName} Core Revision</p>
+                      <h3 className="text-lg font-extrabold text-[#1C211F]">{u.unit}</h3>
+                      <p className="text-xs text-[#5E6763] font-semibold">{subjectName} Core Revision</p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs">
+                  <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] font-bold text-xs">
                     One-Day Focus
                   </span>
                 </div>
@@ -86,16 +86,16 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
                 {/* 10 Key Concepts */}
                 {u.key_concepts && u.key_concepts.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-indigo-600" /> 10 Key Concepts
+                    <h4 className="text-xs font-extrabold text-[#8E9893] uppercase tracking-wider flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-[#C85A32]" /> 10 Key Concepts
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                       {u.key_concepts.map((concept, cIdx) => (
                         <div
                           key={cIdx}
-                          className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-medium text-slate-700"
+                          className="flex items-start gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs font-medium text-[#2D3330]"
                         >
-                          <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center shrink-0 text-[10px]">
+                          <span className="w-5 h-5 rounded-full bg-[#FDF2ED] text-[#C85A32] font-bold flex items-center justify-center shrink-0 text-[10px]">
                             {cIdx + 1}
                           </span>
                           <span>{concept}</span>
@@ -108,16 +108,16 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
                 {/* Definitions */}
                 {u.important_definitions && u.important_definitions.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Bookmark className="w-3.5 h-3.5 text-purple-600" /> Essential Definitions
+                    <h4 className="text-xs font-extrabold text-[#8E9893] uppercase tracking-wider flex items-center gap-1.5">
+                      <Bookmark className="w-3.5 h-3.5 text-[#786498]" /> Essential Definitions
                     </h4>
                     <div className="space-y-2">
                       {u.important_definitions.map((def, dIdx) => (
                         <div
                           key={dIdx}
-                          className="p-3.5 rounded-xl bg-purple-50/50 border border-purple-100 text-xs text-slate-800"
+                          className="p-3.5 rounded-xl bg-[#F4F1F8] border border-[#786498]/20 text-xs text-[#2D3330]"
                         >
-                          <strong className="text-purple-900">{def.term}:</strong> {def.definition}
+                          <strong className="text-[#786498]">{def.term}:</strong> {def.definition}
                         </div>
                       ))}
                     </div>
@@ -127,16 +127,16 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
                 {/* Top Questions */}
                 {u.top_questions && u.top_questions.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <FileCheck className="w-3.5 h-3.5 text-emerald-600" /> Top Expected Examination Questions
+                    <h4 className="text-xs font-extrabold text-[#8E9893] uppercase tracking-wider flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-[#5E8C71]" /> Top Expected Examination Questions
                     </h4>
                     <ul className="space-y-2">
                       {u.top_questions.map((q, qIdx) => (
                         <li
                           key={qIdx}
-                          className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs font-bold text-emerald-950"
+                          className="flex items-center gap-2 p-3 rounded-xl bg-[#F0F6F2] border border-[#5E8C71]/20 text-xs font-bold text-[#1C211F]"
                         >
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#5E8C71] shrink-0" />
                           <span>{q}</span>
                         </li>
                       ))}
@@ -146,10 +146,10 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Clock className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No One-Day Revision notes generated yet.</p>
-              <p className="text-xs text-slate-400 mt-1">
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Clock className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No One-Day Revision notes generated yet.</p>
+              <p className="text-xs text-[#5E6763] mt-1">
                 Click "Generate Exam Notes" above to create comprehensive revision sheets.
               </p>
             </div>
@@ -161,17 +161,17 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
       {activeSubTab === 'last_minute' && (
         <div className="space-y-6 animate-fade-in">
           {lastMinuteData ? (
-            <div className="bg-gradient-to-br from-amber-500/10 via-white to-amber-500/5 rounded-3xl p-6 sm:p-8 border border-amber-200 shadow-sm space-y-6">
-              <div className="flex items-center justify-between border-b border-amber-100 pb-4">
+            <div className="bg-gradient-to-br from-[#FEF7ED] via-white to-[#FEF7ED] rounded-3xl p-6 sm:p-8 border border-[#D9822B]/30 shadow-sm space-y-6">
+              <div className="flex items-center justify-between border-b border-[#FEF7ED] pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white font-extrabold flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <div className="w-12 h-12 rounded-2xl bg-[#D9822B] text-white font-extrabold flex items-center justify-center shadow-lg shadow-[#D9822B]/30">
                     <Zap className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900">
+                    <h3 className="text-xl font-black text-[#1C211F]">
                       {lastMinuteData.title || 'Last-Minute High-Yield Revision Sheet'}
                     </h3>
-                    <p className="text-xs text-amber-800 font-medium">
+                    <p className="text-xs text-[#D9822B] font-medium">
                       High-value compact sheet strictly derived from your uploaded notes
                     </p>
                   </div>
@@ -181,16 +181,16 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
               {/* Essential High-Value Points */}
               {lastMinuteData.essential_points && lastMinuteData.essential_points.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-xs font-extrabold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-amber-600" /> Must-Know Exam Principles
+                  <h4 className="text-xs font-extrabold text-[#D9822B] uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#D9822B]" /> Must-Know Exam Principles
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {lastMinuteData.essential_points.map((pt, pIdx) => (
                       <div
                         key={pIdx}
-                        className="p-3.5 rounded-2xl bg-white border border-amber-100 shadow-xs text-xs font-semibold text-slate-800 flex items-start gap-2.5"
+                        className="p-3.5 rounded-2xl bg-white border border-[#D9822B]/20 shadow-xs text-xs font-semibold text-[#2D3330] flex items-start gap-2.5"
                       >
-                        <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-[#D9822B] mt-1.5 shrink-0" />
                         <span>{pt}</span>
                       </div>
                     ))}
@@ -200,14 +200,14 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
 
               {/* Quick Exam Traps & Tips */}
               {lastMinuteData.quick_exam_traps_and_tips && (
-                <div className="p-5 rounded-2xl bg-white border border-amber-200/80 space-y-2">
-                  <h4 className="text-xs font-extrabold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Lightbulb className="w-4 h-4 text-amber-600" /> Professor's Exam Traps & Key Reminders
+                <div className="p-5 rounded-2xl bg-white border border-[#D9822B]/30 space-y-2">
+                  <h4 className="text-xs font-extrabold text-[#D9822B] uppercase tracking-wider flex items-center gap-1.5">
+                    <Lightbulb className="w-4 h-4 text-[#D9822B]" /> Professor's Exam Traps & Key Reminders
                   </h4>
-                  <ul className="space-y-1.5 text-xs text-slate-700">
+                  <ul className="space-y-1.5 text-xs text-[#2D3330]">
                     {lastMinuteData.quick_exam_traps_and_tips.map((tip, tIdx) => (
                       <li key={tIdx} className="flex items-start gap-2 font-medium">
-                        <span className="text-amber-600 font-bold">⚠️</span> {tip}
+                        <span className="text-[#D9822B] font-bold">⚠️</span> {tip}
                       </li>
                     ))}
                   </ul>
@@ -215,9 +215,9 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200">
-              <Zap className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-sm font-bold text-slate-700">No Last-Minute Revision sheet generated yet.</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-[#EAE3D8]">
+              <Zap className="w-12 h-12 text-[#8E9893] mx-auto mb-3" />
+              <p className="text-sm font-bold text-[#1C211F]">No Last-Minute Revision sheet generated yet.</p>
             </div>
           )}
         </div>

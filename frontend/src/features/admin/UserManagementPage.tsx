@@ -353,29 +353,29 @@ export const UserManagementPage = () => {
     <div className="space-y-7 animate-fade-in font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8]">
               <ShieldCheck className="w-5 h-5" />
             </span>
             Admin Control & Curriculum Management
           </h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">
+          <p className="text-sm text-[#5E6763] font-medium mt-1">
             Manage campus users, design semester subjects, assign faculty leads, and inspect security logs in real-time.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-xs font-bold shadow-xs">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/30 text-xs font-bold shadow-xs">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5E8C71] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5E8C71]"></span>
             </span>
             <span>Live Sync Active</span>
           </div>
 
           <button
             onClick={() => loadData(true)}
-            className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all text-xs font-bold flex items-center gap-1.5 shadow-xs"
+            className="p-2.5 rounded-xl bg-white border border-[#EAE3D8] text-[#5E6763] hover:bg-[#FAF7F2] transition-all text-xs font-bold flex items-center gap-1.5 shadow-xs"
             title="Force refresh data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -385,7 +385,7 @@ export const UserManagementPage = () => {
           {activeTab === 'subjects' && (
             <button
               onClick={() => setShowCourseModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-[#C85A32]/20 transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />
               Add Semester Subject
@@ -395,7 +395,7 @@ export const UserManagementPage = () => {
           {isSuperAdmin && activeTab === 'users' && (
             <button
               onClick={() => setShowAdminModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-[#C85A32]/20 transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4" />
               Create Administrator
@@ -407,32 +407,32 @@ export const UserManagementPage = () => {
       {/* User Statistics Row */}
       {activeTab === 'users' && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Users</div>
-            <div className="text-2xl font-black text-slate-900 mt-1">{users.length}</div>
+          <div className="bg-white rounded-2xl p-4 border border-[#EAE3D8] shadow-xs">
+            <div className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider">Total Users</div>
+            <div className="text-2xl font-black text-[#1C211F] mt-1">{users.length}</div>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
-            <div className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Active Accounts</div>
-            <div className="text-2xl font-black text-emerald-700 mt-1">{users.filter(u => u.status === 'active').length}</div>
+          <div className="bg-white rounded-2xl p-4 border border-[#EAE3D8] shadow-xs">
+            <div className="text-[11px] font-bold text-[#5E8C71] uppercase tracking-wider">Active Accounts</div>
+            <div className="text-2xl font-black text-[#5E8C71] mt-1">{users.filter(u => u.status === 'active').length}</div>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
-            <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Pending Approvals</div>
-            <div className="text-2xl font-black text-amber-700 mt-1">{users.filter(u => u.status === 'pending').length}</div>
+          <div className="bg-white rounded-2xl p-4 border border-[#EAE3D8] shadow-xs">
+            <div className="text-[11px] font-bold text-[#D9822B] uppercase tracking-wider">Pending Approvals</div>
+            <div className="text-2xl font-black text-[#D9822B] mt-1">{users.filter(u => u.status === 'pending').length}</div>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs">
-            <div className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Suspended / Other</div>
-            <div className="text-2xl font-black text-rose-700 mt-1">{users.filter(u => u.status !== 'active' && u.status !== 'pending').length}</div>
+          <div className="bg-white rounded-2xl p-4 border border-[#EAE3D8] shadow-xs">
+            <div className="text-[11px] font-bold text-[#C85A32] uppercase tracking-wider">Suspended / Other</div>
+            <div className="text-2xl font-black text-[#C85A32] mt-1">{users.filter(u => u.status !== 'active' && u.status !== 'pending').length}</div>
           </div>
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-1">
+      <div className="flex flex-wrap gap-2 border-b border-[#EAE3D8] pb-1">
         <button
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
             activeTab === 'users'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-[#C85A32] text-white shadow-sm'
+              : 'text-[#5E6763] hover:bg-[#F4EFEA]'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -443,8 +443,8 @@ export const UserManagementPage = () => {
           onClick={() => setActiveTab('subjects')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
             activeTab === 'subjects'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-[#C85A32] text-white shadow-sm'
+              : 'text-[#5E6763] hover:bg-[#F4EFEA]'
           }`}
         >
           <BookOpen className="w-4 h-4" />
@@ -455,8 +455,8 @@ export const UserManagementPage = () => {
           onClick={() => setActiveTab('audit')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
             activeTab === 'audit'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-[#C85A32] text-white shadow-sm'
+              : 'text-[#5E6763] hover:bg-[#F4EFEA]'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -465,25 +465,25 @@ export const UserManagementPage = () => {
       </div>
 
       {activeTab === 'users' && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-6">
+        <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#8E9893]" />
               <input
                 type="text"
                 placeholder="Search by name, email, or institution ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 outline-none focus:border-indigo-500"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-[#EAE3D8] bg-[#FAF7F2] text-[#1C211F] outline-none focus:border-[#C85A32]"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-400" />
+              <Filter className="w-4 h-4 text-[#8E9893]" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 outline-none cursor-pointer"
+                className="text-xs bg-[#FAF7F2] border border-[#EAE3D8] rounded-xl px-3 py-2 text-[#1C211F] outline-none cursor-pointer"
               >
                 <option value="all">All Account Statuses</option>
                 <option value="pending">Pending Approval</option>
@@ -497,7 +497,7 @@ export const UserManagementPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                <tr className="border-b border-[#EAE3D8] text-[#8E9893] font-bold uppercase tracking-wider">
                   <th className="py-3 px-4">User Details</th>
                   <th className="py-3 px-4">Institution ID</th>
                   <th className="py-3 px-4">Role</th>
@@ -507,23 +507,23 @@ export const UserManagementPage = () => {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+              <tbody className="divide-y divide-[#EAE3D8] text-[#2D3330] font-medium">
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((u) => {
                     const loginInfo = formatLastLogin(u.last_login);
                     return (
-                      <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                      <tr key={u.id} className="hover:bg-[#FAF7F2] transition-colors">
                         <td className="py-3.5 px-4">
                           <div>
-                            <p className="font-bold text-slate-900">{u.full_name}</p>
-                            <p className="text-[11px] text-slate-400">{u.email}</p>
+                            <p className="font-bold text-[#1C211F]">{u.full_name}</p>
+                            <p className="text-[11px] text-[#8E9893]">{u.email}</p>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-600 font-semibold">
+                        <td className="py-3.5 px-4 font-mono text-[#5E6763] font-semibold">
                           {u.institution_id || 'N/A'}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wide">
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8] uppercase tracking-wide">
                             {u.role}
                           </span>
                         </td>
@@ -531,12 +531,12 @@ export const UserManagementPage = () => {
                           <span
                             className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold capitalize ${
                               u.status === 'active'
-                                ? 'bg-emerald-100 text-emerald-700'
+                                ? 'bg-[#F0F6F2] text-[#5E8C71]'
                                 : u.status === 'pending'
-                                ? 'bg-amber-100 text-amber-700'
+                                ? 'bg-[#FEF7ED] text-[#D9822B]'
                                 : u.status === 'suspended'
-                                ? 'bg-rose-100 text-rose-700'
-                                : 'bg-slate-200 text-slate-600'
+                                ? 'bg-[#FDF2ED] text-[#C85A32]'
+                                : 'bg-[#F4EFEA] text-[#8E9893]'
                             }`}
                           >
                             {u.status}
@@ -545,14 +545,14 @@ export const UserManagementPage = () => {
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-1.5">
                             {loginInfo.isRecent && (
-                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                              <span className="w-2 h-2 rounded-full bg-[#5E8C71] animate-pulse"></span>
                             )}
-                            <span className={`text-[11px] font-semibold ${loginInfo.isRecent ? 'text-emerald-700 font-bold' : 'text-slate-500'}`}>
+                            <span className={`text-[11px] font-semibold ${loginInfo.isRecent ? 'text-[#5E8C71] font-bold' : 'text-[#8E9893]'}`}>
                               {loginInfo.text}
                             </span>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                        <td className="py-3.5 px-4 text-[#8E9893] text-[11px]">
                           {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="py-3.5 px-4 text-right">
@@ -560,7 +560,7 @@ export const UserManagementPage = () => {
                             {u.status !== 'active' && (
                               <button
                                 onClick={() => handleStatusChange(u.id, 'active')}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                                className="px-2.5 py-1 rounded-lg bg-[#5E8C71] hover:bg-[#4d735d] text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
                                 title="Accept / Approve User"
                               >
                                 <UserCheck className="w-3.5 h-3.5" /> Accept
@@ -570,7 +570,7 @@ export const UserManagementPage = () => {
                             {u.status !== 'rejected' && u.role !== 'super_admin' && (
                               <button
                                 onClick={() => handleStatusChange(u.id, 'rejected')}
-                                className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+                                className="px-2.5 py-1 rounded-lg bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
                                 title="Reject User"
                               >
                                 <UserX className="w-3.5 h-3.5" /> Reject
@@ -580,7 +580,7 @@ export const UserManagementPage = () => {
                             {u.status === 'active' && u.role !== 'super_admin' && (
                               <button
                                 onClick={() => handleStatusChange(u.id, 'suspended')}
-                                className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] transition-colors"
+                                className="px-2 py-1 rounded-lg bg-[#D9822B] hover:bg-[#b86e24] text-white font-bold text-[11px] transition-colors"
                                 title="Suspend User"
                               >
                                 Suspend
@@ -590,10 +590,10 @@ export const UserManagementPage = () => {
                             {(u.role !== 'super_admin' || isSuperAdmin) && String(u.id) !== String(profile?.id) && u.email !== profile?.email && (
                               <button
                                 onClick={() => handleDeleteUser(u.id, u.full_name)}
-                                className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                                className="px-2 py-1 rounded-lg bg-[#F4EFEA] hover:bg-[#FDF2ED] text-[#5E6763] hover:text-[#C85A32] border border-[#EAE3D8] hover:border-[#C85A32]/30 font-bold text-[11px] flex items-center gap-1 transition-colors"
                                 title="Remove User from Database"
                               >
-                                <Trash2 className="w-3.5 h-3.5 text-rose-500" /> Remove
+                                <Trash2 className="w-3.5 h-3.5 text-[#C85A32]" /> Remove
                               </button>
                             )}
                           </div>
@@ -603,7 +603,7 @@ export const UserManagementPage = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-400 font-medium">
+                    <td colSpan={7} className="py-8 text-center text-[#8E9893] font-medium">
                       No matching user accounts found.
                     </td>
                   </tr>
@@ -615,25 +615,25 @@ export const UserManagementPage = () => {
       )}
 
       {activeTab === 'subjects' && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-6">
+        <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#8E9893]" />
               <input
                 type="text"
                 placeholder="Search subject title or course code..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800 outline-none focus:border-indigo-500"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-[#EAE3D8] bg-[#FAF7F2] text-[#1C211F] outline-none focus:border-[#C85A32]"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-indigo-600" />
+              <GraduationCap className="w-4 h-4 text-[#C85A32]" />
               <select
                 value={selectedSemester}
                 onChange={(e) => setSelectedSemester(e.target.value)}
-                className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 outline-none cursor-pointer font-bold"
+                className="text-xs bg-[#FAF7F2] border border-[#EAE3D8] rounded-xl px-3 py-2 text-[#1C211F] outline-none cursor-pointer font-bold"
               >
                 <option value="all">All Semesters</option>
                 <option value="1">Semester 1</option>
@@ -651,33 +651,33 @@ export const UserManagementPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredCourses.length > 0 ? (
               filteredCourses.map((c) => (
-                <div key={c.id} className="p-5 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-3 hover:bg-slate-50 transition-all flex flex-col justify-between">
+                <div key={c.id} className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-3 hover:bg-[#F4EFEA] transition-all flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100 font-mono">
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-[#FDF2ED] text-[#C85A32] border border-[#EAE3D8] font-mono">
                         {c.code}
                       </span>
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F4F1F8] text-[#786498] border border-[#EAE3D8]">
                         Semester {c.semester || 1}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-slate-900">{c.title}</h3>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Instructor: <span className="font-bold text-slate-700">{c.instructor_name || 'Faculty Member'}</span>
+                    <h3 className="text-base font-bold text-[#1C211F]">{c.title}</h3>
+                    <p className="text-xs text-[#5E6763] font-medium">
+                      Instructor: <span className="font-bold text-[#1C211F]">{c.instructor_name || 'Faculty Member'}</span>
                     </p>
-                    <p className="text-[11px] text-slate-400 font-mono">
+                    <p className="text-[11px] text-[#8E9893] font-mono">
                       Credits: {c.credits || 4} Hours
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-200/80 flex justify-between items-center">
-                    <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                  <div className="pt-3 border-t border-[#EAE3D8] flex justify-between items-center">
+                    <span className="text-[10px] text-[#5E8C71] font-bold bg-[#F0F6F2] px-2 py-0.5 rounded border border-[#5E8C71]/30">
                       Live on Student & Faculty Portals
                     </span>
                     <button
                       onClick={() => handleDeleteCourse(c.id, c.title)}
-                      className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"
+                      className="p-2 rounded-lg text-[#C85A32] hover:bg-[#FDF2ED] transition-colors"
                       title="Delete Subject"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -686,10 +686,10 @@ export const UserManagementPage = () => {
                 </div>
               ))
             ) : (
-              <div className="col-span-full py-12 text-center text-slate-400 font-medium bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-                <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
-                <p className="text-sm font-bold text-slate-700">No Semester Subjects Found</p>
-                <p className="text-xs text-slate-500">Click "+ Add Semester Subject" to design subjects for your curriculum.</p>
+              <div className="col-span-full py-12 text-center text-[#8E9893] font-medium bg-[#FAF7F2] rounded-2xl border border-dashed border-[#EAE3D8] space-y-2">
+                <BookOpen className="w-8 h-8 text-[#8E9893] mx-auto" />
+                <p className="text-sm font-bold text-[#1C211F]">No Semester Subjects Found</p>
+                <p className="text-xs text-[#5E6763]">Click "+ Add Semester Subject" to design subjects for your curriculum.</p>
               </div>
             )}
           </div>
@@ -697,95 +697,95 @@ export const UserManagementPage = () => {
       )}
 
       {activeTab === 'audit' && (
-        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm space-y-4">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-indigo-600" /> Administrative & System Audit Trail
+        <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
+          <h2 className="text-base font-bold text-[#1C211F] flex items-center gap-2">
+            <Clock className="w-4 h-4 text-[#C85A32]" /> Administrative & System Audit Trail
           </h2>
           <div className="space-y-3">
             {auditLogs.length > 0 ? (
               auditLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-mono text-[10px]">
+                      <span className="font-extrabold px-2 py-0.5 rounded bg-[#FDF2ED] text-[#C85A32] font-mono text-[10px] border border-[#EAE3D8]">
                         {log.action}
                       </span>
-                      <span className="text-slate-500 font-medium">Actor ID: {log.actor_user_id || 'System'}</span>
+                      <span className="text-[#5E6763] font-medium">Actor ID: {log.actor_user_id || 'System'}</span>
                     </div>
                     {log.metadata_json && (
-                      <p className="text-slate-600 font-mono text-[11px]">{log.metadata_json}</p>
+                      <p className="text-[#5E6763] font-mono text-[11px]">{log.metadata_json}</p>
                     )}
                   </div>
-                  <div className="text-slate-400 text-[11px] font-medium shrink-0">
+                  <div className="text-[#8E9893] text-[11px] font-medium shrink-0">
                     {new Date(log.timestamp).toLocaleString()}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-slate-400 text-xs py-4 text-center">No audit logs recorded yet.</p>
+              <p className="text-[#8E9893] text-xs py-4 text-center">No audit logs recorded yet.</p>
             )}
           </div>
         </div>
       )}
 
       {showCourseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1C211F]/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl border border-[#EAE3D8] max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-up">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-indigo-600" /> Add Semester Subject
+              <h3 className="text-lg font-extrabold text-[#1C211F] flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-[#C85A32]" /> Add Semester Subject
               </h3>
-              <button onClick={() => setShowCourseModal(false)} className="text-slate-400 hover:text-slate-600 font-bold text-sm">
+              <button onClick={() => setShowCourseModal(false)} className="text-[#8E9893] hover:text-[#1C211F] font-bold text-sm">
                 ✕
               </button>
             </div>
 
             {courseErr && (
-              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-[#FDF2ED] text-[#C85A32] text-xs font-semibold border border-[#C85A32]/30">
                 {courseErr}
               </div>
             )}
             {courseMsg && (
-              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" /> {courseMsg}
+              <div className="p-3 rounded-xl bg-[#F0F6F2] text-[#5E8C71] text-xs font-semibold flex items-center gap-2 border border-[#5E8C71]/30">
+                <CheckCircle className="w-4 h-4 text-[#5E8C71] shrink-0" /> {courseMsg}
               </div>
             )}
 
             <form onSubmit={handleCreateCourse} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Subject Code</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Subject Code</label>
                 <input
                   type="text"
                   value={courseCode}
                   onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
                   placeholder="CS-601"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 font-mono outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] font-mono outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Subject Title</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Subject Title</label>
                 <input
                   type="text"
                   value={courseTitle}
                   onChange={(e) => setCourseTitle(e.target.value)}
                   placeholder="Advanced Machine Learning & AI"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Target Semester</label>
+                  <label className="block font-bold text-[#1C211F] mb-1">Target Semester</label>
                   <select
                     value={courseSemester}
                     onChange={(e) => setCourseSemester(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                    className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                   >
                     <option value="1">Semester 1</option>
                     <option value="2">Semester 2</option>
@@ -799,22 +799,22 @@ export const UserManagementPage = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Credits</label>
+                  <label className="block font-bold text-[#1C211F] mb-1">Credits</label>
                   <input
                     type="number"
                     value={courseCredits}
                     onChange={(e) => setCourseCredits(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                    className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Assign Faculty Lead</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Assign Faculty Lead</label>
                 <select
                   value={courseFacultyId}
                   onChange={(e) => setCourseFacultyId(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                 >
                   <option value="">-- Select Faculty Lead --</option>
                   {facultyList.map((f) => (
@@ -829,14 +829,14 @@ export const UserManagementPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowCourseModal(false)}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
+                  className="w-1/2 py-2.5 rounded-xl bg-[#F4EFEA] text-[#1C211F] font-bold hover:bg-[#EAE3D8] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingCourse}
-                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20"
+                  className="w-1/2 py-2.5 rounded-xl bg-[#C85A32] text-white font-bold hover:bg-[#B44E27] transition-colors shadow-md shadow-[#C85A32]/20"
                 >
                   {submittingCourse ? 'Designing...' : 'Save Subject'}
                 </button>
@@ -847,70 +847,70 @@ export const UserManagementPage = () => {
       )}
 
       {showAdminModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1C211F]/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl border border-[#EAE3D8] max-w-md w-full p-6 shadow-2xl space-y-5 animate-scale-up">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                <Lock className="w-5 h-5 text-indigo-600" /> Create Administrator Account
+              <h3 className="text-lg font-extrabold text-[#1C211F] flex items-center gap-2">
+                <Lock className="w-5 h-5 text-[#C85A32]" /> Create Administrator Account
               </h3>
-              <button onClick={() => setShowAdminModal(false)} className="text-slate-400 hover:text-slate-600 font-bold text-sm">
+              <button onClick={() => setShowAdminModal(false)} className="text-[#8E9893] hover:text-[#1C211F] font-bold text-sm">
                 ✕
               </button>
             </div>
 
             {adminErr && (
-              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-[#FDF2ED] text-[#C85A32] text-xs font-semibold border border-[#C85A32]/30">
                 {adminErr}
               </div>
             )}
             {adminMsg && (
-              <div className="p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-[#F0F6F2] text-[#5E8C71] text-xs font-semibold border border-[#5E8C71]/30">
                 {adminMsg}
               </div>
             )}
 
             <form onSubmit={handleCreateAdmin} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Full Name</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Full Name</label>
                 <input
                   type="text"
                   value={adminName}
                   onChange={(e) => setAdminName(e.target.value)}
                   placeholder="Admin Three"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Email Address</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Email Address</label>
                 <input
                   type="email"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
                   placeholder="admin3@campus.edu"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Institution Admin ID</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Institution Admin ID</label>
                 <input
                   type="text"
                   value={adminId}
                   onChange={(e) => setAdminId(e.target.value.toUpperCase())}
                   placeholder="ADM003"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500 font-mono"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] font-mono bg-[#FAF7F2]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Password</label>
+                <label className="block font-bold text-[#1C211F] mb-1">Password</label>
                 <input
                   type="password"
                   value={adminPass}
                   onChange={(e) => setAdminPass(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 outline-none focus:border-indigo-500"
+                  className="w-full p-2.5 rounded-xl border border-[#EAE3D8] text-[#1C211F] outline-none focus:border-[#C85A32] bg-[#FAF7F2]"
                 />
               </div>
 
@@ -918,13 +918,13 @@ export const UserManagementPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowAdminModal(false)}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors"
+                  className="w-1/2 py-2.5 rounded-xl bg-[#F4EFEA] text-[#1C211F] font-bold hover:bg-[#EAE3D8] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-1/2 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/20"
+                  className="w-1/2 py-2.5 rounded-xl bg-[#C85A32] text-white font-bold hover:bg-[#B44E27] transition-colors shadow-md shadow-[#C85A32]/20"
                 >
                   Create Admin
                 </button>

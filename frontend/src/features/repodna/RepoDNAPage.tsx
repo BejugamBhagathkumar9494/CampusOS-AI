@@ -201,18 +201,18 @@ export default function RepoDNAPage() {
   return (
     <div className="space-y-8 animate-fade-in font-sans pb-16">
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-7 sm:p-9 rounded-[32px] shadow-2xl relative overflow-hidden border border-indigo-500/20">
+      <div className="bg-gradient-to-br from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] text-[#1C211F] p-7 sm:p-9 rounded-[32px] shadow-sm relative overflow-hidden border border-[#EAE3D8]">
         <div className="space-y-3 max-w-2xl z-10 relative">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-extrabold border border-indigo-500/30">
-            <Sparkles className="w-4 h-4 text-indigo-400" /> RepoDNA — AI GitHub Repository Intelligence
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold border border-[#C85A32]/30">
+            <Sparkles className="w-4 h-4 text-[#C85A32]" /> RepoDNA — AI GitHub Repository Intelligence
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1C211F]">
             Understand Any GitHub Project <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+            <span className="text-[#C85A32]">
               Like You Built It Yourself.
             </span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5E6763] font-medium leading-relaxed">
             Enter any public GitHub repository URL. RepoDNA scans the source tree, decodes the architecture, extracts APIs, database models, and generates an interview-ready explanation with codebase RAG.
           </p>
         </div>
@@ -220,8 +220,8 @@ export default function RepoDNAPage() {
         {/* Input Form Inside Hero */}
         <form onSubmit={handleAnalyze} className="mt-6 flex flex-col sm:flex-row items-center gap-3 z-10 relative max-w-3xl">
           <div className="relative flex-1 w-full">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-              <GitFork className="w-4 h-4 text-indigo-400" />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8E9893]">
+              <GitFork className="w-4 h-4 text-[#C85A32]" />
             </div>
             <input
               type="text"
@@ -229,13 +229,13 @@ export default function RepoDNAPage() {
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
               disabled={isScanning}
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/10 text-white placeholder-slate-400 text-xs sm:text-sm font-medium border border-white/15 focus:outline-none focus:ring-2 focus:ring-indigo-400 backdrop-blur-md transition-all shadow-inner"
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white text-[#1C211F] placeholder-[#8E9893] text-xs sm:text-sm font-medium border border-[#EAE3D8] focus:outline-none focus:ring-2 focus:ring-[#C85A32] transition-all shadow-xs"
             />
           </div>
           <button
             type="submit"
             disabled={isScanning || !githubUrl.trim()}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-[#C85A32]/20 transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           >
             {isScanning ? (
               <>
@@ -250,36 +250,36 @@ export default function RepoDNAPage() {
         </form>
 
         {errorMessage && (
-          <div className="mt-4 p-3.5 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-200 text-xs font-medium flex items-center gap-2 z-10 relative animate-fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="mt-4 p-3.5 rounded-2xl bg-[#FEF7ED] border border-[#D9822B]/30 text-[#D9822B] text-xs font-medium flex items-center gap-2 z-10 relative animate-fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#D9822B]" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Live Scanning Step Progress Overlay */}
       {isScanning && (
-        <div className="p-7 rounded-[28px] bg-slate-900 text-white border border-indigo-500/30 shadow-xl space-y-5 animate-fade-in">
+        <div className="p-7 rounded-[28px] bg-white text-[#1C211F] border border-[#EAE3D8] shadow-sm space-y-5 animate-fade-in">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-600/30 text-indigo-400 flex items-center justify-center border border-indigo-500/40">
+              <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center border border-[#C85A32]/30">
                 <RefreshCw className="w-5 h-5 animate-spin" />
               </div>
               <div>
-                <h3 className="text-sm font-extrabold text-white">Analyzing Repository with RepoDNA</h3>
-                <p className="text-xs text-slate-400">Step {scanStepIndex + 1} of {SCAN_STEPS.length}</p>
+                <h3 className="text-sm font-extrabold text-[#1C211F]">Analyzing Repository with RepoDNA</h3>
+                <p className="text-xs text-[#5E6763]">Step {scanStepIndex + 1} of {SCAN_STEPS.length}</p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-mono font-bold">
+            <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-mono font-bold">
               {Math.round(((scanStepIndex + 1) / SCAN_STEPS.length) * 100)}%
             </span>
           </div>
 
-          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#F4EFEA] rounded-full h-2 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 transition-all duration-700 ease-out"
+              className="bg-[#C85A32] h-2 transition-all duration-700 ease-out"
               style={{ width: `${((scanStepIndex + 1) / SCAN_STEPS.length) * 100}%` }}
             />
           </div>
@@ -290,18 +290,18 @@ export default function RepoDNAPage() {
                 key={idx}
                 className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 border transition-all ${
                   idx < scanStepIndex
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    ? 'bg-[#F0F6F2] border-[#5E8C71]/30 text-[#5E8C71]'
                     : idx === scanStepIndex
-                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-200 ring-1 ring-indigo-400'
-                    : 'bg-slate-800/40 border-slate-700/40 text-slate-500'
+                    ? 'bg-[#FDF2ED] border-[#C85A32]/40 text-[#C85A32] ring-1 ring-[#C85A32]'
+                    : 'bg-[#FAF7F2] border-[#EAE3D8] text-[#8E9893]'
                 }`}
               >
                 {idx < scanStepIndex ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#5E8C71] shrink-0" />
                 ) : idx === scanStepIndex ? (
-                  <RefreshCw className="w-4 h-4 text-indigo-400 animate-spin shrink-0" />
+                  <RefreshCw className="w-4 h-4 text-[#C85A32] animate-spin shrink-0" />
                 ) : (
-                  <div className="w-4 h-4 rounded-full border border-slate-600 flex items-center justify-center text-[9px] text-slate-500 shrink-0">
+                  <div className="w-4 h-4 rounded-full border border-[#DCD2C3] flex items-center justify-center text-[9px] text-[#8E9893] shrink-0">
                     {idx + 1}
                   </div>
                 )}
@@ -315,22 +315,22 @@ export default function RepoDNAPage() {
       {/* History Pill Selector for Analyzed Repos */}
       {repositories.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Analyzed Repos:</span>
+          <span className="text-xs font-bold text-[#8E9893] uppercase tracking-wider shrink-0 mr-1">Analyzed Repos:</span>
           {repositories.map(r => (
             <div
               key={r.id}
               onClick={() => selectRepository(r)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 border ${
                 activeRepo?.id === r.id
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-xs'
+                  : 'bg-white text-[#2D3330] border-[#EAE3D8] hover:bg-[#FAF7F2]'
               }`}
             >
               <GitBranch className="w-3.5 h-3.5" />
               <span>{r.owner}/{r.repo_name}</span>
               <button
                 onClick={(e) => handleDeleteRepository(r.id, e)}
-                className="text-slate-400 hover:text-rose-400 p-0.5"
+                className="text-[#8E9893] hover:text-[#C85A32] p-0.5"
                 title="Delete Repository"
               >
                 <Trash2 className="w-3 h-3" />
@@ -344,30 +344,30 @@ export default function RepoDNAPage() {
       {activeRepo && analysis ? (
         <div className="space-y-6">
           {/* Active Repo Top Bar */}
-          <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                  <GitBranch className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-xl font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-[#C85A32]" />
                   {activeRepo.owner} / {activeRepo.repo_name}
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-extrabold border border-emerald-200">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#F0F6F2] text-[#5E8C71] text-[11px] font-extrabold border border-[#5E8C71]/30">
                   {activeRepo.primary_language}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#F4EFEA] text-[#5E6763] text-[11px] font-bold border border-[#EAE3D8]">
                   {activeRepo.default_branch}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">{analysis.one_line_desc || activeRepo.description}</p>
+              <p className="text-xs text-[#5E6763] font-medium">{analysis.one_line_desc || activeRepo.description}</p>
             </div>
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveTab('mindmap')}
-                className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md active:scale-95 ${
+                className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${
                   activeTab === 'mindmap'
-                    ? 'bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white ring-2 ring-indigo-400 shadow-indigo-500/30'
-                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
+                    ? 'bg-[#C85A32] text-white ring-2 ring-[#C85A32]/30'
+                    : 'bg-[#C85A32] hover:bg-[#B44E27] text-white'
                 }`}
               >
                 <Compass className="w-4 h-4" /> Go Visually (Mindmap)
@@ -376,20 +376,20 @@ export default function RepoDNAPage() {
                 href={activeRepo.github_url}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all"
+                className="px-4 py-2 rounded-xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] text-xs font-bold flex items-center gap-1.5 transition-all border border-[#EAE3D8]"
               >
                 <ExternalLink className="w-3.5 h-3.5" /> View on GitHub
               </a>
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> {activeRepo.stars_count}
-                <GitFork className="w-3.5 h-3.5 text-slate-400 ml-1" /> {activeRepo.forks_count}
-                <FileCode className="w-3.5 h-3.5 text-indigo-500 ml-1" /> {files.length} Files
+              <div className="flex items-center gap-2 text-xs font-bold text-[#5E6763] bg-[#FAF7F2] px-3 py-2 rounded-xl border border-[#EAE3D8]">
+                <Star className="w-3.5 h-3.5 text-[#D9822B] fill-[#D9822B]" /> {activeRepo.stars_count}
+                <GitFork className="w-3.5 h-3.5 text-[#8E9893] ml-1" /> {activeRepo.forks_count}
+                <FileCode className="w-3.5 h-3.5 text-[#C85A32] ml-1" /> {files.length} Files
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs Bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-slate-200">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-[#EAE3D8]">
             {[
               { id: 'overview', label: 'Overview', icon: BookOpen },
               { id: 'mindmap', label: 'Mindmap (Visual)', icon: Compass },
@@ -412,8 +412,8 @@ export default function RepoDNAPage() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap transition-all ${
                     activeTab === tab.id
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-[#C85A32] text-white shadow-xs'
+                      : 'text-[#5E6763] hover:text-[#1C211F] hover:bg-[#F4EFEA]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -426,18 +426,18 @@ export default function RepoDNAPage() {
           {/* TAB 0: VISUAL MINDMAP */}
           {activeTab === 'mindmap' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm">
                 <div className="space-y-0.5">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <Compass className="w-5 h-5 text-indigo-600" /> Interactive Repository Mindmap
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-[#C85A32]" /> Interactive Repository Mindmap
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-xs text-[#5E6763] font-medium">
                     NotebookLM-style visual radial universe. Pan, zoom, click any node to inspect modules, or ask AI about specific components.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-extrabold border border-indigo-200 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Interactive Universe
+                  <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold border border-[#C85A32]/20 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> Interactive Universe
                   </span>
                 </div>
               </div>
@@ -457,40 +457,40 @@ export default function RepoDNAPage() {
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
               {/* Interview Pitch Card */}
-              <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-6 rounded-[28px] shadow-lg border border-purple-500/30 space-y-3">
+              <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-md border border-[#2D3330] space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-purple-300 text-xs font-extrabold uppercase tracking-wider">
-                    <Sparkles className="w-4 h-4" /> 60-Second Interview Elevator Pitch
+                  <div className="flex items-center gap-2 text-[#FAF0E9] text-xs font-extrabold uppercase tracking-wider">
+                    <Sparkles className="w-4 h-4 text-[#C85A32]" /> 60-Second Interview Elevator Pitch
                   </div>
                   <button
                     onClick={handleCopyPitch}
                     className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 border border-white/10"
                   >
-                    {copiedPitch ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedPitch ? <Check className="w-3.5 h-3.5 text-[#5E8C71]" /> : <Copy className="w-3.5 h-3.5" />}
                     {copiedPitch ? 'Copied!' : 'Copy Pitch'}
                   </button>
                 </div>
-                <p className="text-sm sm:text-base text-slate-100 font-medium leading-relaxed italic bg-black/20 p-4 rounded-2xl border border-white/5">
+                <p className="text-sm sm:text-base text-[#FAF7F2] font-medium leading-relaxed italic bg-black/20 p-4 rounded-2xl border border-white/5">
                   "{analysis.interview_pitch || analysis.short_summary}"
                 </p>
               </div>
 
               {/* Two Column Summary: Executive & Beginner */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-3">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-indigo-600" /> Executive Overview
+                <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-3">
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-[#C85A32]" /> Executive Overview
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                  <p className="text-xs sm:text-sm text-[#5E6763] leading-relaxed font-medium">
                     {analysis.detailed_overview || analysis.short_summary}
                   </p>
                 </div>
 
-                <div className="bg-indigo-50/50 p-6 rounded-[24px] border border-indigo-100 shadow-sm space-y-3">
-                  <h3 className="text-base font-extrabold text-indigo-950 flex items-center gap-2">
-                    <HelpCircle className="w-4 h-4 text-indigo-600" /> Explain Like I'm a Beginner (ELI5)
+                <div className="bg-[#FAF0E9] p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-3">
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <HelpCircle className="w-4 h-4 text-[#C85A32]" /> Explain Like I'm a Beginner (ELI5)
                   </h3>
-                  <p className="text-xs sm:text-sm text-indigo-900/80 leading-relaxed font-medium">
+                  <p className="text-xs sm:text-sm text-[#2D3330] leading-relaxed font-medium">
                     {analysis.beginner_explanation || analysis.short_summary}
                   </p>
                 </div>
@@ -501,23 +501,23 @@ export default function RepoDNAPage() {
           {/* TAB 2: ARCHITECTURE */}
           {activeTab === 'architecture' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-indigo-600" /> System Architecture & Data Flow
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-[#C85A32]" /> System Architecture & Data Flow
                   </h3>
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                  <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-bold border border-[#EAE3D8]">
                     {analysis.architecture?.pattern || 'Client-Server Architecture'}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-[#5E6763] leading-relaxed font-medium">
                   {analysis.architecture?.summary || 'Standard modular architecture separating presentation, controller routes, and data state.'}
                 </p>
 
                 {analysis.architecture?.mermaid && (
-                  <div className="p-4 rounded-2xl bg-slate-900 text-indigo-300 font-mono text-xs overflow-x-auto border border-slate-800 shadow-inner">
-                    <div className="text-[10px] uppercase text-slate-500 font-bold mb-2">Mermaid System Diagram Code:</div>
-                    <pre className="text-indigo-200">{analysis.architecture.mermaid}</pre>
+                  <div className="p-4 rounded-2xl bg-[#1C211F] text-[#FAF7F2] font-mono text-xs overflow-x-auto border border-[#2D3330] shadow-inner">
+                    <div className="text-[10px] uppercase text-[#8E9893] font-bold mb-2">Mermaid System Diagram Code:</div>
+                    <pre className="text-[#FDF2ED]">{analysis.architecture.mermaid}</pre>
                   </div>
                 )}
               </div>
@@ -527,22 +527,22 @@ export default function RepoDNAPage() {
           {/* TAB 3: PROJECT STRUCTURE */}
           {activeTab === 'structure' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <FolderTree className="w-5 h-5 text-indigo-600" /> Directory Structure & Folder Dictionary
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
+                <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <FolderTree className="w-5 h-5 text-[#C85A32]" /> Directory Structure & Folder Dictionary
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-[#5E6763] font-medium">
                   Every important folder explained in simple student-friendly language.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(analysis.project_structure || []).map((f, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 hover:border-indigo-200 transition-all">
-                      <div className="flex items-center gap-2 font-mono text-xs font-extrabold text-indigo-700">
-                        <FolderTree className="w-4 h-4 text-indigo-500" />
+                    <div key={idx} className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-1 hover:border-[#C85A32]/30 transition-all">
+                      <div className="flex items-center gap-2 font-mono text-xs font-extrabold text-[#C85A32]">
+                        <FolderTree className="w-4 h-4 text-[#C85A32]" />
                         {f.folder}
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed font-medium">{f.explanation}</p>
+                      <p className="text-xs text-[#5E6763] leading-relaxed font-medium">{f.explanation}</p>
                     </div>
                   ))}
                 </div>
@@ -555,21 +555,21 @@ export default function RepoDNAPage() {
             <div className="space-y-6 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {Object.entries(analysis.tech_stack || {}).map(([category, items]) => (
-                  <div key={category} className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm space-y-3">
-                    <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-indigo-600" /> {category}
+                  <div key={category} className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-3">
+                    <h4 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-[#C85A32]" /> {category}
                     </h4>
                     {items && items.length > 0 ? (
                       <div className="space-y-2">
                         {items.map((tech, idx) => (
-                          <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span className="text-xs font-extrabold text-indigo-900 block">{tech.name}</span>
-                            <span className="text-[11px] text-slate-400 font-medium">{tech.evidence}</span>
+                          <div key={idx} className="p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8]">
+                            <span className="text-xs font-extrabold text-[#1C211F] block">{tech.name}</span>
+                            <span className="text-[11px] text-[#8E9893] font-medium">{tech.evidence}</span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-slate-400 py-2 font-medium">None explicitly detected</p>
+                      <p className="text-xs text-[#8E9893] py-2 font-medium">None explicitly detected</p>
                     )}
                   </div>
                 ))}
@@ -580,21 +580,21 @@ export default function RepoDNAPage() {
           {/* TAB 5: APPLICATION FLOWS */}
           {activeTab === 'flows' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-5">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <Compass className="w-5 h-5 text-indigo-600" /> Key Application & Data Flows
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-5">
+                <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-[#C85A32]" /> Key Application & Data Flows
                 </h3>
                 <div className="space-y-6">
                   {(analysis.application_flows || []).map((flow, idx) => (
-                    <div key={idx} className="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-3">
-                      <h4 className="text-sm font-extrabold text-indigo-950 flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-indigo-600" /> {flow.flow_name}
+                    <div key={idx} className="p-5 rounded-2xl bg-[#FAF0E9] border border-[#EAE3D8] space-y-3">
+                      <h4 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-[#C85A32]" /> {flow.flow_name}
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         {flow.steps.map((step, sIdx) => (
-                          <div key={sIdx} className="p-3 rounded-xl bg-white border border-indigo-100 shadow-xs relative">
-                            <span className="text-[10px] font-extrabold text-indigo-500 uppercase block mb-1">Step {sIdx + 1}</span>
-                            <span className="text-xs text-slate-700 font-medium leading-relaxed block">{step}</span>
+                          <div key={sIdx} className="p-3 rounded-xl bg-white border border-[#EAE3D8] shadow-xs relative">
+                            <span className="text-[10px] font-extrabold text-[#C85A32] uppercase block mb-1">Step {sIdx + 1}</span>
+                            <span className="text-xs text-[#2D3330] font-medium leading-relaxed block">{step}</span>
                           </div>
                         ))}
                       </div>
@@ -608,30 +608,30 @@ export default function RepoDNAPage() {
           {/* TAB 6: DATABASE */}
           {activeTab === 'database' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <Database className="w-5 h-5 text-indigo-600" /> Database & Schema Architecture
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Database className="w-5 h-5 text-[#D9822B]" /> Database & Schema Architecture
                   </h3>
-                  <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-100">
+                  <span className="px-3 py-1 rounded-full bg-[#FEF7ED] text-[#D9822B] text-xs font-bold border border-[#D9822B]/20">
                     {analysis.database_analysis?.detected_db || 'PostgreSQL / SQL'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(analysis.database_analysis?.tables_or_collections || []).map((tbl, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+                    <div key={idx} className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-indigo-900 font-mono">{tbl.name}</span>
+                        <span className="text-xs font-extrabold text-[#1C211F] font-mono">{tbl.name}</span>
                         {tbl.source_file && (
-                          <span className="text-[10px] text-slate-400 font-mono truncate max-w-[150px]">{tbl.source_file}</span>
+                          <span className="text-[10px] text-[#8E9893] font-mono truncate max-w-[150px]">{tbl.source_file}</span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 font-medium">{tbl.purpose}</p>
+                      <p className="text-xs text-[#5E6763] font-medium">{tbl.purpose}</p>
                       {tbl.fields && tbl.fields.length > 0 && (
                         <div className="flex flex-wrap gap-1 pt-1">
                           {tbl.fields.map((fld, fIdx) => (
-                            <span key={fIdx} className="px-2 py-0.5 rounded-md bg-white text-slate-600 text-[10px] font-mono border border-slate-200">
+                            <span key={fIdx} className="px-2 py-0.5 rounded-md bg-white text-[#5E6763] text-[10px] font-mono border border-[#EAE3D8]">
                               {fld}
                             </span>
                           ))}
@@ -647,14 +647,14 @@ export default function RepoDNAPage() {
           {/* TAB 7: APIS */}
           {activeTab === 'apis' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-indigo-600" /> REST API Endpoints Explorer
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
+                <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <Terminal className="w-5 h-5 text-[#3D5A80]" /> REST API Endpoints Explorer
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold">
+                      <tr className="border-b border-[#EAE3D8] text-[#8E9893] uppercase font-bold">
                         <th className="py-3 px-3">Method</th>
                         <th className="py-3 px-3">Endpoint</th>
                         <th className="py-3 px-3">Purpose</th>
@@ -662,23 +662,23 @@ export default function RepoDNAPage() {
                         <th className="py-3 px-3">Source File</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 font-medium">
+                    <tbody className="divide-y divide-[#EAE3D8] font-medium">
                       {(analysis.api_analysis || []).map((api, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50 transition-all">
+                        <tr key={idx} className="hover:bg-[#FAF7F2] transition-all">
                           <td className="py-3 px-3">
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono ${
-                              api.method === 'GET' ? 'bg-emerald-50 text-emerald-700' :
-                              api.method === 'POST' ? 'bg-indigo-50 text-indigo-700' :
-                              api.method === 'DELETE' ? 'bg-rose-50 text-rose-700' :
-                              'bg-amber-50 text-amber-700'
+                              api.method === 'GET' ? 'bg-[#F0F6F2] text-[#5E8C71]' :
+                              api.method === 'POST' ? 'bg-[#EEF3F8] text-[#3D5A80]' :
+                              api.method === 'DELETE' ? 'bg-[#FDF2ED] text-[#C85A32]' :
+                              'bg-[#FEF7ED] text-[#D9822B]'
                             }`}>
                               {api.method}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-slate-900">{api.endpoint}</td>
-                          <td className="py-3 px-3 text-slate-600">{api.purpose}</td>
-                          <td className="py-3 px-3 font-mono text-slate-500">{api.controller || 'route'}</td>
-                          <td className="py-3 px-3 font-mono text-slate-400 truncate max-w-[140px]">{api.source_file}</td>
+                          <td className="py-3 px-3 font-mono font-bold text-[#1C211F]">{api.endpoint}</td>
+                          <td className="py-3 px-3 text-[#5E6763]">{api.purpose}</td>
+                          <td className="py-3 px-3 font-mono text-[#8E9893]">{api.controller || 'route'}</td>
+                          <td className="py-3 px-3 font-mono text-[#8E9893] truncate max-w-[140px]">{api.source_file}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -691,29 +691,29 @@ export default function RepoDNAPage() {
           {/* TAB 8: AUTHENTICATION */}
           {activeTab === 'auth' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-indigo-600" /> Authentication & Security Architecture
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-[#5E8C71]" /> Authentication & Security Architecture
                   </h3>
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                  <span className="px-3 py-1 rounded-full bg-[#F0F6F2] text-[#5E8C71] text-xs font-bold border border-[#5E8C71]/30">
                     {analysis.authentication_analysis?.mechanism || 'JWT / Token Authentication'}
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                  <span className="text-xs font-extrabold text-slate-900 block">Login & Verification Walkthrough</span>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2">
+                  <span className="text-xs font-extrabold text-[#1C211F] block">Login & Verification Walkthrough</span>
+                  <p className="text-xs text-[#5E6763] leading-relaxed font-medium">
                     {analysis.authentication_analysis?.login_flow || 'Users submit credentials which are validated by the backend service and returned as a secure session token.'}
                   </p>
                 </div>
 
                 {analysis.authentication_analysis?.protected_routes && analysis.authentication_analysis.protected_routes.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-xs font-extrabold text-slate-900 block">Protected Endpoints & Middlewares</span>
+                    <span className="text-xs font-extrabold text-[#1C211F] block">Protected Endpoints & Middlewares</span>
                     <div className="flex flex-wrap gap-2">
                       {analysis.authentication_analysis.protected_routes.map((rt, idx) => (
-                        <span key={idx} className="px-3 py-1 rounded-xl bg-indigo-50 text-indigo-800 text-xs font-mono font-bold border border-indigo-100">
+                        <span key={idx} className="px-3 py-1 rounded-xl bg-[#F4EFEA] text-[#1C211F] text-xs font-mono font-bold border border-[#EAE3D8]">
                           {rt}
                         </span>
                       ))}
@@ -724,27 +724,28 @@ export default function RepoDNAPage() {
             </div>
           )}
 
+
           {/* TAB 9: IMPORTANT FILES */}
           {activeTab === 'files' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <FileCode className="w-5 h-5 text-indigo-600" /> Analyzed Source Code Files ({files.length})
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
+                <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                  <FileCode className="w-5 h-5 text-[#C85A32]" /> Analyzed Source Code Files ({files.length})
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {files.map(f => (
                     <div
                       key={f.id}
                       onClick={() => setSelectedFileModal(f)}
-                      className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-indigo-300 transition-all cursor-pointer space-y-2"
+                      className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] hover:border-[#C85A32]/30 transition-all cursor-pointer space-y-2"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-900 font-mono truncate">{f.file_path}</span>
-                        <span className="px-2 py-0.5 rounded-md bg-white text-indigo-700 text-[10px] font-bold border border-slate-200">
+                        <span className="text-xs font-extrabold text-[#1C211F] font-mono truncate">{f.file_path}</span>
+                        <span className="px-2 py-0.5 rounded-md bg-white text-[#C85A32] text-[10px] font-bold border border-[#EAE3D8]">
                           {f.language}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 line-clamp-2 font-medium">{f.purpose_summary}</p>
+                      <p className="text-xs text-[#5E6763] line-clamp-2 font-medium">{f.purpose_summary}</p>
                     </div>
                   ))}
                 </div>
@@ -756,39 +757,39 @@ export default function RepoDNAPage() {
           {activeTab === 'health' && (
             <div className="space-y-6 animate-fade-in">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                  <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-indigo-600" /> Codebase Health
+                <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-[#C85A32]" /> Codebase Health
                   </h3>
                   <div className="text-center py-4">
-                    <div className="text-4xl font-extrabold text-indigo-600">
+                    <div className="text-4xl font-extrabold text-[#C85A32]">
                       {analysis.project_health?.organization_score || 8.5}/10
                     </div>
-                    <span className="text-xs font-bold text-slate-400 uppercase">Architecture & Structure Score</span>
+                    <span className="text-xs font-bold text-[#8E9893] uppercase">Architecture & Structure Score</span>
                   </div>
-                  <div className="space-y-2 text-xs font-medium text-slate-600">
-                    <div className="flex justify-between py-1 border-b border-slate-100">
+                  <div className="space-y-2 text-xs font-medium text-[#5E6763]">
+                    <div className="flex justify-between py-1 border-b border-[#EAE3D8]">
                       <span>Automated Tests:</span>
-                      <span className={analysis.project_health?.tests_present ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>
+                      <span className={analysis.project_health?.tests_present ? 'text-[#5E8C71] font-bold' : 'text-[#D9822B] font-bold'}>
                         {analysis.project_health?.tests_present ? 'Detected ✓' : 'Limited Tests'}
                       </span>
                     </div>
                     <div className="flex justify-between py-1">
                       <span>Documentation:</span>
-                      <span className="text-slate-900 font-bold">{analysis.project_health?.documentation_quality || 'High'}</span>
+                      <span className="text-[#1C211F] font-bold">{analysis.project_health?.documentation_quality || 'High'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-2 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                  <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-600" /> Actionable Recommendations & Potential Improvements
+                <div className="lg:col-span-2 bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#786498]" /> Actionable Recommendations & Potential Improvements
                   </h3>
                   <div className="space-y-3">
                     {(analysis.improvements || []).map((imp, idx) => (
-                      <div key={idx} className="p-4 rounded-xl bg-purple-50/50 border border-purple-100 space-y-1">
-                        <span className="text-xs font-extrabold text-purple-900 block">{imp.area}</span>
-                        <p className="text-xs text-slate-700 leading-relaxed font-medium">{imp.recommendation}</p>
+                      <div key={idx} className="p-4 rounded-xl bg-[#F4F1F8] border border-[#786498]/20 space-y-1">
+                        <span className="text-xs font-extrabold text-[#786498] block">{imp.area}</span>
+                        <p className="text-xs text-[#2D3330] leading-relaxed font-medium">{imp.recommendation}</p>
                       </div>
                     ))}
                   </div>
@@ -800,29 +801,29 @@ export default function RepoDNAPage() {
           {/* TAB 11: INTERVIEW PREP */}
           {activeTab === 'interview' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+              <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-600" /> Top 10 Technical Interview Questions & Model Answers
+                  <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#C85A32]" /> Top 10 Technical Interview Questions & Model Answers
                   </h3>
-                  <span className="text-xs font-bold text-slate-400">Tailored to this repository</span>
+                  <span className="text-xs font-bold text-[#8E9893]">Tailored to this repository</span>
                 </div>
 
                 <div className="space-y-3">
                   {(analysis.interview_questions || []).map((q, idx) => {
                     const isExpanded = expandedQuestions[idx];
                     return (
-                      <div key={idx} className="rounded-2xl border border-slate-100 overflow-hidden bg-slate-50/50">
+                      <div key={idx} className="rounded-2xl border border-[#EAE3D8] overflow-hidden bg-[#FAF7F2]">
                         <button
                           onClick={() => toggleQuestion(idx)}
-                          className="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-slate-900 hover:bg-slate-100/70 transition-all"
+                          className="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-[#1C211F] hover:bg-[#F4EFEA] transition-all"
                         >
                           <span>{q.question}</span>
-                          {isExpanded ? <ChevronUp className="w-4 h-4 text-indigo-600 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
+                          {isExpanded ? <ChevronUp className="w-4 h-4 text-[#C85A32] shrink-0" /> : <ChevronDown className="w-4 h-4 text-[#8E9893] shrink-0" />}
                         </button>
                         {isExpanded && (
-                          <div className="p-4 bg-white border-t border-slate-100 text-xs text-slate-700 leading-relaxed font-medium">
-                            <span className="text-[10px] font-extrabold text-indigo-600 uppercase block mb-1">Model Interview Answer:</span>
+                          <div className="p-4 bg-white border-t border-[#EAE3D8] text-xs text-[#2D3330] leading-relaxed font-medium">
+                            <span className="text-[10px] font-extrabold text-[#C85A32] uppercase block mb-1">Model Interview Answer:</span>
                             {q.answer}
                           </div>
                         )}
@@ -836,16 +837,16 @@ export default function RepoDNAPage() {
 
           {/* TAB 12: ASK REPODNA CHAT */}
           {activeTab === 'chat' && (
-            <div className="bg-white rounded-[28px] border border-slate-100 shadow-sm flex flex-col h-[600px] overflow-hidden animate-fade-in">
+            <div className="bg-white rounded-[28px] border border-[#EAE3D8] shadow-sm flex flex-col h-[600px] overflow-hidden animate-fade-in">
               {/* Chat Header */}
-              <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+              <div className="p-4 border-b border-[#EAE3D8] bg-[#FAF7F2] flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-[#C85A32] text-white flex items-center justify-center">
                     <Code2 className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-900">Ask RepoDNA Code Assistant</h4>
-                    <p className="text-[10px] text-slate-400 font-medium">Grounded strictly in {activeRepo.owner}/{activeRepo.repo_name}</p>
+                    <h4 className="text-xs font-extrabold text-[#1C211F]">Ask RepoDNA Code Assistant</h4>
+                    <p className="text-[10px] text-[#8E9893] font-medium">Grounded strictly in {activeRepo.owner}/{activeRepo.repo_name}</p>
                   </div>
                 </div>
               </div>
@@ -860,16 +861,16 @@ export default function RepoDNAPage() {
                     <div
                       className={`max-w-[85%] sm:max-w-[75%] p-4 rounded-2xl text-xs leading-relaxed font-medium ${
                         msg.role === 'user'
-                          ? 'bg-indigo-600 text-white rounded-br-none shadow-sm'
-                          : 'bg-slate-100 text-slate-900 rounded-bl-none'
+                          ? 'bg-[#C85A32] text-white rounded-br-none shadow-xs'
+                          : 'bg-[#FAF7F2] text-[#1C211F] rounded-bl-none border border-[#EAE3D8]'
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.text}</p>
                       {msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-slate-200/60 flex flex-wrap gap-1">
-                          <span className="text-[10px] font-bold text-slate-400 block w-full">Verified Source Files:</span>
+                        <div className="mt-3 pt-2 border-t border-[#EAE3D8] flex flex-wrap gap-1">
+                          <span className="text-[10px] font-bold text-[#8E9893] block w-full">Verified Source Files:</span>
                           {msg.sources.map((src, sIdx) => (
-                            <span key={sIdx} className="px-2 py-0.5 rounded bg-white text-indigo-700 text-[10px] font-mono border border-slate-200">
+                            <span key={sIdx} className="px-2 py-0.5 rounded bg-white text-[#C85A32] text-[10px] font-mono border border-[#EAE3D8]">
                               {src}
                             </span>
                           ))}
@@ -879,8 +880,8 @@ export default function RepoDNAPage() {
                   </div>
                 ))}
                 {isChatLoading && (
-                  <div className="flex items-center gap-2 p-3 bg-slate-100 rounded-2xl text-xs text-slate-500 max-w-xs">
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                  <div className="flex items-center gap-2 p-3 bg-[#FAF7F2] rounded-2xl text-xs text-[#5E6763] max-w-xs border border-[#EAE3D8]">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#C85A32]" />
                     <span>Searching codebase & generating grounded answer...</span>
                   </div>
                 )}
@@ -888,19 +889,19 @@ export default function RepoDNAPage() {
               </div>
 
               {/* Chat Input */}
-              <form onSubmit={handleSendChat} className="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2">
+              <form onSubmit={handleSendChat} className="p-3.5 border-t border-[#EAE3D8] bg-white flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="Ask anything: 'Where is login handled?', 'Explain the database connection', 'What are weaknesses?'"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   disabled={isChatLoading}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 text-xs font-medium border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#FAF7F2] text-[#1C211F] placeholder-[#8E9893] text-xs font-medium border border-[#EAE3D8] focus:outline-none focus:ring-2 focus:ring-[#C85A32]"
                 />
                 <button
                   type="submit"
                   disabled={isChatLoading || !chatInput.trim()}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs transition-all flex items-center gap-1.5 disabled:opacity-50 shadow-xs"
                 >
                   <Send className="w-3.5 h-3.5" /> Send
                 </button>
@@ -909,12 +910,12 @@ export default function RepoDNAPage() {
           )}
         </div>
       ) : !isScanning ? (
-        <div className="bg-white p-12 rounded-[32px] border border-slate-100 text-center space-y-4 shadow-sm">
-          <div className="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto border border-indigo-100">
+        <div className="bg-white p-12 rounded-[32px] border border-[#EAE3D8] text-center space-y-4 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center mx-auto border border-[#C85A32]/20">
             <GitFork className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-extrabold text-slate-900">No Repository Analyzed Yet</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto font-medium">
+          <h3 className="text-lg font-extrabold text-[#1C211F]">No Repository Analyzed Yet</h3>
+          <p className="text-xs text-[#5E6763] max-w-md mx-auto font-medium">
             Paste any public GitHub repository URL above (e.g. your project, a semester project, or an open-source tool) to generate instant architectural intelligence and interview preparation.
           </p>
         </div>
@@ -922,27 +923,27 @@ export default function RepoDNAPage() {
 
       {/* File Excerpt View Modal */}
       {selectedFileModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[28px] max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[28px] max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-[#EAE3D8] max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#EAE3D8] pb-3">
               <div className="flex items-center gap-2">
-                <FileCode className="w-5 h-5 text-indigo-600" />
-                <span className="text-sm font-extrabold text-slate-900 font-mono">{selectedFileModal.file_path}</span>
+                <FileCode className="w-5 h-5 text-[#C85A32]" />
+                <span className="text-sm font-extrabold text-[#1C211F] font-mono">{selectedFileModal.file_path}</span>
               </div>
-              <button onClick={() => setSelectedFileModal(null)} className="text-slate-400 hover:text-slate-600 p-1">
+              <button onClick={() => setSelectedFileModal(null)} className="text-[#8E9893] hover:text-[#1C211F] p-1">
                 ✕
               </button>
             </div>
             <div className="space-y-2">
-              <span className="text-xs font-bold text-slate-400 uppercase">Purpose Summary</span>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-3 rounded-xl">
+              <span className="text-xs font-bold text-[#8E9893] uppercase">Purpose Summary</span>
+              <p className="text-xs text-[#2D3330] font-medium leading-relaxed bg-[#FAF7F2] p-3 rounded-xl border border-[#EAE3D8]">
                 {selectedFileModal.purpose_summary}
               </p>
             </div>
             {selectedFileModal.excerpt && (
               <div className="flex-1 overflow-y-auto space-y-1">
-                <span className="text-xs font-bold text-slate-400 uppercase">Code Excerpt</span>
-                <pre className="p-3.5 rounded-xl bg-slate-900 text-indigo-200 text-xs font-mono overflow-x-auto">
+                <span className="text-xs font-bold text-[#8E9893] uppercase">Code Excerpt</span>
+                <pre className="p-3.5 rounded-xl bg-[#1C211F] text-[#FAF7F2] text-xs font-mono overflow-x-auto border border-[#2D3330]">
                   {selectedFileModal.excerpt}
                 </pre>
               </div>
@@ -950,7 +951,7 @@ export default function RepoDNAPage() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setSelectedFileModal(null)}
-                className="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold"
+                className="px-5 py-2 rounded-xl bg-[#1C211F] text-white text-xs font-extrabold hover:bg-[#2D3330]"
               >
                 Close
               </button>

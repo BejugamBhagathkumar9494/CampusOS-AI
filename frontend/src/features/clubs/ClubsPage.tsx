@@ -210,7 +210,7 @@ export default function ClubsPage() {
                       onClick={() => handleJoin(club.id, club.name)}
                       disabled={isJoined}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                        isJoined ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
+                        isJoined ? 'bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/30' : 'bg-[#C85A32] hover:bg-[#B44E27] text-white shadow-xs'
                       }`}
                     >
                       {isJoined ? 'Joined' : 'Join Society'}

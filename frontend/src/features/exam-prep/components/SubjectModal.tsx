@@ -60,12 +60,12 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
         </button>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center">
             <BookPlus className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-slate-900">New Subject Study Collection</h3>
-            <p className="text-xs text-slate-500 font-medium">
+            <h3 className="text-xl font-extrabold text-[#1C211F]">New Subject Study Collection</h3>
+            <p className="text-xs text-[#5E6763] font-medium">
               Enter course metadata before uploading multiple PDF notes
             </p>
           </div>
@@ -79,7 +79,7 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-[#5E6763] uppercase tracking-wider mb-1.5">
               Subject Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -88,13 +88,13 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
               placeholder="e.g. Database Management Systems"
               value={subjectName}
               onChange={(e) => setSubjectName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium outline-none transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium outline-none transition-all text-[#1C211F]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#5E6763] uppercase tracking-wider mb-1.5">
                 Course Code <span className="text-rose-500">*</span>
               </label>
               <input
@@ -103,18 +103,18 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
                 placeholder="e.g. CS401"
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium uppercase outline-none transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium uppercase outline-none transition-all text-[#1C211F]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#5E6763] uppercase tracking-wider mb-1.5">
                 Semester
               </label>
               <select
                 value={semester}
                 onChange={(e) => setSemester(Number(e.target.value))}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium outline-none transition-all bg-white"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium outline-none transition-all bg-white text-[#1C211F]"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
                   <option key={s} value={s}>
@@ -127,7 +127,7 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#5E6763] uppercase tracking-wider mb-1.5">
                 Branch / Dept
               </label>
               <input
@@ -135,12 +135,12 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
                 placeholder="e.g. CSE, ECE, MECH"
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium uppercase outline-none transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium uppercase outline-none transition-all text-[#1C211F]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#5E6763] uppercase tracking-wider mb-1.5">
                 Academic Year
               </label>
               <input
@@ -148,7 +148,7 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
                 placeholder="e.g. 2025-2026"
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm font-medium outline-none transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3D8] focus:border-[#C85A32] focus:ring-2 focus:ring-[#C85A32]/20 text-sm font-medium outline-none transition-all text-[#1C211F]"
               />
             </div>
           </div>
@@ -157,14 +157,14 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-bold text-xs transition-colors"
+              className="px-5 py-2.5 rounded-xl text-[#5E6763] hover:bg-[#F4EFEA] font-bold text-xs transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-lg shadow-[#C85A32]/20 disabled:opacity-50 transition-all flex items-center gap-2"
             >
               <Sparkles className="w-3.5 h-3.5" />
               {isSubmitting ? 'Creating Collection...' : 'Create & Upload PDFs'}
