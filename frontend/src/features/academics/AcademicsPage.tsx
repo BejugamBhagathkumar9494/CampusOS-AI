@@ -44,7 +44,7 @@ export default function AcademicsPage() {
         if (isMounted) setAllCourses(available || []);
       } catch (err) {
         console.error('Error fetching academic courses:', err);
-      } fontFinally: {
+      } finally {
         if (isMounted) setLoading(false);
       }
     }

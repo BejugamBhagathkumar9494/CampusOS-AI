@@ -201,19 +201,19 @@ export default function RepoDNAPage() {
   return (
     <div className="space-y-8 animate-fade-in font-sans pb-16">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] text-[#1C211F] p-7 sm:p-9 rounded-[32px] shadow-sm relative overflow-hidden border border-[#EAE3D8]">
+      <div className="bg-[#FAF7F2] text-[#1C211F] p-7 sm:p-9 rounded-3xl shadow-xs relative overflow-hidden border border-[#EAE3D8]">
         <div className="space-y-3 max-w-2xl z-10 relative">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold border border-[#C85A32]/30">
-            <Sparkles className="w-4 h-4 text-[#C85A32]" /> RepoDNA — AI GitHub Repository Intelligence
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-bold border border-[#C85A32]/20">
+            <GitBranch className="w-3.5 h-3.5 text-[#C85A32]" /> RepoDNA Codebase Intelligence
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1C211F]">
-            Understand Any GitHub Project <br />
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C211F]">
+            Repository Codebase Intelligence <br />
             <span className="text-[#C85A32]">
-              Like You Built It Yourself.
+              Architecture, Schemas & Endpoints
             </span>
           </h1>
           <p className="text-xs sm:text-sm text-[#5E6763] font-medium leading-relaxed">
-            Enter any public GitHub repository URL. RepoDNA scans the source tree, decodes the architecture, extracts APIs, database models, and generates an interview-ready explanation with codebase RAG.
+            Enter any public GitHub repository URL. RepoDNA analyzes the source tree, decodes system architecture, extracts APIs, database models, and generates technical explanations.
           </p>
         </div>
 
@@ -225,17 +225,17 @@ export default function RepoDNAPage() {
             </div>
             <input
               type="text"
-              placeholder="https://github.com/facebook/react or https://github.com/owner/repository"
+              placeholder="https://github.com/owner/repository"
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
               disabled={isScanning}
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white text-[#1C211F] placeholder-[#8E9893] text-xs sm:text-sm font-medium border border-[#EAE3D8] focus:outline-none focus:ring-2 focus:ring-[#C85A32] transition-all shadow-xs"
+              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white text-[#1C211F] placeholder-[#8E9893] text-xs sm:text-sm font-medium border border-[#EAE3D8] focus:outline-none focus:ring-2 focus:ring-[#C85A32] transition-all shadow-xs"
             />
           </div>
           <button
             type="submit"
             disabled={isScanning || !githubUrl.trim()}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-[#C85A32]/20 transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           >
             {isScanning ? (
               <>
@@ -250,13 +250,11 @@ export default function RepoDNAPage() {
         </form>
 
         {errorMessage && (
-          <div className="mt-4 p-3.5 rounded-2xl bg-[#FEF7ED] border border-[#D9822B]/30 text-[#D9822B] text-xs font-medium flex items-center gap-2 z-10 relative animate-fade-in">
+          <div className="mt-4 p-3.5 rounded-xl bg-[#FEF7ED] border border-[#D9822B]/30 text-[#D9822B] text-xs font-medium flex items-center gap-2 z-10 relative animate-fade-in">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#D9822B]" />
             <span>{errorMessage}</span>
           </div>
         )}
-
-        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Live Scanning Step Progress Overlay */}
@@ -400,54 +398,50 @@ export default function RepoDNAPage() {
               { id: 'database', label: 'Database', icon: Database },
               { id: 'apis', label: 'APIs', icon: Terminal },
               { id: 'auth', label: 'Authentication', icon: ShieldCheck },
-              { id: 'files', label: 'Important Files', icon: FileCode },
-              { id: 'health', label: 'Health & Suggestions', icon: Activity },
-              { id: 'interview', label: 'Interview Prep', icon: Sparkles },
-              { id: 'chat', label: 'Ask RepoDNA', icon: MessageSquare },
+              { id: 'files', label: 'File Tree', icon: FolderTree },
+              { id: 'health', label: 'Code Health', icon: Activity },
+              { id: 'interview', label: 'Interview Prep', icon: BookOpen },
+              { id: 'chat', label: 'Codebase Chat', icon: MessageSquare }
             ].map(tab => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-4 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-[#C85A32] text-white shadow-xs'
-                      : 'text-[#5E6763] hover:text-[#1C211F] hover:bg-[#F4EFEA]'
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border ${
+                    isActive
+                      ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-xs'
+                      : 'bg-white text-[#5E6763] border-[#EAE3D8] hover:text-[#1C211F] hover:bg-[#FAF7F2]'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* TAB 0: VISUAL MINDMAP */}
+          {/* TAB 0: MINDMAP UNIVERSE */}
           {activeTab === 'mindmap' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm">
-                <div className="space-y-0.5">
+              <div className="flex items-center justify-between">
+                <div>
                   <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
-                    <Compass className="w-5 h-5 text-[#C85A32]" /> Interactive Repository Mindmap
+                    <Compass className="w-4 h-4 text-[#C85A32]" /> Architecture Mindmap
                   </h3>
-                  <p className="text-xs text-[#5E6763] font-medium">
-                    NotebookLM-style visual radial universe. Pan, zoom, click any node to inspect modules, or ask AI about specific components.
+                  <p className="text-xs text-[#5E6763]">
+                    Interactive architectural map. Drag to pan, scroll to zoom, click any node to inspect code files.
                   </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold border border-[#C85A32]/20 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> Interactive Universe
-                  </span>
                 </div>
               </div>
               <RepoMindmapView
                 repository={activeRepo}
                 analysis={analysis}
                 files={files}
-                onAskAI={(question) => {
+                onAskAI={(prompt) => {
                   setActiveTab('chat');
-                  setChatInput(question);
+                  setChatInput(prompt);
                 }}
               />
             </div>
@@ -456,24 +450,26 @@ export default function RepoDNAPage() {
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
-              {/* Interview Pitch Card */}
-              <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-md border border-[#2D3330] space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[#FAF0E9] text-xs font-extrabold uppercase tracking-wider">
-                    <Sparkles className="w-4 h-4 text-[#C85A32]" /> 60-Second Interview Elevator Pitch
+              {/* Technical Project Summary */}
+              {analysis.interview_pitch && (
+                <div className="bg-[#1C211F] text-white p-6 rounded-2xl shadow-sm border border-[#2D3330] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#FAF0E9] text-xs font-bold uppercase tracking-wider">
+                      <MessageSquare className="w-4 h-4 text-[#C85A32]" /> Technical Project Summary
+                    </div>
+                    <button
+                      onClick={handleCopyPitch}
+                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 border border-white/10"
+                    >
+                      {copiedPitch ? <Check className="w-3.5 h-3.5 text-[#5E8C71]" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedPitch ? 'Copied!' : 'Copy Summary'}
+                    </button>
                   </div>
-                  <button
-                    onClick={handleCopyPitch}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1.5 border border-white/10"
-                  >
-                    {copiedPitch ? <Check className="w-3.5 h-3.5 text-[#5E8C71]" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copiedPitch ? 'Copied!' : 'Copy Pitch'}
-                  </button>
+                  <p className="text-sm sm:text-base text-[#FAF7F2] font-medium leading-relaxed italic bg-black/20 p-4 rounded-xl border border-white/5">
+                    "{analysis.interview_pitch || analysis.short_summary}"
+                  </p>
                 </div>
-                <p className="text-sm sm:text-base text-[#FAF7F2] font-medium leading-relaxed italic bg-black/20 p-4 rounded-2xl border border-white/5">
-                  "{analysis.interview_pitch || analysis.short_summary}"
-                </p>
-              </div>
+              )}
 
               {/* Two Column Summary: Executive & Beginner */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -649,7 +645,7 @@ export default function RepoDNAPage() {
             <div className="space-y-6 animate-fade-in">
               <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-[#3D5A80]" /> REST API Endpoints Explorer
+                  <Terminal className="w-5 h-5 text-[#C85A32]" /> REST API Endpoints Explorer
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
@@ -668,7 +664,7 @@ export default function RepoDNAPage() {
                           <td className="py-3 px-3">
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono ${
                               api.method === 'GET' ? 'bg-[#F0F6F2] text-[#5E8C71]' :
-                              api.method === 'POST' ? 'bg-[#EEF3F8] text-[#3D5A80]' :
+                              api.method === 'POST' ? 'bg-[#FDF2ED] text-[#C85A32]' :
                               api.method === 'DELETE' ? 'bg-[#FDF2ED] text-[#C85A32]' :
                               'bg-[#FEF7ED] text-[#D9822B]'
                             }`}>
@@ -783,12 +779,12 @@ export default function RepoDNAPage() {
 
                 <div className="lg:col-span-2 bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                   <h3 className="text-sm font-extrabold text-[#1C211F] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#786498]" /> Actionable Recommendations & Potential Improvements
+                    <CheckCircle2 className="w-4 h-4 text-[#5E8C71]" /> Recommendations & Potential Improvements
                   </h3>
                   <div className="space-y-3">
                     {(analysis.improvements || []).map((imp, idx) => (
-                      <div key={idx} className="p-4 rounded-xl bg-[#F4F1F8] border border-[#786498]/20 space-y-1">
-                        <span className="text-xs font-extrabold text-[#786498] block">{imp.area}</span>
+                      <div key={idx} className="p-4 rounded-xl bg-[#FDF2ED] border border-[#C85A32]/20 space-y-1">
+                        <span className="text-xs font-extrabold text-[#C85A32] block">{imp.area}</span>
                         <p className="text-xs text-[#2D3330] leading-relaxed font-medium">{imp.recommendation}</p>
                       </div>
                     ))}
@@ -804,7 +800,7 @@ export default function RepoDNAPage() {
               <div className="bg-white p-6 rounded-[24px] border border-[#EAE3D8] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#C85A32]" /> Top 10 Technical Interview Questions & Model Answers
+                    <HelpCircle className="w-5 h-5 text-[#C85A32]" /> Technical Interview Questions & Model Answers
                   </h3>
                   <span className="text-xs font-bold text-[#8E9893]">Tailored to this repository</span>
                 </div>

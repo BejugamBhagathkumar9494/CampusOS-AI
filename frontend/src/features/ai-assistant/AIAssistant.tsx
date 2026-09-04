@@ -72,7 +72,7 @@ export default function AIAssistant() {
           content: `Hi ${profile?.full_name || 'Student'}! Welcome to your fresh CampusOS AI session. Ask me general programming, academic concepts, reasoning, or switch to RAG Mode for grounded university document search!`,
           mode: mode,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          agentName: mode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'
+          agentName: mode === 'llm' ? 'Gemini 2.5 Flash' : 'Campus Knowledge Base'
         }
       ]);
 
@@ -108,7 +108,7 @@ export default function AIAssistant() {
         mode: m.mode || 'llm',
         timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         sources: m.sources || [],
-        agentName: m.role === 'assistant' ? (m.mode === 'rag' ? '📚 RAG Knowledge Base' : '✨ Gemini 2.5 Flash') : null
+        agentName: m.role === 'assistant' ? (m.mode === 'rag' ? 'Campus Knowledge Base' : 'Gemini 2.5 Flash') : null
       }));
 
       if (formatted.length === 0) {
@@ -120,7 +120,7 @@ export default function AIAssistant() {
             content: `Session "${targetSession.title}". Ask your question to begin!`,
             mode: mode,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            agentName: mode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base'
+            agentName: mode === 'llm' ? 'Gemini 2.5 Flash' : 'Campus Knowledge Base'
           }
         ]);
       } else {
@@ -203,7 +203,7 @@ export default function AIAssistant() {
 
     try {
       let responseData: any;
-      let agentLabel = '✨ Gemini 2.5 Flash';
+      let agentLabel = 'Gemini 2.5 Flash';
 
       if (currentMode === 'llm') {
         const historyContext = messages.slice(-6).map(m => ({
@@ -211,17 +211,17 @@ export default function AIAssistant() {
           content: m.content || m.text
         }));
         responseData = await chatWithLLM(query, historyContext, profile?.id);
-        agentLabel = responseData.agent_name || '✨ Gemini 2.5 Flash';
+        agentLabel = responseData.agent_name || 'Gemini 2.5 Flash';
       } else if (currentMode === 'subject_rag' && selectedColId) {
         responseData = await examPrepService.querySubject({
           collection_id: selectedColId,
           question: query,
         });
         const selectedCol = studyCollections.find(c => c.id === selectedColId);
-        agentLabel = `🎓 ${selectedCol?.subject_name || 'Subject Notes'} RAG`;
+        agentLabel = `${selectedCol?.subject_name || 'Subject Notes'} RAG`;
       } else {
         responseData = await chatWithRAG(query, profile?.role || 'student', profile?.id);
-        agentLabel = responseData.agent_name || '📚 RAG Knowledge Base';
+        agentLabel = responseData.agent_name || 'Campus Knowledge Base';
       }
 
       const botMsgText = responseData.answer || responseData.response || (
@@ -275,7 +275,7 @@ export default function AIAssistant() {
         content: errorMsgText,
         mode: currentMode,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        agentName: currentMode === 'llm' ? '✨ Gemini 2.5 Flash' : '📚 RAG Knowledge Base',
+        agentName: currentMode === 'llm' ? 'Gemini 2.5 Flash' : 'Campus Knowledge Base',
         confidenceScore: 0.0,
         sources: []
       };
@@ -291,19 +291,17 @@ export default function AIAssistant() {
   return (
     <div className="flex flex-col h-[calc(100vh-8.5rem)] animate-fade-in space-y-4 font-sans max-w-7xl mx-auto w-full relative">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-[24px] border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-[#EAE3D8] shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <span className={`p-2 rounded-xl transition-all ${
-                isLLM ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-sky-50 text-sky-600 border border-sky-100'
-              }`}>
-                {isLLM ? <Sparkles className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1C211F] tracking-tight flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
+                {isLLM ? <Bot className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
               </span>
               CampusOS AI Assistant
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium">
+          <p className="text-xs sm:text-sm text-[#5E6763] font-medium">
             {isLLM 
               ? 'General knowledge, coding, academic concepts, and technical reasoning powered by Gemini 2.5 Flash.' 
               : 'Grounded university search. Answers restricted strictly to indexed campus handbooks & rules.'}
@@ -314,7 +312,7 @@ export default function AIAssistant() {
           {/* Chat History Sidebar Toggle Button */}
           <button
             onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-            className="px-3.5 py-2 rounded-2xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#5E6763] text-xs font-bold transition-all flex items-center gap-1.5 border border-[#EAE3D8]"
+            className="px-3.5 py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#5E6763] text-xs font-bold transition-all flex items-center gap-1.5 border border-[#EAE3D8]"
             title="View AI Chat History"
           >
             <History className="w-4 h-4 text-[#C85A32]" />
@@ -323,7 +321,7 @@ export default function AIAssistant() {
 
           <button
             onClick={startNewChatSession}
-            className="px-3.5 py-2 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shadow-[#C85A32]/20"
+            className="px-3.5 py-2 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95"
             title="Start New AI Chat Session"
           >
             <Plus className="w-4 h-4" />
@@ -331,36 +329,36 @@ export default function AIAssistant() {
           </button>
 
           {/* Segmented Mode Selector Switch */}
-          <div className="bg-[#FAF7F2] p-1 rounded-2xl border border-[#EAE3D8] flex items-center gap-1">
+          <div className="bg-[#FAF7F2] p-1 rounded-xl border border-[#EAE3D8] flex items-center gap-1">
             <button
               onClick={() => setMode('llm')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mode === 'llm' ? 'bg-white text-[#786498] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mode === 'llm' ? 'bg-white text-[#C85A32] shadow-xs border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#786498]" />
-              <span className="hidden sm:inline">✨ LLM Mode</span>
+              <Bot className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">LLM Mode</span>
               <span className="sm:hidden">LLM</span>
             </button>
             <button
               onClick={() => setMode('rag')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                mode === 'rag' ? 'bg-white text-[#3D5A80] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                mode === 'rag' ? 'bg-white text-[#C85A32] shadow-xs border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-[#3D5A80]" />
-              <span className="hidden sm:inline">📚 Campus RAG</span>
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Campus RAG</span>
               <span className="sm:hidden">Campus</span>
             </button>
             {profile?.role === 'student' && (
               <button
                 onClick={() => setMode('subject_rag')}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  mode === 'subject_rag' ? 'bg-white text-[#C85A32] shadow-sm border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  mode === 'subject_rag' ? 'bg-white text-[#C85A32] shadow-xs border border-[#EAE3D8]' : 'text-[#8E9893] hover:text-[#1C211F]'
                 }`}
               >
-                <GraduationCap className="w-3.5 h-3.5 text-[#C85A32]" />
-                <span className="hidden sm:inline">🎓 My Subject Notes</span>
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Subject Notes</span>
                 <span className="sm:hidden">Notes</span>
               </button>
             )}
@@ -434,14 +432,14 @@ export default function AIAssistant() {
         )}
 
         {/* Chat Feed */}
-        <div className="flex-1 bg-white rounded-[24px] border border-[#EAE3D8] shadow-sm flex flex-col overflow-hidden">
+        <div className="flex-1 bg-white rounded-2xl border border-[#EAE3D8] shadow-xs flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             {messages.map((msg) => {
               const isUser = msg.role === 'user' || msg.sender === 'user';
               return (
                 <div key={msg.id} className={`flex gap-3 sm:gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs ${
-                    isUser ? 'bg-[#C85A32] text-white' : (isLLM ? 'bg-[#F4F1F8] text-[#786498]' : 'bg-[#EEF3F8] text-[#3D5A80]')
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    isUser ? 'bg-[#C85A32] text-white' : 'bg-[#FAF0E9] text-[#C85A32] border border-[#C85A32]/20'
                   }`}>
                     {isUser ? <User className="w-4 h-4 sm:w-5 sm:h-5" /> : <Bot className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </div>
@@ -453,9 +451,9 @@ export default function AIAssistant() {
                       <span>{msg.timestamp}</span>
                     </div>
 
-                    <div className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed ${
+                    <div className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                       isUser
-                        ? 'bg-[#C85A32] text-white rounded-tr-xs shadow-sm font-medium'
+                        ? 'bg-[#C85A32] text-white rounded-tr-xs shadow-xs font-medium'
                         : 'bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] rounded-tl-xs whitespace-pre-wrap'
                     }`}>
                       {msg.content}
@@ -466,19 +464,19 @@ export default function AIAssistant() {
                       <div className="mt-2 space-y-1.5">
                         <button
                           onClick={() => toggleSources(msg.id)}
-                          className="text-[11px] font-bold text-[#3D5A80] bg-[#EEF3F8] border border-[#3D5A80]/20 hover:bg-[#EEF3F8]/80 px-3 py-1 rounded-xl transition-all flex items-center gap-1.5"
+                          className="text-[11px] font-bold text-[#C85A32] bg-[#FDF2ED] border border-[#C85A32]/20 hover:bg-[#FAF0E9] px-3 py-1 rounded-xl transition-all flex items-center gap-1.5"
                         >
-                          <BookOpen className="w-3.5 h-3.5 text-[#3D5A80]" />
+                          <BookOpen className="w-3.5 h-3.5 text-[#C85A32]" />
                           <span>Sources & Document Citations ({msg.sources.length})</span>
                           {expandedSources[msg.id] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                         </button>
 
                         {expandedSources[msg.id] && (
-                          <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2 text-xs text-[#2D3330] animate-fade-in max-h-48 overflow-y-auto">
+                          <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] space-y-2 text-xs text-[#2D3330] animate-fade-in max-h-48 overflow-y-auto">
                             {msg.sources.map((src: any, i: number) => (
-                              <div key={i} className="p-2.5 rounded-xl bg-white border border-[#EAE3D8] space-y-1">
+                              <div key={i} className="p-2.5 rounded-lg bg-white border border-[#EAE3D8] space-y-1">
                                 <span className="font-bold text-[#1C211F] block text-[11px]">
-                                  📄 Document: {src.file_name || src.title || 'University Record'} (Page {src.page_number || 1})
+                                  Document: {src.file_name || src.title || 'University Record'} (Page {src.page_number || 1})
                                 </span>
                                 <p className="text-[11px] text-[#5E6763] font-mono leading-relaxed bg-[#FAF7F2] p-2 rounded-lg">
                                   "{src.content}"

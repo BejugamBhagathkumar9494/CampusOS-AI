@@ -274,13 +274,13 @@ export default function ExamPrepPage() {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
       {/* Hero Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-gradient-to-r from-[#FAF7F2] via-[#FDF2ED] to-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] p-7 sm:p-8 rounded-[32px] shadow-sm relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#FAF7F2] border border-[#EAE3D8] text-[#1C211F] p-7 sm:p-8 rounded-3xl shadow-xs relative overflow-hidden">
         <div className="space-y-2.5 max-w-2xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E9] text-[#C85A32] text-xs font-bold border border-[#EAE3D8]">
-            <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> B.Tech Multi-Unit PDF Exam Generator
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-bold border border-[#C85A32]/20">
+            <BookOpen className="w-3.5 h-3.5 text-[#C85A32]" /> Multi-Unit PDF Exam Preparation
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1C211F]">
-            AI Exam Preparation from <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#C85A32] via-[#D9822B] to-[#786498]">Multiple PDF Notes</span> 🎓
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C211F]">
+            AI Exam Preparation from <span className="text-[#C85A32]">Subject PDF Notes</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#5E6763] font-medium leading-relaxed">
             Upload all unit PDFs for any engineering subject. CampusOS processes the entire lesson set as a single knowledge collection to generate complete summaries, 2-mark, 4-mark, 10-mark model answers, and revision sheets.
@@ -290,7 +290,7 @@ export default function ExamPrepPage() {
         <div className="flex flex-wrap items-center gap-3 z-10">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/20 transition-all flex items-center gap-2"
+            className="px-5 py-3 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2"
           >
             <Plus className="w-4 h-4" /> New Subject Collection
           </button>
@@ -298,15 +298,13 @@ export default function ExamPrepPage() {
             <button
               onClick={handleGenerateExamNotes}
               disabled={isGenerating || collectionDocs.length === 0}
-              className="px-5 py-3 rounded-2xl bg-[#786498] hover:bg-[#786498]/90 text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-5 py-3 rounded-xl bg-[#2D3330] hover:bg-[#1C211F] text-white font-bold text-xs shadow-xs disabled:opacity-50 transition-all flex items-center gap-2"
             >
-              {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
               {isGenerating ? 'Analyzing & Generating...' : 'Generate Exam Notes'}
             </button>
           )}
         </div>
-
-        <div className="absolute -right-16 -top-16 w-56 h-56 bg-[#FDF2ED] rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Status Alert */}
@@ -670,13 +668,13 @@ export default function ExamPrepPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-extrabold text-[#1C211F] flex items-center gap-2">
-                <Award className="w-5 h-5 text-[#786498]" /> 10-Mark Complete University Long Answers
+                <Award className="w-5 h-5 text-[#C85A32]" /> 10-Mark Complete University Long Answers
               </h3>
               <p className="text-xs text-[#8E9893] font-medium mt-0.5">
                 Exhaustive 500-800 words: Intro, Concept, Working, Types, Example, Advantages, Limitations, Diagram citations & Conclusion
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-[#F4F1F8] text-[#786498] text-xs font-extrabold">
+            <span className="px-3 py-1 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-extrabold">
               {filterByUnit(materials.ten_mark_questions).length} Questions
             </span>
           </div>
@@ -725,7 +723,7 @@ export default function ExamPrepPage() {
                       <span className="w-7 h-7 rounded-lg bg-[#FEF7ED] text-[#D9822B] text-xs font-black flex items-center justify-center">
                         #{q.priority_rank || idx + 1}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#F4F1F8] text-[#786498] text-xs font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#FDF2ED] text-[#C85A32] text-xs font-bold">
                         {q.marks} Marks
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#5E6763] text-xs font-bold">

@@ -104,7 +104,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       color: '#C85A32',
       bgColor: '#FDF2ED',
       borderColor: '#C85A32',
-      icon: '🎨',
+      icon: 'UI',
       details: {
         title: 'Frontend Application & User Interface',
         role: 'Client-side SPA built with React and Vite. Provides responsive student dashboards, interactive AI study workspaces, and real-time visualization.',
@@ -120,7 +120,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#C85A32',
           bgColor: '#FAF0E9',
           borderColor: '#EAE3D8',
-          icon: '📊',
+          icon: 'DASH',
           details: {
             title: 'Student Dashboard & Navigation',
             role: 'Manages multi-tier sidebar navigation, student metrics, quick access cards, and role-based views.',
@@ -130,13 +130,13 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
         },
         {
           id: 'fe-exam-prep',
-          name: 'AI Exam Prep Hub',
+          name: 'Exam Prep Hub',
           category: 'frontend',
           level: 2,
           color: '#C85A32',
           bgColor: '#FAF0E9',
           borderColor: '#EAE3D8',
-          icon: '📚',
+          icon: 'EXAM',
           details: {
             title: 'Exam Preparation UI',
             role: 'Multi-PDF ingestion portal, categorized 2/4/10 marks answer viewer, chapter summaries, and One-Day revision sheets.',
@@ -152,10 +152,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#C85A32',
           bgColor: '#FAF0E9',
           borderColor: '#EAE3D8',
-          icon: '🧬',
+          icon: 'DNA',
           details: {
             title: 'RepoDNA Interactive Portal',
-            role: 'GitHub repository intelligence visualizer, NotebookLM-style radial mindmap, architecture inspector, and grounded codebase chat.',
+            role: 'GitHub repository intelligence visualizer, radial mindmap, architecture inspector, and grounded codebase chat.',
             path: 'frontend/src/features/repodna/RepoDNAPage.tsx',
             tech: ['SVG Graph Engine', 'Interactive Mindmap', 'RAG Chat']
           }
@@ -168,7 +168,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#C85A32',
           bgColor: '#FAF0E9',
           borderColor: '#EAE3D8',
-          icon: '📄',
+          icon: 'SRC',
           details: {
             title: getCleanName(f.file_path),
             role: f.purpose_summary || 'Component handling interactive client-side operations.',
@@ -195,10 +195,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'Backend APIs & Routes',
       category: 'backend',
       level: 1,
-      color: '#3D5A80',
-      bgColor: '#EEF3F8',
-      borderColor: '#3D5A80',
-      icon: '⚙️',
+      color: '#2D3330',
+      bgColor: '#F4EFEA',
+      borderColor: '#2D3330',
+      icon: 'API',
       details: {
         title: 'Backend API & Business Logic Server',
         role: 'High-performance asynchronous FastAPI server handling HTTP requests, RAG embeddings, background processing, and database transactions.',
@@ -212,10 +212,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'RepoDNA API Router',
           category: 'backend',
           level: 2,
-          color: '#3D5A80',
+          color: '#2D3330',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '⚡',
+          icon: 'RT',
           details: {
             title: 'RepoDNA API Endpoints',
             role: 'Handles repository URL ingestion, public GitHub scanning, AST code extraction, and codebase grounded Q&A.',
@@ -229,10 +229,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Exam Prep Router',
           category: 'backend',
           level: 2,
-          color: '#3D5A80',
+          color: '#2D3330',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '⚡',
+          icon: 'RT',
           details: {
             title: 'Exam Preparation API Endpoints',
             role: 'Manages multi-unit PDF uploads, automatic 2/4/10 marks model answer generation, chapter summaries, and revision sheets.',
@@ -246,10 +246,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'AI Assistant Router',
           category: 'backend',
           level: 2,
-          color: '#3D5A80',
+          color: '#2D3330',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '🤖',
+          icon: 'RT',
           details: {
             title: 'CampusOS AI Assistant Router',
             role: 'Unified conversational agent with role-based grounded vector search and academic intelligence.',
@@ -273,7 +273,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       color: '#D9822B',
       bgColor: '#FEF7ED',
       borderColor: '#D9822B',
-      icon: '🗄️',
+      icon: 'DB',
       details: {
         title: 'Database & Entity Schemas',
         role: 'PostgreSQL relational database with Supabase integration and pgvector embeddings for vector similarity search.',
@@ -290,7 +290,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#D9822B',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '👤',
+          icon: 'USR',
           details: {
             title: 'User & Role Tables',
             role: 'Stores student profiles, hashed credentials, roles, and institutional references.',
@@ -306,7 +306,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#D9822B',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '📦',
+          icon: 'MOD',
           details: {
             title: 'RepoDNA Repository Tables',
             role: 'Stores analyzed repositories, file AST metadata, repository chunks, vector embeddings, and intelligence reports.',
@@ -322,7 +322,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#D9822B',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '📑',
+          icon: 'DOC',
           details: {
             title: 'StudyCollection & Exam Material Tables',
             role: 'Persists subject collections, PDF chunks, generated 2/4/10 marks questions, summaries, and One-Day revision sheets.',
@@ -339,10 +339,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       name: 'AI Engine & Grounded RAG',
       category: 'ai',
       level: 1,
-      color: '#786498',
-      bgColor: '#F4F1F8',
-      borderColor: '#786498',
-      icon: '🧠',
+      color: '#C85A32',
+      bgColor: '#FDF2ED',
+      borderColor: '#C85A32',
+      icon: 'RAG',
       details: {
         title: 'CampusOS AI & RAG Engine',
         role: 'Semantic vector retrieval, Gemini LLM prompt orchestration, anti-hallucination verification, and codebase AST extraction.',
@@ -355,10 +355,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'Exam Material Generator',
           category: 'ai',
           level: 2,
-          color: '#786498',
+          color: '#C85A32',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '✨',
+          icon: 'GEN',
           details: {
             title: 'Exam Note & Question Orchestrator',
             role: 'Generates 5 distinct 2-mark, 5 distinct 4-mark, and 5 distinct 10-mark model answers strictly grounded in student notes without duplicates.',
@@ -371,10 +371,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'RepoDNA Generator',
           category: 'ai',
           level: 2,
-          color: '#786498',
+          color: '#C85A32',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '🧬',
+          icon: 'DNA',
           details: {
             title: 'RepoDNA Intelligence Pipeline',
             role: 'Analyzes architecture, detected tech stacks, application flows, database schemas, and powers grounded codebase chat.',
@@ -387,10 +387,10 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           name: 'PDF Extraction Engine',
           category: 'ai',
           level: 2,
-          color: '#786498',
+          color: '#C85A32',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '📄',
+          icon: 'PDF',
           details: {
             title: 'PDF & Document Ingestion',
             role: 'Multi-page text extraction, unit detection, OCR fallbacks, and semantic chunking with page number citations.',
@@ -411,7 +411,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       color: '#5E8C71',
       bgColor: '#F0F6F2',
       borderColor: '#5E8C71',
-      icon: '🔐',
+      icon: 'SEC',
       details: {
         title: 'Authentication & Access Control',
         role: 'Dual-token JWT validation, Supabase Auth integration, session guards, and role-based access control (Student, Faculty, Admin).',
@@ -427,7 +427,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#5E8C71',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '🛡️',
+          icon: 'AUTH',
           details: {
             title: 'get_current_user Dependency',
             role: 'Intercepts Bearer tokens, validates JWT claims, resolves Supabase Auth sessions, and isolates student data.',
@@ -443,7 +443,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#5E8C71',
           bgColor: '#FAF7F2',
           borderColor: '#DCD2C3',
-          icon: '🌐',
+          icon: 'CORS',
           details: {
             title: 'CORS Preflight & Security Headers',
             role: 'Configures allowed origins regex for Vercel preview domains and localhost ports, preventing 400 Bad Request preflights.',
@@ -463,7 +463,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       color: '#1C211F',
       bgColor: '#EFE8DF',
       borderColor: '#1C211F',
-      icon: '🛠️',
+      icon: 'CORE',
       details: {
         title: 'Core Repository Scanner & Workspace Engine',
         role: 'Downloads public GitHub repos via archive zipball or falls back to local workspace scanning for private developer projects.',
@@ -479,7 +479,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#2D3330',
           bgColor: '#FAF7F2',
           borderColor: '#EAE3D8',
-          icon: '🔍',
+          icon: 'SCAN',
           details: {
             title: 'GitHub Repository Scanner',
             role: 'Scans repositories, filters ignored dependencies, extracts AST manifests, and scans local project files on private 404s.',
@@ -495,7 +495,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
           color: '#2D3330',
           bgColor: '#FAF7F2',
           borderColor: '#EAE3D8',
-          icon: '🔬',
+          icon: 'TECH',
           details: {
             title: 'Technology & Framework Detector',
             role: 'Inspects package.json, requirements.txt, go.mod, and imports to detect frontend frameworks, databases, and libraries.',
@@ -514,7 +514,7 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
       color: '#FFFFFF',
       bgColor: '#C85A32',
       borderColor: '#B44E27',
-      icon: '🧬',
+      icon: 'APP',
       details: {
         title: `${repository.owner} / ${repository.repo_name}`,
         role: analysis?.one_line_desc || repository.description || 'Full-Stack Software Architecture',
@@ -949,12 +949,15 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                   style={{ filter: `drop-shadow(0 0 ${isSelected ? '18px' : '10px'} ${node.color}88)` }}
                 />
 
-                {/* Node Icon */}
+                {/* Node Label / Token */}
                 <text
                   textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={isRoot ? '20' : isBranch ? '14' : '10'}
-                  className="pointer-events-none select-none"
+                  dominantBaseline="central"
+                  fill={isRoot ? '#FFFFFF' : node.color}
+                  fontSize={isRoot ? '12' : isBranch ? '10' : '8'}
+                  fontWeight="800"
+                  letterSpacing="0.5px"
+                  className="pointer-events-none select-none font-mono"
                 >
                   {node.icon}
                 </text>
@@ -1018,8 +1021,8 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
             <div className="flex items-start justify-between border-b border-[#EAE3D8] pb-3">
               <div className="flex items-center gap-3">
                 <span
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm border"
-                  style={{ backgroundColor: selectedNode.bgColor, borderColor: selectedNode.borderColor }}
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center font-mono font-bold text-xs shadow-xs border"
+                  style={{ backgroundColor: selectedNode.bgColor, borderColor: selectedNode.borderColor, color: selectedNode.color }}
                 >
                   {selectedNode.icon}
                 </span>
@@ -1090,9 +1093,9 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                   {selectedNode.details.endpoints.map((ep, idx) => (
                     <div
                       key={idx}
-                      className="p-2.5 rounded-xl bg-[#EEF3F8] border border-[#3D5A80]/20 text-[11px] font-mono text-[#3D5A80] flex items-center gap-2"
+                      className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-[11px] font-mono text-[#2D3330] flex items-center gap-2"
                     >
-                      <Terminal className="w-3.5 h-3.5 text-[#3D5A80] shrink-0" />
+                      <Terminal className="w-3.5 h-3.5 text-[#C85A32] shrink-0" />
                       <span className="truncate">{ep}</span>
                     </div>
                   ))}
@@ -1140,30 +1143,30 @@ export const RepoMindmapView: React.FC<RepoMindmapViewProps> = ({
                   onAskAI(`Explain in detail how '${selectedNode.details.title || selectedNode.name}' functions in this repository, its architectural role, dependencies, and code implementation.`);
                 }
               }}
-              className="w-full py-3 px-4 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-[#C85A32]/25 transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95"
             >
-              <Sparkles className="w-4 h-4" /> Ask AI About This Component
+              <MessageSquare className="w-4 h-4" /> Ask AI About This Component
             </button>
           </div>
         </div>
       )}
 
       {/* BOTTOM LEGEND & HELPER BAR */}
-      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-3 pointer-events-auto bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-[#EAE3D8] text-xs text-[#2D3330] shadow-md">
-        <span className="font-extrabold text-[#1C211F] flex items-center gap-1.5 mr-1">
+      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-3 pointer-events-auto bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-[#EAE3D8] text-xs text-[#2D3330] shadow-xs">
+        <span className="font-bold text-[#1C211F] flex items-center gap-1.5 mr-1">
           <Info className="w-3.5 h-3.5 text-[#C85A32]" /> Repository Mindmap:
         </span>
         <span className="flex items-center gap-1.5 font-medium">
           <span className="w-2.5 h-2.5 rounded-full bg-[#C85A32]" /> Frontend UI
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#3D5A80]" /> Backend APIs
+          <span className="w-2.5 h-2.5 rounded-full bg-[#2D3330]" /> Backend APIs
         </span>
         <span className="flex items-center gap-1.5 font-medium">
           <span className="w-2.5 h-2.5 rounded-full bg-[#D9822B]" /> Database
         </span>
         <span className="flex items-center gap-1.5 font-medium">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#786498]" /> AI & RAG
+          <span className="w-2.5 h-2.5 rounded-full bg-[#C85A32]" /> AI & RAG
         </span>
         <span className="flex items-center gap-1.5 font-medium">
           <span className="w-2.5 h-2.5 rounded-full bg-[#5E8C71]" /> Security

@@ -109,15 +109,15 @@ export const RevisionView: React.FC<RevisionViewProps> = ({
                 {u.important_definitions && u.important_definitions.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-xs font-extrabold text-[#8E9893] uppercase tracking-wider flex items-center gap-1.5">
-                      <Bookmark className="w-3.5 h-3.5 text-[#786498]" /> Essential Definitions
+                      <Bookmark className="w-3.5 h-3.5 text-[#C85A32]" /> Essential Definitions
                     </h4>
                     <div className="space-y-2">
                       {u.important_definitions.map((def, dIdx) => (
                         <div
                           key={dIdx}
-                          className="p-3.5 rounded-xl bg-[#F4F1F8] border border-[#786498]/20 text-xs text-[#2D3330]"
+                          className="p-3.5 rounded-xl bg-[#FDF2ED] border border-[#C85A32]/20 text-xs text-[#2D3330]"
                         >
-                          <strong className="text-[#786498]">{def.term}:</strong> {def.definition}
+                          <strong className="text-[#C85A32]">{def.term}:</strong> {def.definition}
                         </div>
                       ))}
                     </div>

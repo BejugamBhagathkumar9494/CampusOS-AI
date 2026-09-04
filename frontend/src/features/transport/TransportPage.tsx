@@ -17,7 +17,7 @@ export default function TransportPage() {
     <div className="space-y-7 animate-fade-in font-sans">
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-[#EEF3F8] text-[#3D5A80] border border-[#EAE3D8]">
+          <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Bus className="w-5 h-5" />
           </span>
           Transport & Bus Tracking
@@ -27,7 +27,7 @@ export default function TransportPage() {
 
       <div className="bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
         <h2 className="text-lg font-bold text-[#1C211F] flex items-center gap-2">
-          <Bus className="w-5 h-5 text-[#3D5A80]" /> Active Campus Bus Routes ({routes.length})
+          <Bus className="w-5 h-5 text-[#C85A32]" /> Active Campus Bus Routes ({routes.length})
         </h2>
         {loading ? (
           <p className="text-xs text-[#8E9893] font-medium p-4 text-center">Loading bus routes from backend...</p>

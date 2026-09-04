@@ -24,8 +24,8 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ item }) => {
   const [selectedSource, setSelectedSource] = useState<SourceCitation | null>(null);
 
   const getMarksBadgeColor = (marks: number) => {
-    if (marks >= 10) return 'bg-[#F4F1F8] text-[#786498] border-[#786498]/30';
-    if (marks >= 4) return 'bg-[#FDF2ED] text-[#C85A32] border-[#C85A32]/30';
+    if (marks >= 10) return 'bg-[#FDF2ED] text-[#C85A32] border-[#C85A32]/30';
+    if (marks >= 4) return 'bg-[#FEF7ED] text-[#D9822B] border-[#D9822B]/30';
     return 'bg-[#F0F6F2] text-[#5E8C71] border-[#5E8C71]/30';
   };
 

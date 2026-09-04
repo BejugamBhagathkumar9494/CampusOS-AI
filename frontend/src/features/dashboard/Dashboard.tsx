@@ -72,156 +72,143 @@ function StudentDashboard({ name, profileId }: { name?: string; profileId?: stri
     if (loading) console.log('Initializing student dashboard...');
     loadStudentData();
     return () => { isMounted = false; };
-  }, [profileId, loading]);
+  }, [profileId]);
 
   return (
     <div className="space-y-7 animate-fade-in font-sans">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
-        <div className="space-y-2 max-w-xl z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
-            <Sparkles className="w-3.5 h-3.5 text-[#C85A32]" /> Student Intelligence Workspace
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="text-[#C85A32]">{name}</span> 👋
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-2xl shadow-md border border-[#EAE3D8]/15">
+        <div className="space-y-1.5 max-w-xl">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Welcome back, <span className="text-[#C85A32]">{name}</span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
-            Your classes, real-time database attendance metrics, and AI assistant insights are ready for today.
+          <p className="text-xs sm:text-sm text-[#8E9893] font-normal leading-relaxed">
+            Your schedule, real-time academic progress, and intelligence workspaces for today.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 z-10">
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/student/mock-interview"
-            className="px-4 py-2.5 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
+            className="px-4 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Mic className="w-4 h-4" /> AI Mock Interview
           </Link>
           <Link
-            to="/student/repodna"
-            className="px-4 py-2.5 rounded-2xl bg-[#5E8C71] hover:bg-[#4D755E] text-white font-extrabold text-xs shadow-lg shadow-[#5E8C71]/25 transition-all flex items-center gap-2 border border-[#5E8C71]/40"
-          >
-            <GitFork className="w-4 h-4" /> RepoDNA Intelligence
-          </Link>
-          <Link
             to="/student/exam-prep"
-            className="px-4 py-2.5 rounded-2xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-lg shadow-[#786498]/25 transition-all flex items-center gap-2 border border-[#786498]/40"
+            className="px-4 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#1C211F] font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
           >
-            <GraduationCap className="w-4 h-4" /> Exam Prep
+            <GraduationCap className="w-4 h-4 text-[#C85A32]" /> Exam Prep
           </Link>
           <Link
-            to="/student/ai-assistant"
-            className="px-4 py-2.5 rounded-2xl bg-[#F4EFEA] hover:bg-[#EFE8DF] text-[#1C211F] font-bold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
+            to="/student/repodna"
+            className="px-4 py-2.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F4EFEA] text-[#1C211F] font-semibold text-xs shadow-sm transition-all flex items-center gap-2 border border-[#EAE3D8]"
           >
-            <Sparkles className="w-4 h-4 text-[#C85A32]" /> AI Assistant
+            <GitFork className="w-4 h-4 text-[#C85A32]" /> RepoDNA
           </Link>
         </div>
-
-
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
+        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
           <div>
-            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Attendance Rate</span>
-            <span className={`text-2xl font-extrabold ${stats.attendance_percentage >= 75 ? 'text-[#5E8C71]' : 'text-rose-600'}`}>
+            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Attendance Rate</span>
+            <span className={`text-2xl font-bold ${stats.attendance_percentage >= 75 ? 'text-[#5E8C71]' : 'text-[#C85A32]'}`}>
               {stats.attendance_percentage}%
             </span>
-            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Target: 75.0% Min</span>
+            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Target: 75.0% Min</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
+          <div className="p-3 rounded-xl bg-[#F0F6F2] text-[#5E8C71] border border-[#5E8C71]/20">
             <Calendar className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
+        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
           <div>
-            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Current CGPA</span>
-            <span className="text-2xl font-extrabold text-[#C85A32]">{stats.cgpa}</span>
-            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Academic Record</span>
+            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Current CGPA</span>
+            <span className="text-2xl font-bold text-[#C85A32]">{stats.cgpa}</span>
+            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Academic Record</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
+          <div className="p-3 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
+        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
           <div>
-            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Issued Library Books</span>
-            <span className="text-2xl font-extrabold text-[#3D5A80]">{stats.issued_books}</span>
-            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Active Holds</span>
+            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Issued Books</span>
+            <span className="text-2xl font-bold text-[#1C211F]">{stats.issued_books}</span>
+            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Active Holds</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-xl bg-[#FAF7F2] text-[#C85A32] border border-[#EAE3D8]">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
+        <div className="bg-white p-5 rounded-2xl border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[#C85A32]/30 transition-all">
           <div>
-            <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Open Concerns</span>
-            <span className="text-2xl font-extrabold text-[#D9822B]">{stats.open_complaints}</span>
-            <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Hostel & Campus</span>
+            <span className="text-[11px] font-semibold text-[#8E9893] uppercase tracking-wider block">Open Concerns</span>
+            <span className="text-2xl font-bold text-[#D9822B]">{stats.open_complaints}</span>
+            <span className="text-[11px] text-[#5E6763] font-medium block mt-0.5">Campus Support</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
+          <div className="p-3 rounded-xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      {/* AI Developer & Study Intelligence Featured Cards */}
+      {/* Featured Intelligence Workspaces */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* RepoDNA Card */}
-        <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-lg border border-[rgba(200,90,50,0.3)] flex flex-col justify-between gap-4 relative overflow-hidden">
-          <div className="flex items-start gap-4 z-10">
-            <div className="w-12 h-12 rounded-2xl bg-[#FDF2ED]/10 text-[#C85A32] flex items-center justify-center border border-[#C85A32]/30 shrink-0">
-              <GitFork className="w-6 h-6" />
+        <div className="bg-[#FFFFFF] p-6 rounded-2xl shadow-sm border border-[#EAE3D8] hover:border-[#C85A32]/40 transition-all flex flex-col justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center border border-[#C85A32]/20 shrink-0">
+              <GitFork className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                RepoDNA — GitHub Intelligence <span className="px-2 py-0.5 rounded-full bg-[#C85A32]/20 text-[#FDF2ED] text-[10px] font-bold border border-[#C85A32]/30">New</span>
+              <h3 className="text-sm font-bold text-[#1C211F]">
+                RepoDNA Codebase Intelligence
               </h3>
-              <p className="text-xs text-[#8E9893] font-medium mt-1">
-                Enter any public GitHub repository to decode its architecture, APIs, data flow, database schemas, and generate interview Q&A.
+              <p className="text-xs text-[#5E6763] font-normal mt-1 leading-relaxed">
+                Inspect GitHub repositories to understand architecture, internal data flows, REST endpoints, database schemas, and generate technical interview Q&A.
               </p>
             </div>
           </div>
-          <div className="flex justify-end z-10">
+          <div className="flex justify-end pt-2">
             <Link
               to="/student/repodna"
-              className="px-5 py-2.5 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-md shadow-[#C85A32]/20 transition-all flex items-center gap-1.5 shrink-0"
+              className="px-4 py-2 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0"
             >
-              Launch RepoDNA <ArrowRight className="w-3.5 h-3.5" />
+              Open RepoDNA <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-[#C85A32]/10 rounded-full blur-2xl pointer-events-none" />
         </div>
 
         {/* AI Exam Prep Card */}
-        <div className="bg-[#1C211F] text-white p-6 rounded-[28px] shadow-lg border border-[#786498]/40 flex flex-col justify-between gap-4 relative overflow-hidden">
-          <div className="flex items-start gap-4 z-10">
-            <div className="w-12 h-12 rounded-2xl bg-[#F4F1F8]/10 text-[#786498] flex items-center justify-center border border-[#786498]/30 shrink-0">
-              <GraduationCap className="w-6 h-6" />
+        <div className="bg-[#FFFFFF] p-6 rounded-2xl shadow-sm border border-[#EAE3D8] hover:border-[#C85A32]/40 transition-all flex flex-col justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-[#FDF2ED] text-[#C85A32] flex items-center justify-center border border-[#C85A32]/20 shrink-0">
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                AI Exam Prep from Notes <span className="px-2 py-0.5 rounded-full bg-[#786498]/20 text-[#F4F1F8] text-[10px] font-bold border border-[#786498]/30">New</span>
+              <h3 className="text-sm font-bold text-[#1C211F]">
+                AI Exam Preparation Studio
               </h3>
-              <p className="text-xs text-[#8E9893] font-medium mt-1">
-                Upload all unit PDFs (Unit 1–5) for any subject to generate complete summaries, 2-mark, 4-mark, and 10-mark model answers.
+              <p className="text-xs text-[#5E6763] font-normal mt-1 leading-relaxed">
+                Upload course lecture notes and unit PDFs to generate chapter summaries, 2-mark, 4-mark, and 10-mark model answers with rapid revision sheets.
               </p>
             </div>
           </div>
-          <div className="flex justify-end z-10">
+          <div className="flex justify-end pt-2">
             <Link
               to="/student/exam-prep"
-              className="px-5 py-2.5 rounded-xl bg-[#786498] hover:bg-[#685587] text-white font-extrabold text-xs shadow-md shadow-[#786498]/20 transition-all flex items-center gap-1.5 shrink-0"
+              className="px-4 py-2 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0"
             >
-              Open Exam Studio <ArrowRight className="w-3.5 h-3.5 text-white" />
+              Open Exam Studio <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-[#786498]/10 rounded-full blur-2xl pointer-events-none" />
         </div>
       </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-8 bg-white rounded-[24px] p-6 border border-[#EAE3D8] shadow-sm space-y-4">
@@ -438,7 +425,7 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
             <span className="text-2xl font-extrabold text-[#1C211F]">{stats.total_students || 20}</span>
             <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Roster Capacity</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <Users className="w-5 h-5" />
           </div>
         </div>
@@ -495,9 +482,9 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
           <button
             onClick={() => setNoticeModal(true)}
-            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#F4F1F8] border border-[#EAE3D8] hover:border-[#786498]/30 transition-all text-center space-y-2 group w-full"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FEF7ED] border border-[#EAE3D8] hover:border-[#D9822B]/30 transition-all text-center space-y-2 group w-full"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#F4F1F8] text-[#786498] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF7ED] text-[#D9822B] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Bell className="w-5 h-5" />
             </div>
             <span className="text-xs font-bold text-[#1C211F] block">Broadcast Notice</span>
@@ -505,9 +492,9 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
           <Link
             to="/student/ai-assistant"
-            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FEF7ED] border border-[#EAE3D8] hover:border-[#D9822B]/30 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FDF2ED] border border-[#EAE3D8] hover:border-[#C85A32]/30 transition-all text-center space-y-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#FEF7ED] text-[#D9822B] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Sparkles className="w-5 h-5" />
             </div>
             <span className="text-xs font-bold text-[#1C211F] block">AI Assistant</span>
@@ -515,12 +502,12 @@ function FacultyDashboard({ name, profileId }: { name?: string; profileId?: stri
 
           <Link
             to="/faculty/attendance"
-            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#EEF3F8] border border-[#EAE3D8] hover:border-[#3D5A80]/30 transition-all text-center space-y-2 group"
+            className="p-4 rounded-2xl bg-[#FAF7F2] hover:bg-[#FDF2ED] border border-[#EAE3D8] hover:border-[#C85A32]/30 transition-all text-center space-y-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-[#FDF2ED] text-[#C85A32] mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
               <Award className="w-5 h-5" />
             </div>
-            <span className="text-xs font-bold text-slate-800 block">Course Roster</span>
+            <span className="text-xs font-bold text-[#1C211F] block">Course Roster</span>
           </Link>
 
           <button
@@ -978,9 +965,9 @@ function AdminDashboard({ name }: { name?: string }) {
         <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
             <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Active Courses</span>
-            <span className="text-2xl font-extrabold text-[#3D5A80]">24</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">24</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <CheckSquare className="w-5 h-5" />
           </div>
         </div>
@@ -1002,13 +989,13 @@ function AdminDashboard({ name }: { name?: string }) {
 function SuperAdminDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-3xl shadow-sm border border-[#2D3330] relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
             <ShieldCheck className="w-3.5 h-3.5 text-[#C85A32]" /> Super Admin Global Control
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Welcome back, <span className="text-[#C85A32]">{name}</span> 👑
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Welcome back, <span className="text-[#C85A32]">{name}</span>
           </h1>
           <p className="text-xs sm:text-sm text-[#8E9893] font-medium leading-relaxed">
             Full system governance, institutional user & role control, database security, and audit logs.
@@ -1018,12 +1005,11 @@ function SuperAdminDashboard({ name }: { name?: string }) {
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/super-admin/users"
-            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
+            className="px-5 py-3 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <Users className="w-4 h-4" /> User & Role Governance
           </Link>
         </div>
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -1041,10 +1027,10 @@ function SuperAdminDashboard({ name }: { name?: string }) {
         <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
             <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Faculty Members</span>
-            <span className="text-2xl font-extrabold text-[#3D5A80]">32</span>
+            <span className="text-2xl font-extrabold text-[#C85A32]">32</span>
             <span className="text-[11px] text-[#5E6763] font-semibold block mt-0.5">Active Staff</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
@@ -1163,9 +1149,9 @@ function HostelWardenDashboard({ name }: { name?: string }) {
         <div className="bg-white p-5 rounded-[24px] border border-[#EAE3D8] shadow-sm flex items-center justify-between hover:border-[rgba(200,90,50,0.3)] transition-all">
           <div>
             <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Gate Pass Pending</span>
-            <span className="text-2xl font-extrabold text-[#3D5A80]">2</span>
+            <span className="text-2xl font-extrabold text-[#D9822B]">2</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-2xl bg-[#FEF7ED] text-[#D9822B] border border-[#D9822B]/20">
             <Clock className="w-5 h-5" />
           </div>
         </div>
@@ -1177,25 +1163,24 @@ function HostelWardenDashboard({ name }: { name?: string }) {
 function PlacementOfficerDashboard({ name }: { name?: string }) {
   return (
     <div className="space-y-7 animate-fade-in font-sans pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-[28px] shadow-xl border border-[#EAE3D8]/15 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1C211F] text-white p-7 rounded-3xl shadow-sm border border-[#2D3330] relative overflow-hidden">
         <div className="space-y-2 max-w-xl z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FDF2ED]/10 text-[#FDF2ED] text-xs font-bold border border-[#C85A32]/30">
             <Target className="w-3.5 h-3.5 text-[#C85A32]" /> Corporate Placement Desk
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Placement Officer Portal, <span className="text-[#C85A32]">{name}</span> 💼
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Placement Officer Portal, <span className="text-[#C85A32]">{name}</span>
           </h1>
         </div>
 
         <div className="flex items-center gap-3 z-10">
           <Link
             to="/placement/placements"
-            className="px-5 py-3 rounded-2xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-extrabold text-xs shadow-lg shadow-[#C85A32]/25 transition-all flex items-center gap-2 border border-[#C85A32]/40"
+            className="px-5 py-3 rounded-xl bg-[#C85A32] hover:bg-[#B44E27] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2 border border-[#C85A32]/40"
           >
             <ClipboardList className="w-4 h-4" /> View Corporate Drives
           </Link>
         </div>
-        <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#C85A32]/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -1224,7 +1209,7 @@ function PlacementOfficerDashboard({ name }: { name?: string }) {
             <span className="text-[11px] font-bold text-[#8E9893] uppercase tracking-wider block">Total Applications</span>
             <span className="text-2xl font-extrabold text-[#1C211F]">45</span>
           </div>
-          <div className="p-3 rounded-2xl bg-[#EEF3F8] text-[#3D5A80] border border-[#3D5A80]/20">
+          <div className="p-3 rounded-2xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
             <ClipboardList className="w-5 h-5" />
           </div>
         </div>

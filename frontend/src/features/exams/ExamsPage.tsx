@@ -82,7 +82,7 @@ export default function ExamsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C211F] tracking-tight flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-[#F4F1F8] text-[#786498] border border-[#EAE3D8]">
+            <span className="p-2 rounded-xl bg-[#FDF2ED] text-[#C85A32] border border-[#C85A32]/20">
               <FileText className="w-5 h-5" />
             </span>
             Exams & Timetables
@@ -160,7 +160,7 @@ export default function ExamsPage() {
 
             <div>
               <h3 className="text-lg font-extrabold text-[#1C211F] flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#C85A32]" /> Schedule Examination
+                <Calendar className="w-5 h-5 text-[#C85A32]" /> Schedule Examination
               </h3>
               <p className="text-xs text-[#5E6763] mt-1">Publish an examination schedule to the student portal.</p>
             </div>
