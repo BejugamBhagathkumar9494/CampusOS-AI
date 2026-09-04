@@ -13,7 +13,7 @@ from app.api.v1.ai import call_featherless_llm, resolve_featherless_api_key
 
 async def _call_gemini_chat(prompt_text: str, system_instruction: str) -> str:
     """
-    Invokes Featherless AI running moonshotai/Kimi-K3 for RepoDNA chat.
+    Invokes Featherless AI (32K context & 4 concurrent units) for RepoDNA chat.
     """
     try:
         messages = [
@@ -107,6 +107,8 @@ async def answer_repository_query(
     ]) if retrieved else "No specific file chunks retrieved."
 
     full_context = "\n\n".join(context_sections) + f"\n\nSource Code Evidence:\n{chunks_text}"
+    if len(full_context) > 20000:
+        full_context = full_context[:20000] + "\n...[Context truncated for 32K context budget]"
 
     prompt = REPODNA_CHAT_PROMPT_TEMPLATE.format(
         owner=repository.owner,

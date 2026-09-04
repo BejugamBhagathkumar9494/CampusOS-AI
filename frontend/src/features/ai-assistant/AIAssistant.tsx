@@ -72,7 +72,7 @@ export default function AIAssistant() {
           content: `Hi ${profile?.full_name || 'Student'}! Welcome to your fresh CampusOS AI session. Ask me general programming, academic concepts, reasoning, or switch to RAG Mode for grounded university document search!`,
           mode: mode,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          agentName: mode === 'llm' ? 'Kimi-K3 (Featherless AI)' : 'Campus Knowledge Base'
+          agentName: mode === 'llm' ? 'Featherless AI' : 'Campus Knowledge Base'
         }
       ]);
 
@@ -108,7 +108,7 @@ export default function AIAssistant() {
         mode: m.mode || 'llm',
         timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         sources: m.sources || [],
-        agentName: m.role === 'assistant' ? (m.mode === 'rag' ? 'Campus Knowledge Base' : 'Kimi-K3 (Featherless AI)') : null
+        agentName: m.role === 'assistant' ? (m.mode === 'rag' ? 'Campus Knowledge Base' : 'Featherless AI') : null
       }));
 
       if (formatted.length === 0) {
@@ -120,7 +120,7 @@ export default function AIAssistant() {
             content: `Session "${targetSession.title}". Ask your question to begin!`,
             mode: mode,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            agentName: mode === 'llm' ? 'Kimi-K3 (Featherless AI)' : 'Campus Knowledge Base'
+            agentName: mode === 'llm' ? 'Featherless AI' : 'Campus Knowledge Base'
           }
         ]);
       } else {
@@ -203,7 +203,7 @@ export default function AIAssistant() {
 
     try {
       let responseData: any;
-      let agentLabel = 'Kimi-K3 (Featherless AI)';
+      let agentLabel = 'Featherless AI';
 
       if (currentMode === 'llm') {
         const historyContext = messages.slice(-6).map(m => ({
@@ -211,7 +211,7 @@ export default function AIAssistant() {
           content: m.content || m.text
         }));
         responseData = await chatWithLLM(query, historyContext, profile?.id);
-        agentLabel = responseData.agent_name || 'Kimi-K3 (Featherless AI)';
+        agentLabel = responseData.agent_name || 'Featherless AI';
       } else if (currentMode === 'subject_rag' && selectedColId) {
         responseData = await examPrepService.querySubject({
           collection_id: selectedColId,
@@ -265,7 +265,7 @@ export default function AIAssistant() {
       console.error(`[AI Assistant Error] Mode ${currentMode.toUpperCase()}:`, err);
 
       const errorMsgText = currentMode === 'llm'
-        ? "Unable to connect to Kimi-K3 (Featherless AI) Assistant right now. Please verify your internet connection or server FEATHERLESS_API_KEY configuration and try again."
+        ? "Unable to connect to Featherless AI Assistant right now. Please verify your internet connection or server FEATHERLESS_API_KEY configuration and try again."
         : "This information is not available in the university knowledge base.";
 
       const botMsg = {
@@ -275,7 +275,7 @@ export default function AIAssistant() {
         content: errorMsgText,
         mode: currentMode,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        agentName: currentMode === 'llm' ? 'Kimi-K3 (Featherless AI)' : 'Campus Knowledge Base',
+        agentName: currentMode === 'llm' ? 'Featherless AI' : 'Campus Knowledge Base',
         confidenceScore: 0.0,
         sources: []
       };
@@ -303,7 +303,7 @@ export default function AIAssistant() {
           </div>
           <p className="text-xs sm:text-sm text-[#5E6763] font-medium">
             {isLLM 
-              ? 'General knowledge, coding, academic concepts, and technical reasoning powered by Kimi-K3 (Featherless AI).' 
+              ? 'General knowledge, coding, academic concepts, and technical reasoning powered by Featherless AI.' 
               : 'Grounded university search. Answers restricted strictly to indexed campus handbooks & rules.'}
           </p>
         </div>

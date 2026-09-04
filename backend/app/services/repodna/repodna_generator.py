@@ -180,19 +180,21 @@ async def analyze_repository_pipeline(
         tree_sample += f"\n... [{len(tree_structure) - 80} additional files]"
 
     code_evidence_lines = []
-    for f in files[:20]:
+    for f in files[:15]:
         meta = file_metadata_map.get(f["file_path"], {})
         code_evidence_lines.append(f"--- FILE: {f['file_path']} ({meta.get('file_type', 'source')}) ---")
         code_evidence_lines.append(f"Purpose: {meta.get('purpose_summary', '')}")
         if meta.get("imports"):
-            code_evidence_lines.append(f"Imports: {', '.join(meta['imports'][:6])}")
+            code_evidence_lines.append(f"Imports: {', '.join(meta['imports'][:5])}")
         if meta.get("functions"):
-            code_evidence_lines.append(f"Functions: {', '.join(meta['functions'][:6])}")
+            code_evidence_lines.append(f"Functions: {', '.join(meta['functions'][:5])}")
         if meta.get("api_endpoints"):
-            code_evidence_lines.append("APIs: " + ", ".join([f"{ep['method']} {ep['endpoint']}" for ep in meta['api_endpoints'][:4]]))
-        code_evidence_lines.append("Code Snippet:\n" + f["content"][:400] + "\n")
+            code_evidence_lines.append("APIs: " + ", ".join([f"{ep['method']} {ep['endpoint']}" for ep in meta['api_endpoints'][:3]]))
+        code_evidence_lines.append("Code Snippet:\n" + f["content"][:300] + "\n")
 
     code_evidence_text = "\n".join(code_evidence_lines)
+    if len(code_evidence_text) > 18000:
+        code_evidence_text = code_evidence_text[:18000] + "\n...[Additional code evidence truncated for 32K context budget]"
 
     prompt = REPODNA_ANALYSIS_PROMPT_TEMPLATE.format(
         owner=repository.owner,
@@ -222,9 +224,9 @@ async def analyze_repository_pipeline(
                             {"role": "user", "content": prompt}
                         ],
                         temperature=0.2,
-                        max_tokens=4096
+                        max_tokens=2048
                     ),
-                    timeout=30.0
+                    timeout=45.0
                 )
             except Exception as e1:
                 print(f"[RepoDNA Generator] Featherless generation warning: {e1}")

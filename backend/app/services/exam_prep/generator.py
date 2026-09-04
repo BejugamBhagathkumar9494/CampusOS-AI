@@ -25,44 +25,22 @@ def get_gemini_api_key() -> str:
 
 
 async def call_gemini_prompt(prompt_text: str, temperature: float = 0.2) -> str:
-    """Invokes Featherless AI (moonshotai/Kimi-K3) LLM with robust fallback."""
+    """Invokes Featherless AI (32K context & 4 concurrent units) with robust retry."""
     from app.api.v1.ai import call_featherless_llm
-    try:
-        res = await call_featherless_llm(
-            message=prompt_text,
-            temperature=temperature,
-            max_tokens=4096
-        )
-        if res and res.strip():
-            return res.strip()
-    except Exception as e:
-        print(f"[ExamPrep Featherless Error] {e}")
+    for attempt in range(2):
+        try:
+            res = await call_featherless_llm(
+                message=prompt_text,
+                temperature=temperature,
+                max_tokens=2048
+            )
+            if res and res.strip():
+                return res.strip()
+        except Exception as e:
+            print(f"[ExamPrep Featherless Error (attempt {attempt+1})] {e}")
+            await asyncio.sleep(0.5)
 
-    # Fallback to direct HTTP endpoint if Featherless fails
-    key = get_gemini_api_key()
-    candidate_models = ["gemini-2.5-flash", "gemini-flash-latest"]
-    async with httpx.AsyncClient(timeout=25.0) as http_client:
-        for model in candidate_models:
-            try:
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
-                res = await http_client.post(
-                    url,
-                    json={
-                        "contents": [{"parts": [{"text": prompt_text}]}],
-                        "generationConfig": {"temperature": temperature}
-                    }
-                )
-                if res.status_code == 200:
-                    data = res.json()
-                    candidates = data.get("candidates", [])
-                    if candidates and "content" in candidates[0]:
-                        parts = candidates[0]["content"].get("parts", [])
-                        if parts and "text" in parts[0]:
-                            return parts[0]["text"].strip()
-            except Exception as http_err:
-                print(f"[ExamPrep HTTP Fallback] Model {model} attempt error: {http_err}")
-
-    raise RuntimeError("Failed to generate content from AI API.")
+    raise RuntimeError("Failed to generate content from Featherless AI.")
 
 
 def clean_json_response(raw_text: str) -> str:
@@ -83,8 +61,11 @@ async def generate_unit_summary(
     unit: str,
     chunks: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
-    """Generates complete chapter summary for a unit from its chunks."""
-    context = "\n\n".join([f"[{c.get('source_file')} - Page {c.get('page_number')}]:\n{c.get('content')}" for c in chunks])
+    """Generates complete chapter summary for a unit from its chunks, bounded to 32K context."""
+    sliced_chunks = chunks[:15]
+    context = "\n\n".join([f"[{c.get('source_file')} - Page {c.get('page_number')}]:\n{c.get('content')}" for c in sliced_chunks])
+    if len(context) > 25000:
+        context = context[:25000] + "\n...[Context truncated for 32K context limit]"
     sample_file = chunks[0].get("source_file", "Notes.pdf") if chunks else "Notes.pdf"
     sample_page = chunks[0].get("page_number", 1) if chunks else 1
 
@@ -144,8 +125,10 @@ async def generate_unit_questions(
     marks: int,
     count: int = 5
 ) -> List[Dict[str, Any]]:
-    """Generates 5 distinct 2-mark, 4-mark, or 10-mark questions with model answers."""
-    context = "\n\n".join([f"[{c.get('source_file')} - Page {c.get('page_number')}]:\n{c.get('content')}" for c in chunks])
+    sliced_chunks = chunks[:15]
+    context = "\n\n".join([f"[{c.get('source_file')} - Page {c.get('page_number')}]:\n{c.get('content')}" for c in sliced_chunks])
+    if len(context) > 25000:
+        context = context[:25000] + "\n...[Context truncated for 32K context limit]"
 
     if marks == 2:
         template = TWO_MARK_PROMPT_TEMPLATE

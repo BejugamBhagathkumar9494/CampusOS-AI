@@ -95,7 +95,7 @@ def get_all_roles() -> List[Dict[str, Any]]:
 
 
 async def call_gemini_for_interview(prompt_messages: List[Dict[str, str]], system_instruction: str) -> str:
-    """Invokes Featherless AI (moonshotai/Kimi-K3) for technical mock interview interactions."""
+    """Invokes Featherless AI (32K context & 4 concurrent units) for technical mock interview interactions."""
     try:
         from app.api.v1.ai import call_featherless_llm
         formatted_messages = [{"role": "system", "content": system_instruction}]

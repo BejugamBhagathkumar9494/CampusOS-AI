@@ -432,6 +432,10 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
             if base_term not in ctx_low and term not in ctx_low:
                 return NOT_FOUND_MSG
 
+    # Bounded context strictly under 32K token budget (~16K characters for retrieved chunks)
+    if len(formatted_context) > 16000:
+        formatted_context = formatted_context[:16000] + "\n...[Additional context truncated to fit 32K context budget]"
+
     system_prompt = (
         "You are CampusOS AI, the official university grounded academic assistant.\n\n"
         "Instructions:\n"
@@ -447,35 +451,43 @@ def generate_llm_answer(query: str, retrieved_chunks: List[Dict[str, Any]], user
     try:
         from app.api.v1.ai import resolve_featherless_api_key
         from app.core.config import settings
+        import time
         featherless_key = resolve_featherless_api_key()
         if featherless_key:
             import httpx
             base_url = (getattr(settings, "FEATHERLESS_BASE_URL", "https://api.featherless.ai/v1") or "https://api.featherless.ai/v1").rstrip("/")
-            model_name = getattr(settings, "FEATHERLESS_MODEL", "moonshotai/Kimi-K3") or "moonshotai/Kimi-K3"
-            res = httpx.post(
-                f"{base_url}/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {featherless_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": model_name,
-                    "messages": [
-                        {"role": "user", "content": system_prompt}
-                    ],
-                    "temperature": 0.2,
-                    "max_tokens": 1024,
-                },
-                timeout=25.0
-            )
-            if res.status_code == 200:
-                data = res.json()
-                choice_msg = data.get("choices", [{}])[0].get("message", {})
-                answer = (choice_msg.get("content") or choice_msg.get("reasoning") or "").strip()
-                if answer:
-                    if "not available in the university knowledge base" in answer.lower():
-                        return NOT_FOUND_MSG
-                    return answer
+            model_name = getattr(settings, "FEATHERLESS_MODEL", "Qwen/Qwen2.5-7B-Instruct") or "Qwen/Qwen2.5-7B-Instruct"
+            
+            for attempt in range(2):
+                res = httpx.post(
+                    f"{base_url}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {featherless_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": model_name,
+                        "messages": [
+                            {"role": "user", "content": system_prompt}
+                        ],
+                        "temperature": 0.2,
+                        "max_tokens": 1024,
+                    },
+                    timeout=30.0
+                )
+                if res.status_code == 200:
+                    data = res.json()
+                    choice_msg = data.get("choices", [{}])[0].get("message", {})
+                    answer = (choice_msg.get("content") or choice_msg.get("reasoning") or "").strip()
+                    if answer:
+                        if "not available in the university knowledge base" in answer.lower():
+                            return NOT_FOUND_MSG
+                        return answer
+                elif res.status_code == 429:
+                    time.sleep(1.0)
+                    continue
+                else:
+                    break
     except Exception as e:
         print(f"[RAG Service] Featherless synthesis call error: {e}")
 

@@ -692,7 +692,7 @@ export default function MockInterviewPage() {
                 AI Voice Mock Interview Studio
               </h1>
               <p className="mt-1 text-sm text-[#5E6763]">
-                Real-time voice dialogue, adaptive follow-ups, and post-session 7-Day Action Plan powered by Kimi-K3 (Featherless AI).
+                Real-time voice dialogue, adaptive follow-ups, and post-session 7-Day Action Plan powered by Featherless AI.
               </p>
             </div>
 
@@ -1176,7 +1176,7 @@ export default function MockInterviewPage() {
               <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#5E6763] flex items-center gap-3">
                 <Sparkles className="h-4 w-4 text-[#C85A32] flex-shrink-0" />
                 <span>
-                  Speak or type your technical response below. The Kimi-K3 AI evaluator verifies technical accuracy, architectural soundness, and edge case depth immediately upon submission.
+                  Speak or type your technical response below. The Featherless AI evaluator verifies technical accuracy, architectural soundness, and edge case depth immediately upon submission.
                 </span>
               </div>
             )}
