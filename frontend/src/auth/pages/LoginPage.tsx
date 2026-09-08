@@ -7,7 +7,7 @@ import { getFriendlyErrorMessage } from '../utils/errorHelper';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, isAuthenticated, role, loading, loginAsDemoStudent } = useAuth();
+  const { signIn, isAuthenticated, role, loading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,20 +15,6 @@ export const LoginPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg] = useState((location.state as any)?.infoMessage || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleDemoLogin = async () => {
-    setIsSubmitting(true);
-    setErrorMsg('');
-    try {
-      await loginAsDemoStudent();
-      navigate('/student/dashboard', { replace: true });
-    } catch (err: any) {
-      console.error('Demo student login error:', err);
-      navigate('/student/dashboard', { replace: true });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   useEffect(() => {
     if (isAuthenticated && role) {
@@ -215,22 +201,6 @@ export const LoginPage: React.FC = () => {
             >
               <span>{isSubmitting ? 'Authenticating...' : 'Sign In'}</span>
               {!isSubmitting && <ArrowRight className="w-4 h-4" />}
-            </button>
-
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-slate-800"></div>
-              <span className="flex-shrink mx-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Or Demo</span>
-              <div className="flex-grow border-t border-slate-800"></div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={isSubmitting || loading}
-              className="w-full flex items-center justify-center gap-2 bg-indigo-950/40 hover:bg-indigo-900/50 text-indigo-300 hover:text-white font-medium py-3 rounded-full border border-indigo-500/30 hover:border-indigo-400/60 transition-all text-xs sm:text-sm active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
-            >
-              <Sparkles className="w-4 h-4 text-indigo-400" />
-              <span>Explore as Demo Student (No Credentials Required)</span>
             </button>
           </form>
 

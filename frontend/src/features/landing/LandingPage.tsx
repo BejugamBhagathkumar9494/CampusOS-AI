@@ -21,23 +21,8 @@ const institutionsList = [
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const { isAuthenticated, role, loginAsDemoStudent } = useAuth()
+  const { isAuthenticated, role } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isDemoLoading, setIsDemoLoading] = useState(false)
-
-  const handleDemoClick = async (e?: React.MouseEvent) => {
-    if (e) e.preventDefault()
-    try {
-      setIsDemoLoading(true)
-      await loginAsDemoStudent()
-      navigate('/student/dashboard')
-    } catch (err) {
-      console.error('Demo student login error:', err)
-      navigate('/student/dashboard')
-    } finally {
-      setIsDemoLoading(false)
-    }
-  }
 
   const getDashboardLink = () => {
     if (!isAuthenticated || !role) return '/login';
