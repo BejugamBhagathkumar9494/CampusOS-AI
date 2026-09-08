@@ -1,5 +1,5 @@
 import { supabase } from '../../services/supabaseClient';
-import { getApiBaseUrl } from '../../services/api';
+import { getApiBaseUrl, fetchWithAuth } from '../../services/api';
 import { UserProfile, UserRole, UserStatus, AuditLog } from '../../types';
 
 export const broadcastAuthEvent = (data: any) => {
@@ -396,7 +396,6 @@ export const authService = {
 
   async updateUserStatus(userId: string, newStatus: UserStatus, rejectionReason: string | null = null): Promise<any> {
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       await fetchWithAuth(`/admin-management/users/${userId}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status: newStatus, rejection_reason: rejectionReason })
@@ -421,7 +420,6 @@ export const authService = {
 
   async deleteUser(userId: string): Promise<boolean> {
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       await fetchWithAuth(`/admin-management/users/${userId}`, {
         method: 'DELETE'
       });
@@ -439,14 +437,14 @@ export const authService = {
     }
 
     try {
-      const localUsers = JSON.parse(localStorage.getItem('campusos_local_users') || '{}');
+      const localUsers = JSON.parse(localStorage.getItem('campusos_local_users') || '[]');
       let updated = false;
-      Object.keys(localUsers).forEach(email => {
-        if (localUsers[email]?.profile?.id === userId || localUsers[email]?.profile?.email === userId) {
-          delete localUsers[email];
+      for (const key of Object.keys(localUsers)) {
+        if (localUsers[key]?.id === userId) {
+          delete localUsers[key];
           updated = true;
         }
-      });
+      }
       if (updated) {
         localStorage.setItem('campusos_local_users', JSON.stringify(localUsers));
       }
@@ -458,7 +456,6 @@ export const authService = {
 
   async fetchAuditLogs(): Promise<AuditLog[]> {
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       const backendLogs = await fetchWithAuth('/admin-management/audit-logs');
       if (Array.isArray(backendLogs) && backendLogs.length > 0) {
         return backendLogs.map((l: any) => ({
@@ -487,7 +484,6 @@ export const authService = {
 
   async fetchUsers(): Promise<UserProfile[]> {
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       const backendUsers = await fetchWithAuth('/admin-management/users');
       if (Array.isArray(backendUsers) && backendUsers.length > 0) {
         return backendUsers.map((u: any) => ({

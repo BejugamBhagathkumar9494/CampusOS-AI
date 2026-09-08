@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
+import { fetchWithAuth } from './api';
 
 export const assignmentService = {
   async getAssignments() {
@@ -27,103 +28,94 @@ export const assignmentService = {
       .select('*, courses(code, title)')
       .maybeSingle();
 
-
     if (error) {
-      console.error('Assignment creation error:', error);
-      throw new Error(error.message || 'Failed to post assignment in database');
-    }
-
-    if (data?.id && total_points) {
+      console.warn('Supabase createAssignment error, falling back to local storage:', error);
+      const newAssignment = {
+        id: `local_assign_${Date.now()}`,
+        course_id: finalCourseId,
+        title,
+        description,
+        due_date,
+        total_points,
+        created_at: new Date().toISOString()
+      };
+      
       try {
-        await supabase
-          .from('assignments')
-          .update({ total_points: Number(total_points) })
-          .eq('id', data.id);
-      } catch (optErr) {
-        // Silently skip if total_points column does not exist
-      }
-    }
+        const existing = JSON.parse(localStorage.getItem('campusos_local_assignments') || '[]');
+        existing.push(newAssignment);
+        localStorage.setItem('campusos_local_assignments', JSON.stringify(existing));
+      } catch (e) {}
 
-    try {
-      const courseLabel = data?.courses?.code ? ` [${data.courses.code}]` : '';
-      await notificationService.notifyAllStudents(
-        'New Assignment Posted',
-        `New assignment "${title}"${courseLabel} has been published. Due: ${new Date(due_date).toLocaleDateString()}.`,
-        'warning'
-      );
-    } catch (nErr) {
-      console.warn('Assignment notification error:', nErr);
+      return newAssignment;
     }
-
     return data;
   },
 
-  async submitAssignment(assignment_id: string | number, studentProfileId: string, file_url?: string) {
-    const { data: student } = await supabase
-      .from('students')
-      .select('id')
-      .eq('profile_id', studentProfileId)
-      .maybeSingle();
+  async getAssignmentsForFaculty(facultyProfileId: string) {
+    try {
+      const { data: faculty } = await supabase
+        .from('faculty')
+        .select('id')
+        .eq('profile_id', facultyProfileId)
+        .maybeSingle();
 
-    const studentId = student?.id || studentProfileId;
+      const facultyId = faculty?.id;
+
+      let { data, error } = await supabase
+        .from('assignments')
+        .select('*, courses!inner(id, code, title, faculty_id)')
+        .eq('courses.faculty_id', facultyId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) return data;
+    } catch (e) {
+      console.warn('Error fetching faculty assignments via relational join:', e);
+    }
+
+    try {
+      const { data } = await supabase
+        .from('assignments')
+        .select('*, courses(id, code, title)')
+        .order('created_at', { ascending: false });
+
+      const localList = JSON.parse(localStorage.getItem('campusos_local_assignments') || '[]');
+      const combined = [...(data || []), ...localList];
+      return combined;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async submitAssignment(assignment_id: string | number, student_id: string | number, file_url?: string) {
     const payload = {
       assignment_id,
-      student_id: studentId,
-      file_url: file_url || 'https://university.edu/submissions/file.pdf',
-      status: 'submitted',
-      submitted_at: new Date().toISOString()
+      student_id,
+      file_url: file_url || 'https://campusos.edu/submissions/demo-doc.pdf',
+      submitted_at: new Date().toISOString(),
+      status: 'submitted'
     };
 
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from('assignment_submissions')
-      .upsert(payload)
+      .insert([payload])
       .select()
       .maybeSingle();
 
-    if (error && (error.code === 'PGRST204' || error.message?.includes('table') || error.message?.includes('schema cache'))) {
-      const retry = await supabase
-        .from('submissions')
-        .upsert(payload)
-        .select()
-        .maybeSingle();
-
-      data = retry.data;
-      error = retry.error;
-    }
-
-    if (error) {
-      console.warn('Database table missing for submissions, saving to local state fallback:', error);
-      const key = `local_sub_${assignment_id}_${studentId}`;
-      localStorage.setItem(key, JSON.stringify(payload));
-      return payload;
-    }
-
-    return data || payload;
+    if (error) throw error;
+    return data;
   },
 
-  async getSubmissions(assignment_id?: string | number) {
-    try {
-      let query = supabase
-        .from('assignment_submissions')
-        .select('*, assignments(title, course_id), students(roll_number, profile_id, profiles(full_name, email))')
-        .order('submitted_at', { ascending: false });
+  async getSubmissionsForAssignment(assignment_id: string | number) {
+    const { data, error } = await supabase
+      .from('assignment_submissions')
+      .select('*, students(id, roll_number, profiles(full_name, email))')
+      .eq('assignment_id', assignment_id);
 
-      if (assignment_id) {
-        query = query.eq('assignment_id', assignment_id);
-      }
-
-      const { data, error } = await query;
-      if (!error && data) return data;
-
-      const { data: subData } = await supabase.from('submissions').select('*');
-      if (subData) return subData;
-    } catch (e) {
-      console.warn('Get submissions fallback warning:', e);
-    }
-    return [];
+    if (error) throw error;
+    return data || [];
   },
 
-  async getUserSubmissions(studentProfileId: string) {
+  async getMySubmissions(studentProfileId: string) {
     try {
       const { data: student } = await supabase
         .from('students')
@@ -135,14 +127,13 @@ export const assignmentService = {
 
       const { data } = await supabase
         .from('assignment_submissions')
-        .select('*, assignments(title, total_points)')
+        .select('*, assignments(title, due_date, courses(code, title))')
         .eq('student_id', studentId);
 
       if (data && data.length > 0) return data;
     } catch (e) {}
 
     try {
-      const { fetchWithAuth } = await import('./api');
       const apiSubs = await fetchWithAuth('/academic-ext/assignments/my-submissions');
       if (apiSubs) return apiSubs;
     } catch (e) {}
@@ -152,7 +143,6 @@ export const assignmentService = {
 
   async gradeSubmission(submission_id: string | number, marks: number, feedback: string, studentProfileId: string | null = null, assignmentTitle: string = 'Assignment') {
     try {
-      const { fetchWithAuth } = await import('./api');
       await fetchWithAuth(`/academic-ext/assignments/submissions/${submission_id}/grade`, {
         method: 'POST',
         body: JSON.stringify({ marks_obtained: Number(marks), feedback })

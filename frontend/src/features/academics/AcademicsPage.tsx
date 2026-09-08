@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { courseService } from '../../services/courseService';
+import { fetchWithAuth } from '../../services/api';
 import { BookOpen, Cpu, CheckCircle, Download, X, Users, Megaphone, Sliders } from 'lucide-react';
 
 export default function AcademicsPage() {
@@ -56,7 +57,6 @@ export default function AcademicsPage() {
     setSelectedCourseRoster(course);
     setLoadingRoster(true);
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       const res = await fetchWithAuth(`/academic-ext/courses/${course.id || 1}/roster`);
       setRosterData(res || []);
     } catch (err) {
@@ -72,7 +72,6 @@ export default function AcademicsPage() {
 
     setPostingAnn(true);
     try {
-      const { fetchWithAuth } = await import('../../services/api');
       await fetchWithAuth('/academic-ext/announcements', {
         method: 'POST',
         body: JSON.stringify({

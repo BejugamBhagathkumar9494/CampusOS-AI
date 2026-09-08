@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
+import { fetchWithAuth } from './api';
 
 export const libraryService = {
   async getBooks(searchQuery?: string) {
@@ -15,7 +16,6 @@ export const libraryService = {
 
   async addBookDirectly(payload: any) {
     try {
-      const { fetchWithAuth } = await import('./api');
       await fetchWithAuth('/library/books', {
         method: 'POST',
         body: JSON.stringify({
@@ -221,7 +221,6 @@ export const libraryService = {
     } catch (e) {}
 
     try {
-      const { fetchWithAuth } = await import('./api');
       await fetchWithAuth('/library/request', {
         method: 'POST',
         body: JSON.stringify({

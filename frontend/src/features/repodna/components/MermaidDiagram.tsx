@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
 import { Code, Eye, ZoomIn, ZoomOut, RotateCcw, Copy, Check, AlertCircle } from 'lucide-react';
 
 interface MermaidDiagramProps {
@@ -43,6 +42,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
       setIsRendering(true);
       setError(null);
       try {
+        const mermaid = (await import('mermaid')).default;
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',

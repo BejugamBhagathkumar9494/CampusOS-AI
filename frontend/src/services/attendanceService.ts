@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
+import { fetchWithAuth } from './api';
 
 export const attendanceService = {
   async getStudentAttendance(studentProfileId: string) {
@@ -306,7 +307,6 @@ export const attendanceService = {
     }
 
     try {
-      const { fetchWithAuth } = await import('./api');
       const backendPayload = {
         records: records.map(r => ({
           student_id: Number(r.student_id) || 1,
