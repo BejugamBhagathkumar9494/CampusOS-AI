@@ -6,7 +6,7 @@ from app.api.deps import get_current_active_user, get_db
 from app.models.database_models import User, Notification
 from app.schemas.schemas import NotificationResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 @router.get("", response_model=List[NotificationResponse])

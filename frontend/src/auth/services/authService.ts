@@ -14,9 +14,24 @@ export const broadcastAuthEvent = (data: any) => {
   } catch (e) {}
 };
 
+const isUuid = (str?: string | null): boolean => {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+};
+
 export const authService = {
   async getProfile(userId: string): Promise<UserProfile | null> {
-    if (userId && userId !== 'me' && userId !== 'current_token_user') {
+    const mockUserJson = localStorage.getItem('campusos_mock_user');
+    if (mockUserJson) {
+      try {
+        const mockProfile = JSON.parse(mockUserJson) as UserProfile;
+        if (!userId || userId === mockProfile.id || userId === 'me' || userId === 'current_token_user') {
+          return mockProfile;
+        }
+      } catch (err) {}
+    }
+
+    if (userId && isUuid(userId) && userId !== 'me' && userId !== 'current_token_user') {
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -24,13 +39,10 @@ export const authService = {
           .eq('id', userId)
           .maybeSingle();
 
-
         if (!error && data) {
           return data as UserProfile;
         }
-      } catch (e) {
-        console.warn('Supabase profile fetch error:', e);
-      }
+      } catch (e) {}
 
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -54,13 +66,6 @@ export const authService = {
           return fallbackProfile;
         }
       } catch (e) {}
-    }
-
-    const mockUserJson = localStorage.getItem('campusos_mock_user');
-    if (mockUserJson) {
-      try {
-        return JSON.parse(mockUserJson) as UserProfile;
-      } catch (err) {}
     }
 
     try {

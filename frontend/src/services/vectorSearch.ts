@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from './api';
+
 export interface VectorSearchParams {
   query: string;
   role?: string;
@@ -7,8 +9,8 @@ export interface VectorSearchParams {
 
 export async function searchVectorDatabase(params: VectorSearchParams): Promise<any[]> {
   try {
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${API_BASE}/api/v1/ai/knowledge/search`, {
+    const API_BASE = getApiBaseUrl();
+    const response = await fetch(`${API_BASE}/ai/knowledge/search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

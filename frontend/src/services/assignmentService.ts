@@ -2,15 +2,28 @@ import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
 import { fetchWithAuth } from './api';
 
+const isUuid = (str?: string | null): boolean => {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+};
+
 export const assignmentService = {
   async getAssignments() {
-    const { data, error } = await supabase
-      .from('assignments')
-      .select('*, courses(code, title)')
-      .order('due_date', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('assignments')
+        .select('*, courses(code, title)')
+        .order('due_date', { ascending: true });
 
-    if (error) throw error;
-    return data || [];
+      if (!error && data && data.length > 0) return data;
+    } catch (e) {}
+
+    try {
+      const apiAssignments = await fetchWithAuth('/academic-ext/assignments');
+      if (Array.isArray(apiAssignments) && apiAssignments.length > 0) return apiAssignments;
+    } catch (e) {}
+
+    return [];
   },
 
   async createAssignment(course_id: string | number, title: string, description: string, due_date: string, total_points: number = 100) {
@@ -52,24 +65,24 @@ export const assignmentService = {
   },
 
   async getAssignmentsForFaculty(facultyProfileId: string) {
-    try {
-      const { data: faculty } = await supabase
-        .from('faculty')
-        .select('id')
-        .eq('profile_id', facultyProfileId)
-        .maybeSingle();
+    if (facultyProfileId && isUuid(facultyProfileId)) {
+      try {
+        const { data: faculty } = await supabase
+          .from('faculty')
+          .select('id')
+          .eq('profile_id', facultyProfileId)
+          .maybeSingle();
 
-      const facultyId = faculty?.id;
+        const facultyId = faculty?.id;
 
-      let { data, error } = await supabase
-        .from('assignments')
-        .select('*, courses!inner(id, code, title, faculty_id)')
-        .eq('courses.faculty_id', facultyId)
-        .order('created_at', { ascending: false });
+        let { data, error } = await supabase
+          .from('assignments')
+          .select('*, courses!inner(id, code, title, faculty_id)')
+          .eq('courses.faculty_id', facultyId)
+          .order('created_at', { ascending: false });
 
-      if (!error && data && data.length > 0) return data;
-    } catch (e) {
-      console.warn('Error fetching faculty assignments via relational join:', e);
+        if (!error && data && data.length > 0) return data;
+      } catch (e) {}
     }
 
     try {
@@ -116,29 +129,35 @@ export const assignmentService = {
   },
 
   async getMySubmissions(studentProfileId: string) {
-    try {
-      const { data: student } = await supabase
-        .from('students')
-        .select('id')
-        .eq('profile_id', studentProfileId)
-        .maybeSingle();
+    if (studentProfileId && isUuid(studentProfileId)) {
+      try {
+        const { data: student } = await supabase
+          .from('students')
+          .select('id')
+          .eq('profile_id', studentProfileId)
+          .maybeSingle();
 
-      const studentId = student?.id || studentProfileId;
+        const studentId = student?.id || studentProfileId;
 
-      const { data } = await supabase
-        .from('assignment_submissions')
-        .select('*, assignments(title, due_date, courses(code, title))')
-        .eq('student_id', studentId);
+        const { data } = await supabase
+          .from('assignment_submissions')
+          .select('*, assignments(title, due_date, courses(code, title))')
+          .eq('student_id', studentId);
 
-      if (data && data.length > 0) return data;
-    } catch (e) {}
+        if (data && data.length > 0) return data;
+      } catch (e) {}
+    }
 
     try {
       const apiSubs = await fetchWithAuth('/academic-ext/assignments/my-submissions');
-      if (apiSubs) return apiSubs;
+      if (apiSubs && Array.isArray(apiSubs)) return apiSubs;
     } catch (e) {}
 
     return [];
+  },
+
+  async getUserSubmissions(studentProfileId: string) {
+    return this.getMySubmissions(studentProfileId);
   },
 
   async gradeSubmission(submission_id: string | number, marks: number, feedback: string, studentProfileId: string | null = null, assignmentTitle: string = 'Assignment') {

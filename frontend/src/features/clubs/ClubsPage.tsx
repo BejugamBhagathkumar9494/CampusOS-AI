@@ -30,19 +30,22 @@ export default function ClubsPage() {
       const res = await eventService.getClubs();
       setClubs(res || []);
 
-      if (profile?.id) {
+      const joinedFromBackend = (res || []).filter((c: any) => c.is_member).map((c: any) => c.id);
+      if (joinedFromBackend.length > 0) {
+        setJoinedClubIds(joinedFromBackend);
+      }
+
+      if (profile?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(profile.id)) {
         try {
           const { data: myMemberships } = await supabase
             .from('club_memberships')
             .select('club_id')
             .eq('student_id', profile.id);
 
-          if (myMemberships) {
-            setJoinedClubIds(myMemberships.map(m => m.club_id));
+          if (myMemberships && myMemberships.length > 0) {
+            setJoinedClubIds(prev => Array.from(new Set([...prev, ...myMemberships.map(m => m.club_id)])));
           }
-        } catch (mErr) {
-          console.warn('Membership query warning:', mErr);
-        }
+        } catch (mErr) {}
       }
     } catch (err) {
       console.error('Error fetching clubs:', err);

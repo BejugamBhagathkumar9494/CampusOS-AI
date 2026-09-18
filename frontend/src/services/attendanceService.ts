@@ -2,31 +2,36 @@ import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
 import { fetchWithAuth } from './api';
 
+const isUuid = (str?: string | null): boolean => {
+  if (!str) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+};
+
 export const attendanceService = {
   async getStudentAttendance(studentProfileId: string) {
     let studentId = studentProfileId;
 
-    try {
-      const { data: student } = await supabase
-        .from('students')
-        .select('id, current_semester')
-        .eq('profile_id', studentProfileId)
-        .maybeSingle();
+    if (studentProfileId && isUuid(studentProfileId)) {
+      try {
+        const { data: student } = await supabase
+          .from('students')
+          .select('id, current_semester')
+          .eq('profile_id', studentProfileId)
+          .maybeSingle();
 
-      if (student?.id) studentId = student.id;
-    } catch (e) {
-      console.warn('Error fetching student profile for attendance:', e);
+        if (student?.id) studentId = student.id;
+      } catch (e) {}
     }
 
     let records: any[] = [];
-    try {
-      const { data } = await supabase
-        .from('attendance')
-        .select('*, courses(id, code, title, semester)')
-        .eq('student_id', studentId);
-      if (data) records = data;
-    } catch (e) {
-      console.warn('Error fetching attendance table from Supabase:', e);
+    if (studentId && isUuid(studentId)) {
+      try {
+        const { data } = await supabase
+          .from('attendance')
+          .select('*, courses(id, code, title, semester)')
+          .eq('student_id', studentId);
+        if (data) records = data;
+      } catch (e) {}
     }
 
     try {
@@ -36,9 +41,7 @@ export const attendanceService = {
         const filteredLocal = localLogs.filter((l: any) => l.student_id === studentId || l.student_id === studentProfileId);
         records = [...records, ...filteredLocal];
       }
-    } catch (e) {
-      console.warn('Error reading local attendance logs:', e);
-    }
+    } catch (e) {}
 
     const defaultSubjects = [
       { id: 'c-101', code: 'CS101', title: 'Data Structures & Algorithms', semester: 5 },
@@ -141,16 +144,16 @@ export const attendanceService = {
   },
 
   async getFacultyCoursesWithStudents(facultyProfileId: string) {
-    try {
-      const { data: faculty } = await supabase
-        .from('faculty')
-        .select('id')
-        .eq('profile_id', facultyProfileId)
-        .maybeSingle();
+    if (facultyProfileId && isUuid(facultyProfileId)) {
+      try {
+        const { data: faculty } = await supabase
+          .from('faculty')
+          .select('id')
+          .eq('profile_id', facultyProfileId)
+          .maybeSingle();
 
-      if (faculty?.id) console.log('Faculty ID found:', faculty.id);
-    } catch (e) {
-      console.warn('Faculty id lookup warning:', e);
+        if (faculty?.id) console.log('Faculty ID found:', faculty.id);
+      } catch (e) {}
     }
 
     let activeCourses: any[] = [];

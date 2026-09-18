@@ -1,7 +1,9 @@
+import { getApiBaseUrl } from './api';
+
 export async function fetchDocumentsByRole(role: string): Promise<any[]> {
   try {
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${API_BASE}/api/v1/ai/knowledge/list?role=${role}`);
+    const API_BASE = getApiBaseUrl();
+    const response = await fetch(`${API_BASE}/ai/knowledge/list?role=${role}`);
     
     if (!response.ok) {
       return [];
@@ -21,8 +23,8 @@ export async function uploadDocument(file: File, role: string) {
     formData.append('file', file);
     formData.append('category', role);
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${API_BASE}/api/v1/ai/knowledge/upload`, {
+    const API_BASE = getApiBaseUrl();
+    const response = await fetch(`${API_BASE}/ai/knowledge/upload`, {
       method: 'POST',
       body: formData
     });

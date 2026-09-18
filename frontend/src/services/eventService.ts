@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { notificationService } from './notificationService';
+import { fetchWithAuth } from './api';
 
 export const eventService = {
   async getEvents() {
@@ -53,16 +54,21 @@ export const eventService = {
       if (!error && data && data.length > 0) {
         return data;
       }
-    } catch (err) {
-      console.warn('Error querying clubs table from Supabase:', err);
-    }
+    } catch (err) {}
+
+    try {
+      const backendClubs = await fetchWithAuth('/academic-ext/clubs');
+      if (Array.isArray(backendClubs) && backendClubs.length > 0) {
+        return backendClubs;
+      }
+    } catch (apiErr) {}
 
     return [
-      { id: 'club-1', name: 'AI & Data Science Club', category: 'Technical', description: 'Exploring machine learning models, neural networks, and computer vision competitions.' },
-      { id: 'club-2', name: 'CyberSecurity Guild', category: 'Technical', description: 'CTF challenges, ethical hacking workshops, and network defense bootcamps.' },
-      { id: 'club-3', name: 'Robotics & Automation Society', category: 'Technical', description: 'Building autonomous rovers, IoT sensors, and microcontroller hardware projects.' },
-      { id: 'club-4', name: 'Campus Cultural Club', category: 'Cultural', description: 'Organizing annual university cultural fests, music performances, and drama events.' },
-      { id: 'club-5', name: 'Sports & Athletics League', category: 'Sports', description: 'Inter-college cricket, football, basketball tournaments, and fitness training.' }
+      { id: 1, name: 'AI & Data Science Club', category: 'Technical', description: 'Exploring machine learning models, neural networks, and computer vision competitions.' },
+      { id: 2, name: 'CyberSecurity Guild', category: 'Technical', description: 'CTF challenges, ethical hacking workshops, and network defense bootcamps.' },
+      { id: 3, name: 'Robotics & Automation Society', category: 'Technical', description: 'Building autonomous rovers, IoT sensors, and microcontroller hardware projects.' },
+      { id: 4, name: 'Campus Cultural Club', category: 'Cultural', description: 'Organizing annual university cultural fests, music performances, and drama events.' },
+      { id: 5, name: 'Sports & Athletics League', category: 'Sports', description: 'Inter-college cricket, football, basketball tournaments, and fitness training.' }
     ];
   },
 
