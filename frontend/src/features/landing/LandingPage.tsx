@@ -104,11 +104,11 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FFFCF7] text-[#142B43] font-sans antialiased selection:bg-[#E85D24] selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen lg:h-screen bg-[#FFFCF7] text-[#142B43] font-sans antialiased selection:bg-[#E85D24] selection:text-white flex flex-col justify-between overflow-x-hidden">
       
       {/* ─── SLIM HORIZONTAL HEADER ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#FFFCF7]/95 backdrop-blur-md border-b border-[#EAE5DE] transition-all duration-200">
-        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#FFFCF7]/95 backdrop-blur-md border-b border-[#EAE5DE] transition-all duration-200 shrink-0">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 h-16 flex items-center justify-between gap-4">
           
           {/* Logo on Left */}
           <div className="shrink-0 flex items-center">
@@ -347,11 +347,11 @@ export default function LandingPage() {
       </header>
 
       {/* ─── HERO SECTION: TWO-COLUMN LAYOUT ───────────────────────────────── */}
-      <main className="flex-1 flex flex-col justify-center max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-center">
+      <main className="flex-1 flex flex-col justify-center w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-6 lg:py-8 xl:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
           
           {/* Left Column: Heading, Paragraph, Highlights, CTAs */}
-          <div className="lg:col-span-6 space-y-6 lg:pr-2">
+          <div className="lg:col-span-6 space-y-5 xl:space-y-6 lg:pr-4 xl:pr-8">
             
             {/* Small Eyebrow Label */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF4EF] border border-[#FAD8C7] text-[#E85D24] text-xs font-semibold tracking-wide shadow-sm">
@@ -363,13 +363,13 @@ export default function LandingPage() {
             </div>
 
             {/* Main Heading (exact wording required) */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-extrabold tracking-tight leading-[1.12]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] xl:text-[54px] font-extrabold tracking-tight leading-[1.12]">
               <span className="text-[#142B43] block">Your University Life,</span>
               <span className="text-[#E85D24] block mt-1">Simplified with AI</span>
             </h1>
 
             {/* Supporting Paragraph (exact wording required) */}
-            <p className="text-[#63768A] text-base sm:text-lg leading-relaxed max-w-xl">
+            <p className="text-[#63768A] text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl">
               CampusOS AI is an all-in-one platform that connects students, faculty, and administrators with AI-powered tools, real-time insights, and everything you need for a seamless university experience.
             </p>
 
@@ -430,10 +430,10 @@ export default function LandingPage() {
           </div>
 
           {/* Right Column: Hero Visual Composition and Floating Cards */}
-          <div className="lg:col-span-6 flex items-center justify-center">
+          <div className="lg:col-span-6 flex items-center justify-center lg:justify-end">
             
             {/* Composition Container (proportional, contained inside hero layout boundaries) */}
-            <div className="relative w-full max-w-[520px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EAE5DE] shadow-xl shadow-[#142B43]/8 bg-[#FAF5EE]">
+            <div className="relative w-full max-w-[560px] lg:max-w-[620px] xl:max-w-[700px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EAE5DE] shadow-xl shadow-[#142B43]/8 bg-[#FAF5EE]">
               
               {/* Proportional Campus Illustration */}
               <img
@@ -557,16 +557,16 @@ export default function LandingPage() {
       </main>
 
       {/* ─── TRUST STRIP (COMPACT DIRECTLY BELOW HERO) ───────────────────────── */}
-      <section className="border-t border-[#EAE5DE] bg-white py-5 sm:py-6">
-        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-[#63768A] mb-3.5">
+      <section className="border-t border-[#EAE5DE] bg-white py-3.5 sm:py-4 shrink-0">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <p className="text-center text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-[#63768A] mb-3">
             Trusted by Modern Higher Education Campuses & Accredited Institutions
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 lg:gap-8">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 lg:gap-8 xl:gap-10">
             {institutionsList.map((inst, idx) => (
               <div 
                 key={idx}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF5EE] border border-[#EAE5DE] hover:border-[#E85D24]/30 hover:bg-[#FFF4EF] transition-colors"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF5EE] border border-[#EAE5DE] hover:border-[#E85D24]/30 hover:bg-[#FFF4EF] transition-colors"
               >
                 <span className="text-sm sm:text-base">{inst.icon}</span>
                 <span className="text-xs font-semibold text-[#142B43]">{inst.title}</span>
@@ -577,10 +577,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SLIM SUB-FOOTER (NO OVERSIZED BLOCKS) ─────────────────────────── */}
-      <footer className="border-t border-[#EAE5DE] bg-[#FAF5EE] py-3.5 sm:py-4 text-xs text-[#63768A]">
-        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-[#EAE5DE] bg-[#FAF5EE] py-3 sm:py-3.5 text-xs text-[#63768A] shrink-0">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>© 2026 CampusOS AI. All rights reserved.</p>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 font-medium">
             <button onClick={() => setActiveRoleModal('about')} className="hover:text-[#E85D24]">About Platform</button>
             <button onClick={() => setActiveRoleModal('features')} className="hover:text-[#E85D24]">AI Modules</button>
             <Link to="/login" className="hover:text-[#E85D24]">Faculty Portal</Link>
