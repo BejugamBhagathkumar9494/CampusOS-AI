@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Eye, EyeOff, User, Mail, Lock, ShieldCheck, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import {
+  Sparkles,
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  ShieldCheck,
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  GraduationCap,
+  Calendar,
+  BookOpen
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { getFriendlyErrorMessage } from '../utils/errorHelper';
 import { UserRole } from '../../types';
+import CampusOSLogo from '../../components/common/CampusOSLogo';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,6 +46,7 @@ export const RegisterPage: React.FC = () => {
         hostel_warden: '/hostel/dashboard',
         placement_officer: '/placement/dashboard',
         super_admin: '/super-admin/dashboard',
+        librarian: '/library/dashboard',
       };
       navigate(dashboardRoutes[role] || '/', { replace: true });
     }
@@ -104,13 +120,13 @@ export const RegisterPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(email, password, fullName, selectedRole as UserRole, institutionId);
-      const pendingMsg = 'Request has been successfully sent. Your account registration is pending Superadmin approval. Once approved by Superadmin, you will be able to access CampusOS.';
+      await signUp(cleanEmail, password, fullName.trim(), selectedRole as UserRole, institutionId.trim().toUpperCase());
+      const pendingMsg = 'Registration submitted successfully! Your account registration is pending Superadmin approval. Once approved, you will be able to access CampusOS.';
       setSuccessMsg(pendingMsg);
       
       setTimeout(() => {
         navigate('/login', { state: { infoMessage: pendingMsg } });
-      }, 3000);
+      }, 2500);
     } catch (err: any) {
       console.error('Registration error:', err);
       setErrorMsg(getFriendlyErrorMessage(err, 'An error occurred during registration.'));
@@ -123,144 +139,161 @@ export const RegisterPage: React.FC = () => {
     { value: 'student', label: 'Student (.student@campus.edu)', desc: 'Access class portals, academics, & placements', sampleId: 'e.g. STU001', tag: '.student' },
     { value: 'faculty', label: 'Faculty Member (.faculty@campus.edu)', desc: 'Manage courses, grades, & schedules', sampleId: 'e.g. FAC001', tag: '.faculty' },
     { value: 'placement_officer', label: 'Placement Officer (.pofficer@campus.edu)', desc: 'Coordinate corporate recruitment drives', sampleId: 'e.g. PO001', tag: '.pofficer' },
+    { value: 'hostel_warden', label: 'Hostel Warden (.warden@campus.edu)', desc: 'Manage room allotments & student welfare', sampleId: 'e.g. WAR001', tag: '.warden' },
+    { value: 'librarian', label: 'Librarian (.librarian@campus.edu)', desc: 'Manage digital & physical library access', sampleId: 'e.g. LIB001', tag: '.librarian' },
   ];
 
   return (
-    <div className="flex min-h-screen w-screen bg-slate-950 text-slate-100 relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-pulse-slow"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-pulse-slow"></div>
+    <div className="min-h-screen w-full bg-[#FFFCF7] text-[#142B43] flex flex-col lg:flex-row font-sans selection:bg-[#E85D24] selection:text-white">
+      
+      {/* ─── LEFT PANEL: BRANDING & ROLE OVERVIEW ─────────────────────────── */}
+      <div className="w-full lg:w-2/5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-14 bg-[#FFFCF7] border-b lg:border-b-0 lg:border-r border-[#EAE5DE] relative overflow-hidden">
+        
+        {/* Top: Brand Logo */}
+        <div className="flex items-center justify-between mb-8">
+          <CampusOSLogo size="default" />
+          <Link
+            to="/"
+            className="text-xs font-semibold text-[#63768A] hover:text-[#E85D24] transition-colors"
+          >
+            ← Back to Home
+          </Link>
+        </div>
 
-      <div className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 bg-slate-900/40 border-r border-slate-900 relative z-10">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="p-1.5 rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-500/20">
-            <Sparkles className="w-5 h-5 animate-pulse" />
-          </span>
-          <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-            CampusOS <span className="text-indigo-500 font-extrabold">AI</span>
-          </span>
-        </Link>
+        {/* Content */}
+        <div className="space-y-5 max-w-md z-10 my-auto py-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF4EF] border border-[#FAD8C7] text-[#E85D24] text-xs font-semibold tracking-wide shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E85D24]"></span>
+            <span>Identity & Access Verification</span>
+          </div>
 
-        <div className="space-y-6 max-w-sm">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
-            Create Your Campus Account.
-          </h2>
-          <p className="text-slate-300 text-sm leading-relaxed">
-            Register with your institution credentials. Identity and role access are strictly authorized by CampusOS database security.
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#142B43] leading-tight">
+            Create Your Campus{' '}
+            <span className="text-[#E85D24]">Account.</span>
+          </h1>
+
+          <p className="text-[#63768A] text-sm leading-relaxed">
+            Register with your institution email. Role-based privileges are governed by CampusOS database security.
           </p>
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Verified Institution Identity</span>
+
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-2.5 text-xs font-medium text-[#142B43] bg-white p-2.5 rounded-xl border border-[#EAE5DE]">
+              <ShieldCheck className="w-4 h-4 text-[#2E9B65] shrink-0" />
+              <span>Verified Institutional Email Authentication</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
-              <ShieldCheck className="w-4 h-4 text-indigo-400" />
-              <span>Zero-Trust Database RLS Enforcement</span>
+            <div className="flex items-center gap-2.5 text-xs font-medium text-[#142B43] bg-white p-2.5 rounded-xl border border-[#EAE5DE]">
+              <GraduationCap className="w-4 h-4 text-[#E85D24] shrink-0" />
+              <span>Role-Tailored Academic & Administrative Dashboards</span>
             </div>
           </div>
         </div>
 
-        <p className="text-slate-400 text-xs font-medium">
-          © 2026 CampusOS AI. All rights reserved.
-        </p>
+        {/* Campus Graphic Preview (hidden on mobile below 640px) */}
+        <div className="relative mt-6 pt-2 pb-2 hidden sm:block">
+          <div className="relative rounded-2xl overflow-hidden border border-[#EAE5DE] shadow-sm bg-white">
+            <img
+              src="/images/campus-hero.jpg"
+              alt="Campus View"
+              className="w-full h-40 object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FFFCF7]/60 to-transparent pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Bottom Copyright */}
+        <div className="pt-4 border-t border-[#EAE5DE]/60 text-xs text-[#8898AA]">
+          <p>© 2026 CampusOS AI. All rights reserved.</p>
+        </div>
       </div>
 
-      <div className="w-full lg:w-3/5 flex items-center justify-center p-6 sm:p-12 relative z-10 overflow-y-auto custom-scrollbar">
-        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 max-w-lg w-full rounded-2xl p-8 shadow-2xl shadow-indigo-950/40 relative my-8">
+      {/* ─── RIGHT PANEL: REGISTRATION CARD ───────────────────────────────── */}
+      <div className="w-full lg:w-3/5 flex items-center justify-center p-6 sm:p-10 lg:p-12 xl:p-14 bg-[#FAF5EE]/70 overflow-y-auto">
+        <div className="bg-white border border-[#EAE5DE] max-w-xl w-full rounded-3xl p-8 sm:p-10 shadow-xl shadow-[#142B43]/5 relative my-4">
           
-          <div className="lg:hidden flex items-center justify-between mb-6">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-indigo-600 text-white">
-                <Sparkles className="w-4 h-4" />
-              </span>
-              <span className="font-bold text-lg text-white">CampusOS AI</span>
-            </Link>
-          </div>
-
           <div className="mb-6">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#142B43] tracking-tight mb-1.5">
               Create Account
-            </h1>
-            <p className="text-slate-400 text-sm font-medium">
-              Join CampusOS and set up your authenticated workspace.
+            </h2>
+            <p className="text-[#63768A] text-sm">
+              Join CampusOS and initialize your university identity.
             </p>
           </div>
 
+          {/* Feedback Alerts */}
           {errorMsg && (
-            <div className={`mb-5 flex items-start gap-2.5 p-4 rounded-xl text-sm font-medium animate-fade-in ${
-              errorMsg.toLowerCase().includes('pending superadmin approval') || errorMsg.toLowerCase().includes('successfully sent')
-                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
-                : 'bg-red-500/10 border border-red-500/20 text-red-400'
-            }`}>
-              {errorMsg.toLowerCase().includes('pending superadmin approval') || errorMsg.toLowerCase().includes('successfully sent') ? (
-                <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-400" />
-              ) : (
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-400" />
-              )}
+            <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] text-xs sm:text-sm font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#DC2626]" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="mb-5 flex items-start gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium animate-fade-in">
-              <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EAF7F0] border border-[#C6E7D6] text-[#2E9B65] text-xs sm:text-sm font-medium">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#2E9B65]" />
               <span>{successMsg}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Full Name & Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="fullName" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
+                <label htmlFor="fullName" className="block text-xs font-semibold text-[#142B43] mb-1.5">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <User className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
                   <input
                     type="text"
                     id="fullName"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Rahul Kumar"
+                    placeholder="Ananya Sharma"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    required
+                    className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm pl-10 pr-4 py-2.5 rounded-xl outline-none transition-all placeholder-[#8898AA]"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
-                  Email Address
+                <label htmlFor="email" className="block text-xs font-semibold text-[#142B43] mb-1.5">
+                  Institutional Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
                   <input
                     type="email"
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="rahul.student@campus.edu"
+                    placeholder="user.student@campus.edu"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    required
+                    className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm pl-10 pr-4 py-2.5 rounded-xl outline-none transition-all placeholder-[#8898AA]"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Role & Institution ID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="role" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
-                  Requested Role
+                <label htmlFor="role" className="block text-xs font-semibold text-[#142B43] mb-1.5">
+                  Campus Role
                 </label>
                 <select
                   id="role"
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as UserRole)}
                   disabled={isSubmitting}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm px-4 py-3 rounded-xl outline-none transition-all cursor-pointer"
+                  required
+                  className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm px-3.5 py-2.5 rounded-xl outline-none transition-all cursor-pointer"
                 >
                   <option value="" disabled>-- Select campus role --</option>
                   {roleOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value} className="bg-slate-950 text-slate-200">
+                    <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
@@ -268,11 +301,11 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="institutionId" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
-                  Institution / Role ID
+                <label htmlFor="institutionId" className="block text-xs font-semibold text-[#142B43] mb-1.5">
+                  Institution ID / Hall Ticket
                 </label>
                 <div className="relative">
-                  <ShieldCheck className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <ShieldCheck className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
                   <input
                     type="text"
                     id="institutionId"
@@ -282,22 +315,24 @@ export const RegisterPage: React.FC = () => {
                       selectedRole === 'student' ? 'STU001' :
                       selectedRole === 'faculty' ? 'FAC001' :
                       selectedRole === 'hostel_warden' ? 'WAR001' :
-                      selectedRole === 'placement_officer' ? 'PO001' : 'STU001 / FAC001'
+                      selectedRole === 'placement_officer' ? 'PO001' : 'e.g. STU001'
                     }
                     disabled={isSubmitting}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-4 py-3 rounded-xl outline-none transition-all placeholder-slate-500 uppercase tracking-wide font-mono"
+                    required
+                    className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm pl-10 pr-4 py-2.5 rounded-xl outline-none transition-all placeholder-[#8898AA] uppercase font-mono tracking-wider"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Password & Confirm Password */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
+                <label htmlFor="password" className="block text-xs font-semibold text-[#142B43] mb-1.5">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
@@ -305,12 +340,13 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    required
+                    className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm pl-10 pr-10 py-2.5 rounded-xl outline-none transition-all placeholder-[#8898AA]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3.5 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-3 text-[#8898AA] hover:text-[#142B43]"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -318,11 +354,11 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-1.5">
+                <label htmlFor="confirmPassword" className="block text-xs font-semibold text-[#142B43] mb-1.5">
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="confirmPassword"
@@ -330,12 +366,13 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     disabled={isSubmitting}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                    required
+                    className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] text-[#142B43] text-sm pl-10 pr-10 py-2.5 rounded-xl outline-none transition-all placeholder-[#8898AA]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3.5 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-3 text-[#8898AA] hover:text-[#142B43]"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -343,24 +380,31 @@ export const RegisterPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting || loading}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+              className="w-full flex items-center justify-center gap-2 bg-[#E85D24] hover:bg-[#D44E18] text-white font-semibold py-3.5 rounded-full shadow-md shadow-[#E85D24]/20 hover:shadow-lg hover:shadow-[#E85D24]/30 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-3 cursor-pointer"
             >
-              <span>{isSubmitting ? 'Registering User...' : 'Sign Up'}</span>
+              <span>{isSubmitting ? 'Registering Account...' : 'Sign Up'}</span>
               {!isSubmitting && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs sm:text-sm font-medium text-slate-400">
+          {/* Footer Navigation */}
+          <p className="mt-6 text-center text-xs sm:text-sm font-medium text-[#63768A]">
             Already have an account?{' '}
-            <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-semibold hover:underline">
+            <Link 
+              to="/login" 
+              className="text-[#E85D24] hover:text-[#D44E18] font-semibold hover:underline"
+            >
               Sign in instead
             </Link>
           </p>
+
         </div>
       </div>
+
     </div>
   );
 };

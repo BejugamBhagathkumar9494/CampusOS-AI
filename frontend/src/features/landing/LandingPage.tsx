@@ -1,42 +1,67 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../auth/hooks/useAuth'
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/hooks/useAuth';
+import CampusOSLogo from '../../components/common/CampusOSLogo';
 import {
   Sparkles,
   ArrowRight,
   Search,
-  Check,
+  CheckCircle2,
   Menu,
   X,
-  Play
-} from 'lucide-react'
+  Play,
+  Calendar,
+  BookOpen,
+  Briefcase,
+  Bell,
+  MessageSquare,
+  Shield,
+  GraduationCap,
+  Users,
+  Compass,
+  Check,
+  ChevronRight,
+  ExternalLink,
+  Laptop
+} from 'lucide-react';
 
-const institutionsList = [
-  { icon: '🏛', title: 'Universities', tag: 'Multi-disciplinary Campuses' },
+interface InstitutionalPartner {
+  icon: string;
+  title: string;
+  tag: string;
+}
+
+const institutionsList: InstitutionalPartner[] = [
+  { icon: '🏛️', title: 'Universities', tag: 'Multi-disciplinary Campuses' },
   { icon: '🎓', title: 'Engineering Colleges', tag: 'Lab & Accreditation Tracking' },
   { icon: '🏫', title: 'Technical Institutes', tag: 'Vocational Skill Automation' },
   { icon: '🔬', title: 'Research Centers', tag: 'R&D Grants & Publication RAG' },
   { icon: '🌍', title: 'Global Campuses', tag: 'Multi-Location AI Sync' },
-]
+];
 
 export default function LandingPage() {
-  const navigate = useNavigate()
-  const { isAuthenticated, role, loginAsDemoStudent } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isDemoLoading, setIsDemoLoading] = useState(false)
+  const navigate = useNavigate();
+  const { isAuthenticated, role, loginAsDemoStudent } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [activeRoleModal, setActiveRoleModal] = useState<string | null>(null);
+  const [aiPromptAnswered, setAiPromptAnswered] = useState(false);
 
-  const handleDemoClick = async () => {
-    setIsDemoLoading(true)
-    try {
-      await loginAsDemoStudent()
-      navigate('/student/dashboard')
-    } catch (err) {
-      console.error('Failed to login as demo student:', err)
-      navigate('/login')
-    } finally {
-      setIsDemoLoading(false)
-    }
-  }
+  // Search shortcuts
+  const searchResults = [
+    { title: 'My Academic Courses', subtitle: 'View syllabus, attendance & marks', route: '/student/academics', role: 'Student' },
+    { title: 'AI Assistant Copilot', subtitle: '24/7 Academic RAG question answering', route: '/student/ai-assistant', role: 'AI' },
+    { title: 'Campus Placement Drives', subtitle: 'AI placement predictor & active jobs', route: '/placement/dashboard', role: 'Placement' },
+    { title: 'Exam Prep & Mock Tests', subtitle: 'Generate custom AI exams & review', route: '/student/exam-prep', role: 'Academics' },
+    { title: 'Announcements & Notices', subtitle: 'University notifications & events', route: '/student/dashboard', role: 'Notices' },
+  ].filter(item => 
+    searchQuery.trim() === '' || 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    item.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getDashboardLink = () => {
     if (!isAuthenticated || !role) return '/login';
@@ -47,159 +72,234 @@ export default function LandingPage() {
       hostel_warden: '/hostel/dashboard',
       placement_officer: '/placement/dashboard',
       super_admin: '/super-admin/dashboard',
+      librarian: '/library/dashboard',
     };
-
     return routes[role] || '/login';
   };
 
-  const dashboardLink = getDashboardLink();
-  const [searchFocused, setSearchFocused] = useState(false);
-  const heroVideoRef = useRef<HTMLVideoElement | null>(null)
-
-  useEffect(() => {
-    if (heroVideoRef.current) {
-      heroVideoRef.current.defaultMuted = true
-      heroVideoRef.current.muted = true
-      heroVideoRef.current.play().catch((err) => {
-        console.warn('Hero video autoplay error:', err)
-      })
+  const handleDemoClick = async () => {
+    setIsDemoLoading(true);
+    try {
+      await loginAsDemoStudent();
+      navigate('/student/dashboard');
+    } catch (err) {
+      console.error('Failed to login as demo student:', err);
+      navigate('/login');
+    } finally {
+      setIsDemoLoading(false);
     }
-  }, [])
+  };
 
+  // Close modals on Escape key
   useEffect(() => {
-    const body = document.body
-    const originalClasses = body.className
-    body.className = "bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
-    return () => {
-      body.className = originalClasses
-    }
-  }, [])
-
-  const [stats, setStats] = useState({
-    modules: 0,
-    features: 0,
-    portals: 0,
-    workflows: 0
-  })
-
-  useEffect(() => {
-    const duration = 1500
-    const steps = 50
-    const stepTime = duration / steps
-    let currentStep = 0
-
-    const timer = setInterval(() => {
-      currentStep++
-      setStats({
-        modules: Math.floor((7 / steps) * currentStep),
-        features: Math.floor((20 / steps) * currentStep),
-        portals: Math.floor((5 / steps) * currentStep),
-        workflows: Math.floor((50 / steps) * currentStep)
-      })
-
-      if (currentStep >= steps) {
-        clearInterval(timer)
-        setStats({
-          modules: 7,
-          features: 20,
-          portals: 5,
-          workflows: 50
-        })
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDemoModalOpen(false);
+        setActiveRoleModal(null);
+        setSearchFocused(false);
       }
-    }, stepTime)
-
-    return () => clearInterval(timer)
-  }, [])
-
-
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans relative overflow-hidden grid-bg-light">
-      <div className="absolute top-0 inset-x-0 h-[1000px] pointer-events-none -z-10" />
+    <div className="min-h-screen bg-[#FFFCF7] text-[#142B43] font-sans antialiased selection:bg-[#E85D24] selection:text-white flex flex-col justify-between overflow-x-hidden">
+      
+      {/* ─── SLIM HORIZONTAL HEADER ────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#FFFCF7]/95 backdrop-blur-md border-b border-[#EAE5DE] transition-all duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between gap-4">
+          
+          {/* Logo on Left */}
+          <div className="shrink-0 flex items-center">
+            <CampusOSLogo size="default" />
+          </div>
 
-      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
-        <div className="max-w-7xl xl:max-w-[1440px] mx-auto px-6 sm:px-8 xl:px-12 h-18 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="p-1.5 rounded-lg bg-blue-600 text-white shadow-md shadow-blue-500/20">
-              <Sparkles className="w-5 h-5" />
-            </span>
-            <span className="font-bold text-xl tracking-tight font-sans text-white">
-              CampusOS <span className="text-blue-400 font-extrabold">AI</span>
-            </span>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-7">
-            <a href="#features" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Features</a>
-            <a href="#agents" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Agents</a>
-            <a href="#intelligence" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Solutions</a>
-            <a href="#copilot" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">AI Copilot</a>
-            <a href="#pricing" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">Pricing</a>
-            <a href="#faq" className="text-[15px] font-medium text-slate-300 hover:text-blue-400 transition-colors duration-200">FAQ</a>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[14px] font-medium text-[#142B43]">
+            <Link 
+              to="/" 
+              className="text-[#E85D24] font-semibold transition-colors hover:text-[#D44E18]"
+            >
+              Home
+            </Link>
+            <button 
+              onClick={() => setActiveRoleModal('features')}
+              className="text-[#142B43] hover:text-[#E85D24] transition-colors focus:outline-none cursor-pointer"
+            >
+              Features
+            </button>
+            <button 
+              onClick={() => setActiveRoleModal('students')}
+              className="text-[#142B43] hover:text-[#E85D24] transition-colors focus:outline-none cursor-pointer"
+            >
+              For Students
+            </button>
+            <button 
+              onClick={() => setActiveRoleModal('faculty')}
+              className="text-[#142B43] hover:text-[#E85D24] transition-colors focus:outline-none cursor-pointer"
+            >
+              For Faculty
+            </button>
+            <button 
+              onClick={() => setActiveRoleModal('admins')}
+              className="text-[#142B43] hover:text-[#E85D24] transition-colors focus:outline-none cursor-pointer"
+            >
+              For Admins
+            </button>
+            <button 
+              onClick={() => setActiveRoleModal('about')}
+              className="text-[#142B43] hover:text-[#E85D24] transition-colors focus:outline-none cursor-pointer"
+            >
+              About
+            </button>
           </nav>
 
-          <div className="hidden lg:flex items-center gap-4">
-            <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-60' : 'w-44'}`}>
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search solutions..."
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                className="w-full bg-slate-900/80 hover:bg-slate-900 focus:bg-slate-900 text-white text-xs pl-9 pr-4 py-2 rounded-full border border-white/10 focus:border-blue-500/50 outline-none transition-all placeholder-slate-400"
-              />
+          {/* Right Header Actions: Search, Login, Get Started */}
+          <div className="hidden lg:flex items-center gap-3">
+            
+            {/* Search Field */}
+            <div className="relative">
+              <div className={`relative flex items-center transition-all duration-200 ${searchFocused ? 'w-56' : 'w-40 xl:w-44'}`}>
+                <Search className="w-3.5 h-3.5 text-[#63768A] absolute left-3 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search campus..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 250)}
+                  className="w-full bg-[#FAF5EE] hover:bg-[#F4ECE0] focus:bg-white text-[#142B43] text-xs pl-8 pr-3 py-2 rounded-full border border-[#EAE5DE] focus:border-[#E85D24] focus:ring-1 focus:ring-[#E85D24] outline-none transition-all placeholder-[#8898AA]"
+                />
+              </div>
+
+              {/* Interactive Search Dropdown */}
+              {searchFocused && (
+                <div className="absolute top-11 right-0 w-80 bg-white border border-[#EAE5DE] rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider text-[#63768A] uppercase">
+                    Quick Navigation
+                  </div>
+                  <div className="space-y-1">
+                    {searchResults.map((item, idx) => (
+                      <Link
+                        key={idx}
+                        to={item.route}
+                        className="flex items-center justify-between p-2 rounded-xl hover:bg-[#FFF4EF] group transition-colors"
+                      >
+                        <div>
+                          <p className="text-xs font-semibold text-[#142B43] group-hover:text-[#E85D24] transition-colors">
+                            {item.title}
+                          </p>
+                          <p className="text-[11px] text-[#63768A]">{item.subtitle}</p>
+                        </div>
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#FAF5EE] text-[#63768A] group-hover:bg-[#E85D24]/10 group-hover:text-[#E85D24]">
+                          {item.role}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Auth Buttons */}
             {isAuthenticated ? (
               <Link
-                to={dashboardLink}
-                className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
+                to={getDashboardLink()}
+                className="text-xs sm:text-sm font-semibold tracking-wide bg-[#E85D24] hover:bg-[#D44E18] text-white px-4 py-2 rounded-full shadow-sm hover:shadow-md hover:shadow-[#E85D24]/20 transition-all inline-flex items-center gap-1.5 active:scale-95 shrink-0"
               >
-                <span>Go to Dashboard</span>
-                <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                <span>Dashboard</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={handleDemoClick}
-                  disabled={isDemoLoading}
-                  className="text-xs font-semibold tracking-wide bg-gradient-to-r from-blue-600/30 to-indigo-600/30 hover:bg-blue-600/50 text-blue-300 hover:text-white px-3.5 py-1.5 rounded-full border border-blue-500/30 hover:border-blue-400/60 transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
-                  title="Test student portal instantly without credentials"
-                >
-                  <Play className="w-3 h-3 fill-blue-400 text-blue-400" />
-                  <span>{isDemoLoading ? 'Opening...' : 'Live Demo'}</span>
-                </button>
-                <Link to="/register" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors px-3 py-1.5">
-                  Register
-                </Link>
                 <Link
                   to="/login"
-                  className="text-sm font-semibold tracking-wide bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap border border-blue-400/30 active:scale-95 shrink-0"
+                  className="text-xs sm:text-sm font-medium text-[#142B43] hover:text-[#E85D24] px-3 py-2 transition-colors rounded-lg"
                 >
-                  <span>Login</span>
-                  <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="text-xs sm:text-sm font-semibold tracking-wide bg-[#E85D24] hover:bg-[#D44E18] text-white px-4 py-2 rounded-full shadow-sm hover:shadow-md hover:shadow-[#E85D24]/20 transition-all inline-flex items-center gap-1.5 active:scale-95 shrink-0"
+                >
+                  <span>Get Started</span>
                 </Link>
               </>
             )}
           </div>
 
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-300 hover:text-white"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Menu Toggle Button */}
+          <div className="flex lg:hidden items-center gap-2">
+            {!isAuthenticated && (
+              <Link
+                to="/login"
+                className="text-xs font-semibold text-[#142B43] hover:text-[#E85D24] px-3 py-1.5 border border-[#EAE5DE] rounded-full bg-white shadow-sm"
+              >
+                Login
+              </Link>
+            )}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-[#142B43] hover:text-[#E85D24] rounded-lg focus:outline-none cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b border-slate-200 px-6 py-8 flex flex-col gap-6 shadow-xl animate-fade-in">
-            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">Features</a>
-            <a href="#agents" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">AI Agents</a>
-            <a href="#intelligence" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">Solutions</a>
-            <a href="#copilot" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">AI Copilot</a>
-            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">Pricing</a>
-            <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-base font-semibold text-slate-800 hover:text-blue-600">FAQ</a>
-            <hr className="border-slate-100" />
-            <div className="flex flex-col gap-4">
+          <div className="lg:hidden bg-[#FFFCF7] border-b border-[#EAE5DE] px-6 py-6 space-y-4 shadow-xl">
+            <div className="relative mb-3">
+              <Search className="w-4 h-4 text-[#63768A] absolute left-3 top-3" />
+              <input
+                type="text"
+                placeholder="Search campus features..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white text-[#142B43] text-sm pl-9 pr-4 py-2.5 rounded-xl border border-[#EAE5DE] focus:border-[#E85D24] outline-none"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 text-sm font-medium">
+              <button
+                onClick={() => { setMobileMenuOpen(false); setActiveRoleModal('features'); }}
+                className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EE] text-[#142B43]"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setActiveRoleModal('students'); }}
+                className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EE] text-[#142B43]"
+              >
+                For Students
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setActiveRoleModal('faculty'); }}
+                className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EE] text-[#142B43]"
+              >
+                For Faculty
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setActiveRoleModal('admins'); }}
+                className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EE] text-[#142B43]"
+              >
+                For Admins
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setActiveRoleModal('about'); }}
+                className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF5EE] text-[#142B43]"
+              >
+                About CampusOS
+              </button>
+            </div>
+
+            <hr className="border-[#EAE5DE]" />
+
+            <div className="flex flex-col gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={() => {
@@ -207,180 +307,506 @@ export default function LandingPage() {
                   handleDemoClick();
                 }}
                 disabled={isDemoLoading}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 via-sky-600 to-blue-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-sky-500/20 active:scale-95"
+                className="w-full flex items-center justify-center gap-2 bg-[#FFF4EF] hover:bg-[#FFE8DC] text-[#E85D24] font-semibold py-2.5 rounded-full border border-[#FAD8C7] transition-colors"
               >
-                <Play className="w-4 h-4 fill-white" />
-                <span>{isDemoLoading ? 'Opening Demo...' : 'Live Demo (Student)'}</span>
+                <Play className="w-3.5 h-3.5 fill-[#E85D24]" />
+                <span>{isDemoLoading ? 'Opening...' : 'Quick Student Live Demo'}</span>
               </button>
+
               {isAuthenticated ? (
                 <Link
-                  to={dashboardLink}
+                  to={getDashboardLink()}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                  className="w-full flex items-center justify-center gap-2 bg-[#E85D24] text-white font-semibold py-3 rounded-full shadow-md hover:bg-[#D44E18]"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               ) : (
-                <>
-                  <Link
-                    to="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center text-base font-semibold text-slate-800 hover:text-blue-600 py-2 border border-slate-200 rounded-xl"
-                  >
-                    Register
-                  </Link>
+                <div className="grid grid-cols-2 gap-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-full shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+                    className="flex items-center justify-center text-sm font-semibold text-[#142B43] py-2.5 border border-[#EAE5DE] rounded-full bg-white hover:bg-[#FAF5EE]"
                   >
-                    <span>Login</span>
-                    <ArrowRight className="w-4 h-4" />
+                    Login
                   </Link>
-                </>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-1.5 bg-[#E85D24] text-white text-sm font-semibold py-2.5 rounded-full shadow-sm hover:bg-[#D44E18]"
+                  >
+                    <span>Get Started</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               )}
             </div>
           </div>
         )}
       </header>
 
-      <section className="relative z-0 pt-14 pb-14 lg:pt-20 lg:pb-20 px-6 sm:px-8 xl:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-4.5rem)]">
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 transform-gpu bg-slate-950">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e1b4b15_1px,transparent_1px),linear-gradient(to_bottom,#1e1b4b15_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-
-          <video
-            ref={heroVideoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover scale-105 transition-transform duration-10000 transform-gpu opacity-80"
-          >
-            <source src="/hero-bg.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[1px]" />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/40 via-slate-950/30 to-purple-950/40" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-slate-950/80" />
-        </div>
-
-        <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4.5 py-2 rounded-full bg-slate-900/60 border border-blue-500/30 text-blue-200 backdrop-blur-md mb-5 shadow-lg shadow-blue-950/20 text-xs sm:text-sm font-semibold tracking-wide uppercase transition-all hover:border-blue-500/50 hover:bg-slate-900/80">
-            <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
-            <span>Built for Modern Higher Education</span>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-2.5 mb-7">
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
-              <Check className="w-3.5 h-3.5 text-blue-400" /> AI Powered
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
-              <Check className="w-3.5 h-3.5 text-indigo-400" /> Enterprise Ready
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
-              <Check className="w-3.5 h-3.5 text-sky-400" /> Multi-Agent AI
-            </span>
-            <span className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-slate-900/60 text-slate-200 border border-white/10 backdrop-blur-md shadow-sm">
-              <Check className="w-3.5 h-3.5 text-emerald-400" /> Predictive Analytics
-            </span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-6 drop-shadow-md">
-            The AI Operating System for{' '}
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-md">
-              Modern Universities
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg lg:text-xl text-slate-200 max-w-[640px] font-normal leading-relaxed mb-9 drop-shadow-sm">
-            Empowering students, faculty, administrators, and university staff with AI Agents, Machine Learning, Predictive Analytics, Intelligent Automation, and Enterprise Decision Support.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-9 w-full sm:w-auto">
-            <Link
-              to="/dashboard"
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-full shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all text-base flex items-center justify-center gap-2 group border border-blue-400/30 hover:-translate-y-0.5 active:scale-95"
-            >
-              Get Started
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <button
-              type="button"
-              onClick={handleDemoClick}
-              disabled={isDemoLoading}
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full border border-white/20 backdrop-blur-md shadow-md transition-all text-base flex items-center justify-center gap-2 hover:-translate-y-0.5 group active:scale-95 cursor-pointer disabled:opacity-60"
-            >
-              <Play className="w-4 h-4 fill-white text-white group-hover:scale-110 transition-transform" />
-              {isDemoLoading ? 'Launching Demo...' : 'Watch Demo'}
-            </button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-3 pt-2 text-xs font-semibold text-slate-300">
-            {institutionsList.map((inst, i) => (
-              <span key={i} className="px-3.5 py-1.5 rounded-full bg-slate-900/60 border border-slate-700/60 backdrop-blur-md flex items-center gap-1.5">
-                <span>{inst.icon}</span> {inst.title}
+      {/* ─── HERO SECTION: TWO-COLUMN LAYOUT ───────────────────────────────── */}
+      <main className="flex-1 flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          
+          {/* Left Column: Heading, Paragraph, Highlights, CTAs */}
+          <div className="lg:col-span-6 space-y-6 lg:pr-2">
+            
+            {/* Small Eyebrow Label */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF4EF] border border-[#FAD8C7] text-[#E85D24] text-xs font-semibold tracking-wide shadow-sm">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E85D24] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E85D24]"></span>
               </span>
+              <span>AI-Powered Campus Management System</span>
+            </div>
+
+            {/* Main Heading (exact wording required) */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-extrabold tracking-tight leading-[1.12]">
+              <span className="text-[#142B43] block">Your University Life,</span>
+              <span className="text-[#E85D24] block mt-1">Simplified with AI</span>
+            </h1>
+
+            {/* Supporting Paragraph (exact wording required) */}
+            <p className="text-[#63768A] text-base sm:text-lg leading-relaxed max-w-xl">
+              CampusOS AI is an all-in-one platform that connects students, faculty, and administrators with AI-powered tools, real-time insights, and everything you need for a seamless university experience.
+            </p>
+
+            {/* Three Compact Feature Highlights */}
+            <div className="space-y-2.5 pt-1">
+              <div className="flex items-start gap-2.5 text-sm sm:text-[15px]">
+                <div className="mt-0.5 rounded-full p-0.5 bg-[#EAF7F0] text-[#2E9B65] shrink-0">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <span className="font-semibold text-[#142B43]">Academic Management</span>
+                  <span className="text-[#63768A]"> — Courses, results, attendance.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 text-sm sm:text-[15px]">
+                <div className="mt-0.5 rounded-full p-0.5 bg-[#EAF7F0] text-[#2E9B65] shrink-0">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <span className="font-semibold text-[#142B43]">AI Assistant</span>
+                  <span className="text-[#63768A]"> — Instant help, 24/7.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 text-sm sm:text-[15px]">
+                <div className="mt-0.5 rounded-full p-0.5 bg-[#EAF7F0] text-[#2E9B65] shrink-0">
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <span className="font-semibold text-[#142B43]">Campus Community</span>
+                  <span className="text-[#63768A]"> — Events, clubs, connections.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Two Prominent Action Buttons */}
+            <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 bg-[#E85D24] hover:bg-[#D44E18] text-white font-semibold px-6 py-3.5 rounded-full shadow-md shadow-[#E85D24]/20 hover:shadow-lg hover:shadow-[#E85D24]/30 hover:-translate-y-0.5 active:scale-95 transition-all text-sm sm:text-base cursor-pointer"
+              >
+                <span>Get Started Free</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setDemoModalOpen(true)}
+                className="inline-flex items-center gap-2.5 bg-white hover:bg-[#FAF5EE] text-[#142B43] hover:text-[#E85D24] font-semibold px-5 py-3.5 rounded-full border border-[#EAE5DE] hover:border-[#E85D24]/30 shadow-sm transition-all text-sm sm:text-base cursor-pointer"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#FFF4EF] flex items-center justify-center text-[#E85D24]">
+                  <Play className="w-3 h-3 fill-[#E85D24] ml-0.5" />
+                </div>
+                <span>Watch Demo</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Hero Visual Composition and Floating Cards */}
+          <div className="lg:col-span-6 relative flex items-center justify-center mt-6 lg:mt-0 py-4 sm:py-6 lg:py-8">
+            
+            {/* Composition Wrapper with Overlapping Cards */}
+            <div className="relative w-full max-w-[500px] sm:max-w-[520px] mx-auto">
+              
+              {/* Rounded Campus Illustration with Green Trees */}
+              <div className="relative w-full rounded-[28px] sm:rounded-[32px] overflow-hidden border border-[#EAE5DE] shadow-xl shadow-[#142B43]/8 bg-[#FAF5EE]">
+                <img
+                  src="/images/campus-hero.jpg"
+                  alt="CampusOS AI University Campus with Student using laptop"
+                  className="w-full h-[320px] sm:h-[370px] lg:h-[400px] object-cover object-center block select-none transform hover:scale-[1.01] transition-transform duration-500"
+                  loading="eager"
+                />
+
+                {/* Gentle ambient vignette overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FFFCF7]/30 via-transparent to-transparent pointer-events-none rounded-[28px] sm:rounded-[32px]" />
+              </div>
+
+              {/* Floating Card 1: White Translucent CampusOS AI Dashboard Card (Left) */}
+              <div 
+                className="absolute -top-3 left-2 sm:-top-5 sm:-left-6 lg:-left-8 max-w-[250px] sm:max-w-[285px] w-full bg-white/90 backdrop-blur-xl rounded-2xl p-3 sm:p-3.5 border border-white/90 sm:border-[#EAE5DE]/80 shadow-[0_16px_36px_-6px_rgba(20,43,67,0.13)] transition-transform duration-300 hover:-translate-y-1 z-20"
+              >
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#EAE5DE]/70">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#E85D24] to-[#F1733E] text-white flex items-center justify-center text-xs shadow-sm shadow-[#E85D24]/20">
+                      <GraduationCap className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#142B43] tracking-tight">CampusOS AI</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#2E9B65] bg-[#EAF7F0] px-2 py-0.5 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2E9B65] animate-pulse"></span>
+                    <span>Live Portal</span>
+                  </div>
+                </div>
+
+                {/* Dashboard Items */}
+                <div className="space-y-1.5 text-xs">
+                  {/* Item 1: My Courses */}
+                  <Link 
+                    to="/login"
+                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
+                        <BookOpen className="w-3 h-3" />
+                      </div>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">My Courses</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-[#63768A]">4 Active</span>
+                  </Link>
+
+                  {/* Item 2: Placement Drives */}
+                  <Link 
+                    to="/login"
+                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#EAF7F0] text-[#2E9B65] flex items-center justify-center">
+                        <Briefcase className="w-3 h-3" />
+                      </div>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">Placement Drives</span>
+                    </div>
+                    <span className="text-[10px] font-bold bg-[#FFF4EF] text-[#E85D24] px-1.5 py-0.5 rounded">12 New</span>
+                  </Link>
+
+                  {/* Item 3: Events & Notices */}
+                  <Link 
+                    to="/login"
+                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#F0F5FA] text-[#142B43] flex items-center justify-center">
+                        <Bell className="w-3 h-3" />
+                      </div>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">Events & Notices</span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] text-[#63768A]">Campus Fest</span>
+                  </Link>
+
+                  {/* Item 4: Ask AI Assistant (Interactive) */}
+                  <div 
+                    onClick={() => setAiPromptAnswered(!aiPromptAnswered)}
+                    className="cursor-pointer p-2 rounded-xl bg-[#FFF4EF] border border-[#FAD8C7] hover:bg-[#FFEADA] transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#E85D24]" />
+                        <span className="font-bold text-[#E85D24] text-[10px] sm:text-[11px]">Ask AI Assistant</span>
+                      </div>
+                      <span className="text-[9px] sm:text-[10px] text-[#E85D24] underline">
+                        {aiPromptAnswered ? 'Reset' : 'Try prompt'}
+                      </span>
+                    </div>
+                    <p className="text-[10px] sm:text-[11px] text-[#142B43] mt-1 line-clamp-1">
+                      {aiPromptAnswered ? '“Here is your CS301 exam revision summary!”' : '“Summarize my midterm preparation notes...”'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Card 2: Overlapping Upcoming Events Card (Bottom-Right) */}
+              <div 
+                className="absolute -bottom-4 right-2 sm:-bottom-5 sm:-right-6 lg:-right-8 max-w-[210px] sm:max-w-[235px] w-full bg-white/95 backdrop-blur-xl rounded-2xl p-3 sm:p-3.5 border border-white/90 sm:border-[#EAE5DE]/80 shadow-[0_16px_36px_-6px_rgba(20,43,67,0.15)] transition-transform duration-300 hover:-translate-y-1 z-20"
+              >
+                <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-[#EAE5DE]/70">
+                  <div className="w-5 h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
+                    <Calendar className="w-3 h-3" />
+                  </div>
+                  <span className="text-xs font-bold text-[#142B43]">Upcoming Events</span>
+                </div>
+                
+                <div className="space-y-1.5">
+                  <div className="p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
+                    <p className="text-[11px] font-bold text-[#142B43] leading-tight">AI Workshop @ Hall A</p>
+                    <p className="text-[10px] text-[#63768A]">Today • 2:30 PM</p>
+                  </div>
+                  <div className="p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
+                    <p className="text-[11px] font-bold text-[#142B43] leading-tight">Campus Hackathon 2026</p>
+                    <p className="text-[10px] text-[#2E9B65] font-semibold">Tomorrow • RSVP Open</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* ─── TRUST STRIP (COMPACT DIRECTLY BELOW HERO) ───────────────────────── */}
+      <section className="border-t border-[#EAE5DE] bg-white py-6 px-4 sm:px-6 lg:px-8 mt-4">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-center text-xs font-semibold tracking-wider uppercase text-[#63768A] mb-4">
+            Trusted by Modern Higher Education Campuses & Accredited Institutions
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 lg:gap-12">
+            {institutionsList.map((inst, idx) => (
+              <div 
+                key={idx}
+                className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#FAF5EE] border border-[#EAE5DE] hover:border-[#E85D24]/30 hover:bg-[#FFF4EF] transition-colors"
+              >
+                <span className="text-base">{inst.icon}</span>
+                <span className="text-xs font-semibold text-[#142B43]">{inst.title}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-white border-y border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30 shadow-sm">
-        <div className="max-w-7xl xl:max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          <div className="flex flex-col items-center justify-center px-4">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
-              {stats.modules}+
-            </h3>
-            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-              Smart Campus Modules
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight mb-2">
-              {stats.features}+
-            </h3>
-            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-              AI-Powered Features
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-indigo-600 tracking-tight mb-2">
-              {stats.portals}
-            </h3>
-            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-              User Portals
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
-              {stats.workflows}+
-            </h3>
-            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-              Automated Workflows
-            </p>
-          </div>
-          <div className="flex flex-col items-center justify-center px-4 pt-6 md:pt-0">
-            <h3 className="text-4xl md:text-5xl font-extrabold text-emerald-600 tracking-tight mb-2">
-              24/7
-            </h3>
-            <p className="text-xs md:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-              AI Assistance
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <footer className="bg-white border-t border-slate-200/80 py-16 px-6 sm:px-8 xl:px-12 relative z-30">
-        <div className="max-w-7xl xl:max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-medium gap-4">
-          <span>&copy; {new Date().getFullYear()} CampusOS AI Platform. All rights reserved.</span>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-blue-600">Privacy Policy</a>
-            <a href="#" className="hover:text-blue-600">Terms of Service</a>
+      {/* ─── SLIM SUB-FOOTER (NO OVERSIZED BLOCKS) ─────────────────────────── */}
+      <footer className="border-t border-[#EAE5DE] bg-[#FAF5EE] py-4 px-4 sm:px-6 lg:px-8 text-xs text-[#63768A]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>© 2026 CampusOS AI. All rights reserved.</p>
+          <div className="flex items-center gap-5 font-medium">
+            <button onClick={() => setActiveRoleModal('about')} className="hover:text-[#E85D24]">About Platform</button>
+            <button onClick={() => setActiveRoleModal('features')} className="hover:text-[#E85D24]">AI Modules</button>
+            <Link to="/login" className="hover:text-[#E85D24]">Faculty Portal</Link>
+            <Link to="/login" className="hover:text-[#E85D24]">Admin Access</Link>
+            <div className="flex items-center gap-1.5 text-[#2E9B65]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2E9B65]"></span>
+              <span>All Systems Online</span>
+            </div>
           </div>
         </div>
       </footer>
+
+      {/* ─── MODAL: WATCH DEMO VIDEO & INTERACTIVE TOUR ─────────────────────── */}
+      {demoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#142B43]/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[#EAE5DE] max-w-2xl w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => setDemoModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-full text-[#63768A] hover:text-[#142B43] hover:bg-[#FAF5EE]"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
+                <Play className="w-5 h-5 fill-[#E85D24]" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#142B43]">CampusOS AI in Action</h3>
+                <p className="text-xs text-[#63768A]">Platform demonstration and AI features tour</p>
+              </div>
+            </div>
+
+            {/* Video Player */}
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video mb-5 shadow-inner">
+              <video
+                src="/hero-bg.mp4"
+                controls
+                autoPlay
+                className="w-full h-full object-cover"
+              >
+                Your browser does not support video playback.
+              </video>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-[#EAE5DE]">
+              <p className="text-xs text-[#63768A]">
+                Want to test real data directly? Jump in without credentials.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setDemoModalOpen(false);
+                  handleDemoClick();
+                }}
+                disabled={isDemoLoading}
+                className="inline-flex items-center gap-2 bg-[#E85D24] hover:bg-[#D44E18] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-sm"
+              >
+                <Laptop className="w-3.5 h-3.5" />
+                <span>Launch Live Student Session</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL: ROLE DESTINATIONS (STUDENTS, FACULTY, ADMINS, ABOUT) ────── */}
+      {activeRoleModal && (
+        <div className="fixed inset-0 z-50 bg-[#142B43]/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[#EAE5DE] max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => setActiveRoleModal(null)}
+              className="absolute top-5 right-5 p-2 rounded-full text-[#63768A] hover:text-[#142B43] hover:bg-[#FAF5EE]"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {activeRoleModal === 'features' && (
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center mb-3">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-bold text-[#142B43] mb-2">Platform Features</h3>
+                <p className="text-sm text-[#63768A] mb-4">
+                  CampusOS AI combines academic intelligence, career prediction, and campus logistics.
+                </p>
+                <div className="space-y-2.5 mb-6 text-sm">
+                  <div className="p-3 rounded-xl bg-[#FAF5EE]">
+                    <p className="font-semibold text-[#142B43]">RAG Academic Copilot</p>
+                    <p className="text-xs text-[#63768A]">Instant questions answered from course handbooks & syllabus.</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-[#FAF5EE]">
+                    <p className="font-semibold text-[#142B43]">Placement Readiness Model</p>
+                    <p className="text-xs text-[#63768A]">Predictive placement probability scores and mock interviews.</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-[#FAF5EE]">
+                    <p className="font-semibold text-[#142B43]">Automated Attendance & Exams</p>
+                    <p className="text-xs text-[#63768A]">Real-time tracking, exam schedules, and hall tickets.</p>
+                  </div>
+                </div>
+                <Link
+                  to="/register"
+                  onClick={() => setActiveRoleModal(null)}
+                  className="w-full flex items-center justify-center gap-2 bg-[#E85D24] text-white font-semibold py-2.5 rounded-full text-sm"
+                >
+                  <span>Explore with Free Account</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
+            {activeRoleModal === 'students' && (
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center mb-3">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-bold text-[#142B43] mb-2">For Students</h3>
+                <p className="text-sm text-[#63768A] mb-4">
+                  Everything you need to excel academically, prepare for placements, and engage with campus life.
+                </p>
+                <div className="space-y-2 mb-6 text-xs text-[#63768A]">
+                  <p>✓ Track daily lectures, timetable, and attendance thresholds.</p>
+                  <p>✓ Generate custom AI quizzes and midterm prep materials.</p>
+                  <p>✓ Apply to campus placement drives with AI resume insights.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setActiveRoleModal(null);
+                      handleDemoClick();
+                    }}
+                    className="w-full bg-[#FAF5EE] text-[#142B43] font-semibold py-2.5 rounded-full text-sm hover:bg-[#F2ECE1]"
+                  >
+                    Try Live Student Demo
+                  </button>
+                  <Link
+                    to="/login"
+                    onClick={() => setActiveRoleModal(null)}
+                    className="w-full flex items-center justify-center bg-[#E85D24] text-white font-semibold py-2.5 rounded-full text-sm"
+                  >
+                    Student Login
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {activeRoleModal === 'faculty' && (
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#F0F5FA] text-[#142B43] flex items-center justify-center mb-3">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-bold text-[#142B43] mb-2">For Faculty</h3>
+                <p className="text-sm text-[#63768A] mb-4">
+                  Streamlined course management, AI grading aids, and student performance analytics.
+                </p>
+                <div className="space-y-2 mb-6 text-xs text-[#63768A]">
+                  <p>✓ Record student attendance in seconds.</p>
+                  <p>✓ Upload course documents for AI-indexed student search.</p>
+                  <p>✓ Publish announcements and grade assignments with feedback.</p>
+                </div>
+                <Link
+                  to="/login"
+                  onClick={() => setActiveRoleModal(null)}
+                  className="w-full flex items-center justify-center gap-2 bg-[#142B43] text-white font-semibold py-2.5 rounded-full text-sm hover:bg-[#1f3c5b]"
+                >
+                  <span>Faculty Sign In</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
+            {activeRoleModal === 'admins' && (
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#EAF7F0] text-[#2E9B65] flex items-center justify-center mb-3">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-bold text-[#142B43] mb-2">For Administrators</h3>
+                <p className="text-sm text-[#63768A] mb-4">
+                  Comprehensive campus governance, user management, audit logs, and fee workflows.
+                </p>
+                <div className="space-y-2 mb-6 text-xs text-[#63768A]">
+                  <p>✓ Role-based access control (RBAC) across 7 specialized campus roles.</p>
+                  <p>✓ Real-time campus KPI analytics and academic audit compliance.</p>
+                  <p>✓ Integrated Supabase and PostgreSQL backend infrastructure.</p>
+                </div>
+                <Link
+                  to="/login"
+                  onClick={() => setActiveRoleModal(null)}
+                  className="w-full flex items-center justify-center gap-2 bg-[#142B43] text-white font-semibold py-2.5 rounded-full text-sm hover:bg-[#1f3c5b]"
+                >
+                  <span>Admin Portal Access</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
+            {activeRoleModal === 'about' && (
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center mb-3">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-bold text-[#142B43] mb-2">About CampusOS AI</h3>
+                <p className="text-sm text-[#63768A] mb-4">
+                  CampusOS AI is an intelligent university operating system engineered to unite students, educators, and administrators into an integrated, AI-first ecosystem.
+                </p>
+                <div className="p-3 rounded-xl bg-[#FAF5EE] text-xs space-y-1 mb-6 text-[#142B43]">
+                  <p><span className="font-semibold">Version:</span> 2.6.0 Production</p>
+                  <p><span className="font-semibold">AI Architecture:</span> LangChain RAG + PgVector Embeddings</p>
+                  <p><span className="font-semibold">Security:</span> Enterprise RBAC, Session Persistence & Encryption</p>
+                </div>
+                <button
+                  onClick={() => setActiveRoleModal(null)}
+                  className="w-full bg-[#E85D24] text-white font-semibold py-2.5 rounded-full text-sm"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
-  )
+  );
 }

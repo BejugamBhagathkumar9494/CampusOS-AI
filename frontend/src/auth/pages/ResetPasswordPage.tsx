@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Lock, AlertCircle, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Lock, AlertCircle, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../services/supabaseClient';
+import CampusOSLogo from '../../components/common/CampusOSLogo';
 
 export const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -44,45 +45,41 @@ export const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-screen bg-slate-950 text-slate-100 items-center justify-center p-6 font-sans relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none"></div>
-
-      <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 max-w-md w-full rounded-2xl p-8 shadow-2xl relative z-10">
-        <div className="flex items-center gap-2 mb-6">
-          <span className="p-1.5 rounded-lg bg-indigo-600 text-white">
-            <Sparkles className="w-5 h-5" />
-          </span>
-          <span className="font-bold text-xl text-white">CampusOS AI</span>
+    <div className="flex min-h-screen w-screen bg-[#FFFCF7] text-[#142B43] items-center justify-center p-6 font-sans relative overflow-hidden selection:bg-[#E85D24] selection:text-white">
+      
+      <div className="bg-white border border-[#EAE5DE] max-w-md w-full rounded-3xl p-8 sm:p-10 shadow-xl shadow-[#142B43]/5 relative z-10">
+        <div className="mb-6">
+          <CampusOSLogo size="default" />
         </div>
 
-        <h1 className="text-2xl font-extrabold text-white tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#142B43] tracking-tight mb-2">
           Set New Password
         </h1>
-        <p className="text-slate-400 text-sm font-medium mb-6">
+        <p className="text-[#63768A] text-sm font-medium mb-6">
           Enter a secure password for your CampusOS account.
         </p>
 
         {errorMsg && (
-          <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-2.5 p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] text-xs sm:text-sm font-medium">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="mb-6 flex items-start gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
-            <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EAF7F0] border border-[#C6E7D6] text-[#2E9B65] text-xs sm:text-sm font-medium">
+            <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{successMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-2">
+            <label htmlFor="password" className="block text-xs font-semibold text-[#142B43] mb-1.5">
               New Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+              <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -90,12 +87,13 @@ export const ResetPasswordPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isSubmitting}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                required
+                className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] focus:ring-1 focus:ring-[#E85D24] text-[#142B43] text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-[#8898AA]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3.5 text-slate-400 hover:text-white"
+                className="absolute right-3 top-3.5 text-[#8898AA] hover:text-[#142B43]"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -103,11 +101,11 @@ export const ResetPasswordPage: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-semibold text-slate-200 mb-2">
+            <label htmlFor="confirmPassword" className="block text-xs font-semibold text-[#142B43] mb-1.5">
               Confirm New Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+              <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-[#8898AA]" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="confirmPassword"
@@ -115,7 +113,8 @@ export const ResetPasswordPage: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isSubmitting}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-slate-500"
+                required
+                className="w-full bg-[#FAF5EE]/60 hover:bg-[#FAF5EE] focus:bg-white border border-[#EAE5DE] focus:border-[#E85D24] focus:ring-1 focus:ring-[#E85D24] text-[#142B43] text-sm pl-10 pr-10 py-3 rounded-xl outline-none transition-all placeholder-[#8898AA]"
               />
             </div>
           </div>
@@ -123,7 +122,7 @@ export const ResetPasswordPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 bg-[#E85D24] hover:bg-[#D44E18] text-white font-semibold py-3.5 rounded-full shadow-md shadow-[#E85D24]/20 hover:shadow-lg hover:shadow-[#E85D24]/30 hover:-translate-y-0.5 transition-all disabled:opacity-50 mt-3 cursor-pointer"
           >
             <span>{isSubmitting ? 'Updating Password...' : 'Update Password'}</span>
             {!isSubmitting && <ArrowRight className="w-4 h-4" />}

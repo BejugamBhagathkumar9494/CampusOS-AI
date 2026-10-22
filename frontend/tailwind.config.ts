@@ -44,50 +44,83 @@ export default {
         },
         // 1. Primary Brand Accents (Terracotta)
         terracotta: {
-          DEFAULT: "#C85A32",
-          hover: "#B44E27",
-          light: "#FDF2ED",
+          DEFAULT: "#E85D24",
+          hover: "#D44E18",
+          light: "#FFF4EF",
           subtle: "#FAF0E9",
-          glow: "rgba(200, 90, 50, 0.16)",
+          glow: "rgba(232, 93, 36, 0.16)",
         },
-        // 2. Neutral Backgrounds (Warm Cream & White)
+        // 2. Neutral Backgrounds (Warm Ivory & White)
         cream: {
-          warm: "#FAF7F2",
-          alt: "#F4EFEA",
-          darker: "#EFE8DF",
+          warm: "#FFFCF7",
+          alt: "#FAF5EE",
+          darker: "#F2ECE1",
           card: "#FFFFFF",
           cardSubtle: "#FDFBF8",
         },
-        // 3. Typography & Text Hierarchy (Charcoal & Warm Greys)
+        ivory: {
+          DEFAULT: "#FFFCF7",
+          warm: "#FFFCF7",
+          alt: "#FAF5EE",
+          darker: "#F2ECE1",
+          card: "#FFFFFF",
+          cardSubtle: "#FDFBF8",
+        },
+        // 3. Typography & Text Hierarchy
         charcoal: {
-          DEFAULT: "#1C211F",
-          body: "#2D3330",
-          secondary: "#5E6763",
-          muted: "#8E9893",
+          DEFAULT: "#142B43",
+          body: "#142B43",
+          secondary: "#63768A",
+          muted: "#8898AA",
+        },
+        navy: {
+          DEFAULT: "#142B43",
+          deep: "#142B43",
+          heading: "#142B43",
+          muted: "#2C435A",
+          light: "#F0F5FA",
+        },
+        slateText: {
+          DEFAULT: "#63768A",
+          muted: "#8898AA",
         },
         // 4. Secondary & Functional Accents
         sage: {
-          DEFAULT: "#5E8C71",
-          light: "#F0F6F2",
+          DEFAULT: "#2E9B65",
+          light: "#EAF7F0",
+        },
+        successGreen: {
+          DEFAULT: "#2E9B65",
+          light: "#EAF7F0",
         },
         amberAccent: {
           DEFAULT: "#D9822B",
           light: "#FEF7ED",
         },
-        navy: {
-          DEFAULT: "#3D5A80",
-          light: "#EEF3F8",
-        },
         purpleAccent: {
-          DEFAULT: "#786498",
-          light: "#F4F1F8",
+          DEFAULT: "#8B5CF6",
+          light: "#F5F3FF",
         },
-        // 5. Borders & Dividers (Warm Beige)
+        skyAccent: {
+          DEFAULT: "#38BDF8",
+          light: "#F0F9FF",
+        },
+        lavenderAccent: {
+          DEFAULT: "#8B5CF6",
+          light: "#F5F3FF",
+        },
+        // 5. Borders & Dividers (Warm Beige & Gray)
         beige: {
-          DEFAULT: "#EAE3D8",
-          light: "#F3ECE2",
-          dark: "#DCD2C3",
-          accent: "rgba(200, 90, 50, 0.3)",
+          DEFAULT: "#EAE5DE",
+          light: "#F2EFEB",
+          dark: "#DDD6CD",
+          accent: "rgba(232, 93, 36, 0.3)",
+        },
+        warmBorder: {
+          DEFAULT: "#EAE5DE",
+          light: "#F2EFEB",
+          dark: "#DDD6CD",
+          accent: "rgba(232, 93, 36, 0.3)",
         },
       },
       borderRadius: {

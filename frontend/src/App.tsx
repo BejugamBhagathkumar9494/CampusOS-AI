@@ -39,13 +39,13 @@ const DashboardRedirect: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-[#FAF7F2] text-[#1C211F]">
+      <div className="flex h-screen w-screen items-center justify-center bg-[#FFFCF7] text-[#142B43]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative h-12 w-12">
-            <div className="absolute inset-0 rounded-full border-4 border-[#C85A32]/20"></div>
-            <div className="absolute inset-0 animate-spin rounded-full border-4 border-[#C85A32] border-t-transparent"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-[#E85D24]/20"></div>
+            <div className="absolute inset-0 animate-spin rounded-full border-4 border-[#E85D24] border-t-transparent"></div>
           </div>
-          <p className="text-sm font-semibold tracking-wide text-[#C85A32]">Verifying session identity...</p>
+          <p className="text-sm font-semibold tracking-wide text-[#E85D24]">Verifying session identity...</p>
         </div>
       </div>
     );

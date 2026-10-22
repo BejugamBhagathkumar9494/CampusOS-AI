@@ -4,74 +4,74 @@
 
 @layer base {
   :root {
-    --background: 38 42% 96%; /* #FAF7F2 Warm Cream */
-    --foreground: 160 8% 12%; /* #1C211F Charcoal */
+    --background: 40 100% 98.6%; /* #FFFCF7 Warm Ivory */
+    --foreground: 212 54% 17%; /* #142B43 Deep Navy */
 
-    --muted: 33 28% 93%; /* #F4EFEA Warm Cream Alt */
-    --muted-foreground: 153 5% 38%; /* #5E6763 Charcoal Secondary */
+    --muted: 38 35% 95%; /* #FAF5EE Warm Ivory Alt */
+    --muted-foreground: 212 16% 46%; /* #63768A Slate Text */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 160 8% 12%;
+    --popover-foreground: 212 54% 17%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 8% 12%;
+    --card-foreground: 212 54% 17%;
 
-    --border: 35 25% 88%; /* #EAE3D8 Beige */
-    --input: 35 25% 88%;
+    --border: 35 20% 89%; /* #EAE5DE Warm Gray */
+    --input: 35 20% 89%;
 
-    --primary: 16 60% 49%; /* #C85A32 Terracotta */
+    --primary: 17 81% 52%; /* #E85D24 Terracotta */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 214 36% 37%; /* #3D5A80 Navy */
+    --secondary: 212 54% 17%; /* #142B43 Deep Navy */
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 33 28% 93%; /* #F4EFEA */
-    --accent-foreground: 160 8% 12%;
+    --accent: 38 35% 95%; /* #FAF5EE */
+    --accent-foreground: 212 54% 17%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 16 60% 49%; /* #C85A32 Terracotta */
+    --ring: 17 81% 52%; /* #E85D24 Terracotta */
     --radius: 1.25rem;
   }
 }
 
 :root {
   /* 1. Primary Brand Accents (Terracotta) */
-  --accent-terracotta: #C85A32;
-  --accent-terracotta-hover: #B44E27;
-  --accent-terracotta-light: #FDF2ED;
+  --accent-terracotta: #E85D24;
+  --accent-terracotta-hover: #D44E18;
+  --accent-terracotta-light: #FFF4EF;
   --accent-terracotta-subtle: #FAF0E9;
-  --accent-terracotta-glow: rgba(200, 90, 50, 0.16);
+  --accent-terracotta-glow: rgba(232, 93, 36, 0.16);
 
-  /* 2. Neutral Backgrounds (Warm Cream & White) */
-  --bg-warm-cream: #FAF7F2;
-  --bg-warm-cream-alt: #F4EFEA;
-  --bg-cream-darker: #EFE8DF;
+  /* 2. Neutral Backgrounds (Warm Ivory & White) */
+  --bg-warm-cream: #FFFCF7;
+  --bg-warm-cream-alt: #FAF5EE;
+  --bg-cream-darker: #F2ECE1;
   --bg-card: #FFFFFF;
   --bg-card-subtle: #FDFBF8;
 
-  /* 3. Typography & Text Hierarchy (Charcoal & Warm Greys) */
-  --text-charcoal: #1C211F;
-  --text-body: #2D3330;
-  --text-secondary: #5E6763;
-  --text-muted: #8E9893;
+  /* 3. Typography & Text Hierarchy */
+  --text-charcoal: #142B43;
+  --text-body: #142B43;
+  --text-secondary: #63768A;
+  --text-muted: #8898AA;
 
   /* 4. Secondary & Functional Accents */
-  --accent-sage: #5E8C71;
-  --accent-sage-light: #F0F6F2;
+  --accent-sage: #2E9B65;
+  --accent-sage-light: #EAF7F0;
   --accent-amber: #D9822B;
   --accent-amber-light: #FEF7ED;
-  --accent-navy: #3D5A80;
+  --accent-navy: #142B43;
   --accent-navy-light: #EEF3F8;
-  --accent-purple: #786498;
-  --accent-purple-light: #F4F1F8;
+  --accent-purple: #8B5CF6;
+  --accent-purple-light: #F5F3FF;
 
-  /* 5. Borders & Dividers (Warm Beige) */
-  --border-beige: #EAE3D8;
-  --border-beige-light: #F3ECE2;
-  --border-beige-dark: #DCD2C3;
-  --border-accent: rgba(200, 90, 50, 0.3);
+  /* 5. Borders & Dividers */
+  --border-beige: #EAE5DE;
+  --border-beige-light: #F2EFEB;
+  --border-beige-dark: #DDD6CD;
+  --border-accent: rgba(232, 93, 36, 0.3);
 }
 
 @layer base {
@@ -138,11 +138,11 @@
 
 /* Terracotta Editorial Gradients */
 .gradient-terracotta {
-  background: linear-gradient(135deg, #C85A32 0%, #B44E27 100%);
+  background: linear-gradient(135deg, #E85D24 0%, #D44E18 100%);
 }
 
 .gradient-text-terracotta {
-  background: linear-gradient(135deg, #C85A32 0%, #E0734C 60%, #C85A32 100%);
+  background: linear-gradient(135deg, #E85D24 0%, #F1733E 60%, #E85D24 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -150,7 +150,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #C85A32 0%, #B44E27 100%);
+  background: linear-gradient(135deg, #142B43 0%, #E85D24 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -158,18 +158,17 @@
 }
 
 .gradient-text-blue {
-  background: linear-gradient(135deg, #C85A32 0%, #B44E27 100%);
+  background: linear-gradient(135deg, #142B43 0%, #2A4F72 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-bg-indigo {
-  background: linear-gradient(135deg, #C85A32 0%, #B44E27 100%);
+  background: linear-gradient(135deg, #E85D24 0%, #D44E18 100%);
 }
 
-
 .gradient-bg-hero {
-  background: linear-gradient(135deg, #FAF7F2 0%, #FDF2ED 50%, #F4EFEA 100%);
+  background: linear-gradient(180deg, #FFFCF7 0%, #FAF5EE 50%, #FFFCF7 100%);
 }
 
 /* Custom Scrollbars */
