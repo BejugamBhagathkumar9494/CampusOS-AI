@@ -108,7 +108,7 @@ export default function LandingPage() {
       
       {/* ─── SLIM HORIZONTAL HEADER ────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-[#FFFCF7]/95 backdrop-blur-md border-b border-[#EAE5DE] transition-all duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between gap-4">
+        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* Logo on Left */}
           <div className="shrink-0 flex items-center">
@@ -347,8 +347,8 @@ export default function LandingPage() {
       </header>
 
       {/* ─── HERO SECTION: TWO-COLUMN LAYOUT ───────────────────────────────── */}
-      <main className="flex-1 flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <main className="flex-1 flex flex-col justify-center max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-center">
           
           {/* Left Column: Heading, Paragraph, Highlights, CTAs */}
           <div className="lg:col-span-6 space-y-6 lg:pr-2">
@@ -430,125 +430,123 @@ export default function LandingPage() {
           </div>
 
           {/* Right Column: Hero Visual Composition and Floating Cards */}
-          <div className="lg:col-span-6 relative flex items-center justify-center mt-6 lg:mt-0 py-4 sm:py-6 lg:py-8">
+          <div className="lg:col-span-6 flex items-center justify-center">
             
-            {/* Composition Wrapper with Overlapping Cards */}
-            <div className="relative w-full max-w-[500px] sm:max-w-[520px] mx-auto">
+            {/* Composition Container (proportional, contained inside hero layout boundaries) */}
+            <div className="relative w-full max-w-[520px] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#EAE5DE] shadow-xl shadow-[#142B43]/8 bg-[#FAF5EE]">
               
-              {/* Rounded Campus Illustration with Green Trees */}
-              <div className="relative w-full rounded-[28px] sm:rounded-[32px] overflow-hidden border border-[#EAE5DE] shadow-xl shadow-[#142B43]/8 bg-[#FAF5EE]">
-                <img
-                  src="/images/campus-hero.jpg"
-                  alt="CampusOS AI University Campus with Student using laptop"
-                  className="w-full h-[320px] sm:h-[370px] lg:h-[400px] object-cover object-center block select-none transform hover:scale-[1.01] transition-transform duration-500"
-                  loading="eager"
-                />
+              {/* Proportional Campus Illustration */}
+              <img
+                src="/images/campus-hero.jpg"
+                alt="CampusOS AI University Campus with Student using laptop"
+                className="w-full h-auto object-contain object-center block select-none transform hover:scale-[1.01] transition-transform duration-500"
+                loading="eager"
+              />
 
-                {/* Gentle ambient vignette overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FFFCF7]/30 via-transparent to-transparent pointer-events-none rounded-[28px] sm:rounded-[32px]" />
-              </div>
+              {/* Gentle ambient vignette overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#FFFCF7]/30 via-transparent to-transparent pointer-events-none" />
 
               {/* Floating Card 1: White Translucent CampusOS AI Dashboard Card (Left) */}
               <div 
-                className="absolute -top-3 left-2 sm:-top-5 sm:-left-6 lg:-left-8 max-w-[250px] sm:max-w-[285px] w-full bg-white/90 backdrop-blur-xl rounded-2xl p-3 sm:p-3.5 border border-white/90 sm:border-[#EAE5DE]/80 shadow-[0_16px_36px_-6px_rgba(20,43,67,0.13)] transition-transform duration-300 hover:-translate-y-1 z-20"
+                className="absolute top-3 left-3 sm:top-4 sm:left-4 max-w-[240px] sm:max-w-[275px] w-full bg-white/90 backdrop-blur-xl rounded-2xl p-2.5 sm:p-3.5 border border-white/90 shadow-[0_12px_28px_-4px_rgba(20,43,67,0.12)] transition-transform duration-300 hover:-translate-y-0.5 z-20"
               >
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#EAE5DE]/70">
+                <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-[#EAE5DE]/70">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#E85D24] to-[#F1733E] text-white flex items-center justify-center text-xs shadow-sm shadow-[#E85D24]/20">
-                      <GraduationCap className="w-3.5 h-3.5" />
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-br from-[#E85D24] to-[#F1733E] text-white flex items-center justify-center text-xs shadow-sm shadow-[#E85D24]/20">
+                      <GraduationCap className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </div>
-                    <span className="text-xs font-bold text-[#142B43] tracking-tight">CampusOS AI</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-[#142B43] tracking-tight">CampusOS AI</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#2E9B65] bg-[#EAF7F0] px-2 py-0.5 rounded-full">
+                  <div className="flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold text-[#2E9B65] bg-[#EAF7F0] px-1.5 sm:px-2 py-0.5 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#2E9B65] animate-pulse"></span>
                     <span>Live Portal</span>
                   </div>
                 </div>
 
                 {/* Dashboard Items */}
-                <div className="space-y-1.5 text-xs">
+                <div className="space-y-1 sm:space-y-1.5 text-xs">
                   {/* Item 1: My Courses */}
                   <Link 
                     to="/login"
-                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                    className="flex items-center justify-between p-1 sm:p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
-                        <BookOpen className="w-3 h-3" />
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
+                        <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </div>
-                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">My Courses</span>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[10px] sm:text-[11px]">My Courses</span>
                     </div>
-                    <span className="text-[10px] sm:text-[11px] text-[#63768A]">4 Active</span>
+                    <span className="text-[9px] sm:text-[10px] text-[#63768A]">4 Active</span>
                   </Link>
 
                   {/* Item 2: Placement Drives */}
                   <Link 
                     to="/login"
-                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                    className="flex items-center justify-between p-1 sm:p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[#EAF7F0] text-[#2E9B65] flex items-center justify-center">
-                        <Briefcase className="w-3 h-3" />
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-[#EAF7F0] text-[#2E9B65] flex items-center justify-center">
+                        <Briefcase className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </div>
-                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">Placement Drives</span>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[10px] sm:text-[11px]">Placement Drives</span>
                     </div>
-                    <span className="text-[10px] font-bold bg-[#FFF4EF] text-[#E85D24] px-1.5 py-0.5 rounded">12 New</span>
+                    <span className="text-[9px] sm:text-[10px] font-bold bg-[#FFF4EF] text-[#E85D24] px-1.5 py-0.5 rounded">12 New</span>
                   </Link>
 
                   {/* Item 3: Events & Notices */}
                   <Link 
                     to="/login"
-                    className="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
+                    className="flex items-center justify-between p-1 sm:p-1.5 rounded-lg hover:bg-[#FAF5EE] transition-colors group"
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[#F0F5FA] text-[#142B43] flex items-center justify-center">
-                        <Bell className="w-3 h-3" />
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-[#F0F5FA] text-[#142B43] flex items-center justify-center">
+                        <Bell className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       </div>
-                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[11px] sm:text-xs">Events & Notices</span>
+                      <span className="font-semibold text-[#142B43] group-hover:text-[#E85D24] text-[10px] sm:text-[11px]">Events & Notices</span>
                     </div>
-                    <span className="text-[10px] sm:text-[11px] text-[#63768A]">Campus Fest</span>
+                    <span className="text-[9px] sm:text-[10px] text-[#63768A]">Campus Fest</span>
                   </Link>
 
-                  {/* Item 4: Ask AI Assistant (Interactive) */}
+                  {/* Item 4: Ask AI Assistant */}
                   <div 
                     onClick={() => setAiPromptAnswered(!aiPromptAnswered)}
-                    className="cursor-pointer p-2 rounded-xl bg-[#FFF4EF] border border-[#FAD8C7] hover:bg-[#FFEADA] transition-all"
+                    className="cursor-pointer p-1.5 sm:p-2 rounded-xl bg-[#FFF4EF] border border-[#FAD8C7] hover:bg-[#FFEADA] transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#E85D24]" />
-                        <span className="font-bold text-[#E85D24] text-[10px] sm:text-[11px]">Ask AI Assistant</span>
+                      <div className="flex items-center gap-1 sm:gap-1.5">
+                        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#E85D24]" />
+                        <span className="font-bold text-[#E85D24] text-[9px] sm:text-[10px]">Ask AI Assistant</span>
                       </div>
-                      <span className="text-[9px] sm:text-[10px] text-[#E85D24] underline">
+                      <span className="text-[8px] sm:text-[9px] text-[#E85D24] underline">
                         {aiPromptAnswered ? 'Reset' : 'Try prompt'}
                       </span>
                     </div>
-                    <p className="text-[10px] sm:text-[11px] text-[#142B43] mt-1 line-clamp-1">
+                    <p className="text-[9px] sm:text-[10px] text-[#142B43] mt-0.5 sm:mt-1 line-clamp-1">
                       {aiPromptAnswered ? '“Here is your CS301 exam revision summary!”' : '“Summarize my midterm preparation notes...”'}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Floating Card 2: Overlapping Upcoming Events Card (Bottom-Right) */}
+              {/* Floating Card 2: Upcoming Events Card (Bottom-Right) */}
               <div 
-                className="absolute -bottom-4 right-2 sm:-bottom-5 sm:-right-6 lg:-right-8 max-w-[210px] sm:max-w-[235px] w-full bg-white/95 backdrop-blur-xl rounded-2xl p-3 sm:p-3.5 border border-white/90 sm:border-[#EAE5DE]/80 shadow-[0_16px_36px_-6px_rgba(20,43,67,0.15)] transition-transform duration-300 hover:-translate-y-1 z-20"
+                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 max-w-[190px] sm:max-w-[220px] w-full bg-white/95 backdrop-blur-xl rounded-2xl p-2.5 sm:p-3 border border-white/90 shadow-[0_12px_28px_-4px_rgba(20,43,67,0.14)] transition-transform duration-300 hover:-translate-y-0.5 z-20"
               >
-                <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-[#EAE5DE]/70">
-                  <div className="w-5 h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
-                    <Calendar className="w-3 h-3" />
+                <div className="flex items-center gap-1.5 mb-1.5 pb-1 border-b border-[#EAE5DE]/70">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-[#FFF4EF] text-[#E85D24] flex items-center justify-center">
+                    <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   </div>
-                  <span className="text-xs font-bold text-[#142B43]">Upcoming Events</span>
+                  <span className="text-[10px] sm:text-xs font-bold text-[#142B43]">Upcoming Events</span>
                 </div>
                 
-                <div className="space-y-1.5">
-                  <div className="p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
-                    <p className="text-[11px] font-bold text-[#142B43] leading-tight">AI Workshop @ Hall A</p>
-                    <p className="text-[10px] text-[#63768A]">Today • 2:30 PM</p>
+                <div className="space-y-1 sm:space-y-1.5">
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
+                    <p className="text-[10px] sm:text-[11px] font-bold text-[#142B43] leading-tight">AI Workshop @ Hall A</p>
+                    <p className="text-[9px] text-[#63768A]">Today • 2:30 PM</p>
                   </div>
-                  <div className="p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
-                    <p className="text-[11px] font-bold text-[#142B43] leading-tight">Campus Hackathon 2026</p>
-                    <p className="text-[10px] text-[#2E9B65] font-semibold">Tomorrow • RSVP Open</p>
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-[#FAF5EE] border border-[#EAE5DE]/40">
+                    <p className="text-[10px] sm:text-[11px] font-bold text-[#142B43] leading-tight">Campus Hackathon 2026</p>
+                    <p className="text-[9px] text-[#2E9B65] font-semibold">Tomorrow • RSVP Open</p>
                   </div>
                 </div>
               </div>
@@ -559,18 +557,18 @@ export default function LandingPage() {
       </main>
 
       {/* ─── TRUST STRIP (COMPACT DIRECTLY BELOW HERO) ───────────────────────── */}
-      <section className="border-t border-[#EAE5DE] bg-white py-6 px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-center text-xs font-semibold tracking-wider uppercase text-[#63768A] mb-4">
+      <section className="border-t border-[#EAE5DE] bg-white py-5 sm:py-6">
+        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-[#63768A] mb-3.5">
             Trusted by Modern Higher Education Campuses & Accredited Institutions
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 lg:gap-12">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 lg:gap-8">
             {institutionsList.map((inst, idx) => (
               <div 
                 key={idx}
-                className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#FAF5EE] border border-[#EAE5DE] hover:border-[#E85D24]/30 hover:bg-[#FFF4EF] transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF5EE] border border-[#EAE5DE] hover:border-[#E85D24]/30 hover:bg-[#FFF4EF] transition-colors"
               >
-                <span className="text-base">{inst.icon}</span>
+                <span className="text-sm sm:text-base">{inst.icon}</span>
                 <span className="text-xs font-semibold text-[#142B43]">{inst.title}</span>
               </div>
             ))}
@@ -579,10 +577,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SLIM SUB-FOOTER (NO OVERSIZED BLOCKS) ─────────────────────────── */}
-      <footer className="border-t border-[#EAE5DE] bg-[#FAF5EE] py-4 px-4 sm:px-6 lg:px-8 text-xs text-[#63768A]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-[#EAE5DE] bg-[#FAF5EE] py-3.5 sm:py-4 text-xs text-[#63768A]">
+        <div className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>© 2026 CampusOS AI. All rights reserved.</p>
-          <div className="flex items-center gap-5 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-medium">
             <button onClick={() => setActiveRoleModal('about')} className="hover:text-[#E85D24]">About Platform</button>
             <button onClick={() => setActiveRoleModal('features')} className="hover:text-[#E85D24]">AI Modules</button>
             <Link to="/login" className="hover:text-[#E85D24]">Faculty Portal</Link>
