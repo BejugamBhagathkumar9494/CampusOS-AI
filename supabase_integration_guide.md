@@ -7,7 +7,7 @@ This guide provides a comprehensive setup for **CampusOS AI – Intelligent Camp
 ## 1. Complete SQL Schema & RLS Policies
 
 The database migration script defines **24 core tables** and **5 compatibility tables** (for AI and ML features) under the public schema. It is stored in:
-- `backend/supabase/migrations/20260727000000_initial_supabase_schema.sql`
+- `supabase/migrations/20260727000000_initial_supabase_schema.sql`
 - `supabase_setup.sql`
 
 ### Row Level Security (RLS) Rules:
