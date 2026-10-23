@@ -17,16 +17,6 @@ from app.schemas import (
     RAGSearchResultItem
 )
 from app.services.ml_models.placement_predictor import predict_placement_readiness
-from app.services.ai_agents import (
-    academic, 
-    hostel as hostel_agent, 
-    library as library_agent, 
-    placement as placement_agent, 
-    transport as transport_agent, 
-    finance as finance_agent,
-    knowledge as knowledge_agent
-)
-from app.services.ai_agents.agentic_supervisor import AgenticSupervisor
 from app.services.rag_service import execute_pgvector_rag_query, process_and_ingest_document
 from app.core.config import settings
 
@@ -772,37 +762,17 @@ async def chat_with_agent(
         assistant_name = role_assistant_names.get(primary_role.lower(), "🤖 CampusOS AI Assistant")
 
         loop = asyncio.get_event_loop()
-        if is_agentic:
-            agent_res = await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: AgenticSupervisor.process_query(
-                        query=query_text,
-                        user_role=primary_role,
-                        user_name=user_name,
-                        student_data=current_user,
-                        db=db,
-                        agentic_mode=True
-                    )
-                ),
-                timeout=12.0
-            )
-            answer_text = agent_res.get("answer", "No response generated.")
-            sources_list = agent_res.get("source_documents", [])
-            confidence_score = float(agent_res.get("confidence_score", 0.95))
-            agent_name = assistant_name
-        else:
-            rag_res = await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=5, match_threshold=0.20)
-                ),
-                timeout=12.0
-            )
-            answer_text = rag_res.get("answer", "No response generated.")
-            sources_list = rag_res.get("source_documents", [])
-            confidence_score = float(rag_res.get("confidence", 0.95))
-            agent_name = assistant_name
+        rag_res = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: execute_pgvector_rag_query(query=query_text, user_role=primary_role, k=5, match_threshold=0.20)
+            ),
+            timeout=12.0
+        )
+        answer_text = rag_res.get("answer", "No response generated.")
+        sources_list = rag_res.get("source_documents", [])
+        confidence_score = float(rag_res.get("confidence", 0.95))
+        agent_name = assistant_name
 
         return {
             "answer": answer_text,

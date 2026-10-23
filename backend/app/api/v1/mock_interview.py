@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from app.api.deps import get_db, get_current_user_optional
 from app.models import User
-from app.services.ai_agents.student_success_agent.interview_brain import (
+from app.services.interview_brain import (
     get_all_roles,
     start_mock_interview_session,
     process_interview_turn,
